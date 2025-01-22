@@ -23,39 +23,49 @@ void kmain(void)
 	// Note that here, you should call the function *before* the output
 	// via klogv(), or the message won't print. In all other cases, the
 	// output should come first as it describes what is about to happen.
-	klogv(COM1, "Initialized serial I/O on COM1 device...");
+	int intialize_serial = serial_init(COM1);
+
+	if(intialize_serial == 0){
+		klogv(COM1, "Initialized serial I/O on COM1 device...");
+	}
 
 	// 1) Global Descriptor Table (GDT) -- <mpx/gdt.h>
 	// Keeps track of the various memory segments (Code, Data, Stack, etc.)
 	// required by the x86 architecture. This needs to be initialized before
 	// interrupts can be configured.
+	gdt_init();
 	klogv(COM1, "Initializing Global Descriptor Table...");
 
 	// 2) Interrupt Descriptor Table (IDT) -- <mpx/interrupts.h>
 	// Keeps track of where the various Interrupt Vectors are stored. It
 	// needs to be initialized before Interrupt Service Routines (ISRs) can
 	// be installed.
+	idt_init();
 	klogv(COM1, "Initializing Interrupt Descriptor Table...");
 
 	// 3) Disable Interrupts -- <mpx/interrupts.h>
 	// You'll be modifying how interrupts work, so disable them to avoid
 	// crashing.
+	cli();
 	klogv(COM1, "Disabling interrupts...");
 
 	// 4) Interrupt Request (IRQ) -- <mpx/interrupts.h>
 	// The x86 architecture requires ISRs for at least the first 32
 	// Interrupt Request (IRQ) lines.
+	irq_init();
 	klogv(COM1, "Initializing Interrupt Request routines...");
 
 	// 5) Programmable Interrupt Controller (PIC) -- <mpx/interrupts.h>
 	// The x86 architecture uses a Programmable Interrupt Controller (PIC)
 	// to map hardware interrupts to software interrupts that the CPU can
 	// then handle via the IDT and its list of ISRs.
+	pic_init();
 	klogv(COM1, "Initializing Programmable Interrupt Controller...");
 
 	// 6) Reenable interrupts -- <mpx/interrupts.h>
 	// Now that interrupt routines are set up, allow interrupts to happen
 	// again.
+	sti();
 	klogv(COM1, "Enabling Interrupts...");
 
 	// 7) Virtual Memory (VM) -- <mpx/vm.h>
@@ -67,6 +77,7 @@ void kmain(void)
 	// Read, Write, or Execute for pages of memory. VM is managed through
 	// Page Tables, data structures that describe the logical-to-physical
 	// mapping as well as manage permissions and other metadata.
+	vm_init();
 	klogv(COM1, "Initializing Virtual Memory...");
 
 	// 8) MPX Modules -- *headers vary*
