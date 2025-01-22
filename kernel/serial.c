@@ -62,11 +62,14 @@ int serial_out(device dev, const char *buffer, size_t len)
 
 int serial_poll(device dev, char *buffer, size_t len)
 {
-	// while(){
-	// 	if((dev + 5)){
-	// 		char c = inb(dev);
-	// 	}
-	// }
+	while(sizeof(buffer) < len){
+		if(inb(dev + LSR) == 1){
+			char c = inb(dev);
+			int ASCIIc = atoi(c);
+		}
+	}
+
+	return sizeof(buffer);
 	// insert your code to gather keyboard input via the technique of polling.
 	// You must validate each key and handle special keys such as delete, back space, and
 	// arrow keys
@@ -74,8 +77,8 @@ int serial_poll(device dev, char *buffer, size_t len)
 	// REMOVE THIS -- IT ONLY EXISTS TO AVOID UNUSED PARAMETER WARNINGS
 	// Failure to remove this comment and the following line *will* result in
 	// losing points for inattention to detail
-	(void)dev; (void)buffer;
+	// (void)dev; (void)buffer;
 
 	// THIS MUST BE CHANGED TO RETURN THE CORRECT VALUE
-	return (int)len;
+	// return (int)len;
 }
