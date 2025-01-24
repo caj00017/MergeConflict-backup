@@ -1,6 +1,9 @@
 // Include required header files
 #include <mpx/comexec.h>
 #include <string.h>
+#include <mpx/serial.h>
+#include <mpx/device.h>
+
 
 int comexec(char buf[]) {
     // Code for executing commands
@@ -12,7 +15,8 @@ int comexec(char buf[]) {
     if (strcmp(buf, "version") == 0) {
         // "error: implicit declaration of function 'puts' is invalid in C99"
         // another function must be used
-        // puts("v1.0"); 
+
+        serial_out(COM1, "Version1", 8); 
         return 0;
     }
     if (strcmp(buf, "get_date") == 0) {

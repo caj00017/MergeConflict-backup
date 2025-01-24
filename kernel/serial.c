@@ -70,11 +70,12 @@ int serial_poll(device dev, char *buffer, size_t len)
 		if(inb(dev + LSR) & 1) /* checks to see if their is a byte to read */ {
 			char c = inb(dev); //reads the byte using inb
 			const char *c_ptr = &(c);
-			if(c == '\n'){  //checks for escape sqeuence and then exits
+			if(atoi(c_ptr) == 10){  //checks for escape sqeuence and then exits
 				exit_return = 1;
 			}
 			if(atoi(c_ptr) >= 32 || atoi(c_ptr) <= 126){ 
-				buffer[pos] = c;  //adds the char to the buffer
+				buffer[pos] = c; //adds the char to the buffer
+				outb(dev, buffer[pos]);//prints the char to the terminal
 				pos++;  //updates position in buffer
 			}
 		}

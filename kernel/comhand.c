@@ -8,7 +8,8 @@
 void comhand(void) {
     while(1) {
         char buf[100] = { 0 };
-        int nread = sys_req(READ, COM1, buf, sizeof(buf));
+        sys_req(WRITE, COM1, buf, sizeof(buf));
+        int nread = sys_req(READ, COM1, buf, 100);
 
         /* the following simply echoes the input */
         sys_req(WRITE, COM1, buf, nread);
@@ -24,5 +25,6 @@ void comhand(void) {
             // puts("Shutting down...");
             return;
         }
+        
     } 
 }
