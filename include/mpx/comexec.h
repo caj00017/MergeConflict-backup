@@ -4,6 +4,7 @@
 /*
 *   Method for executing commands. Called by comhand().
 */
-void comexec();
+int comexec(char buf[]);
 
 #endif
+

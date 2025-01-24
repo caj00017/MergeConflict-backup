@@ -1,9 +1,9 @@
 // Include required header files
-#include <mpx/comhand.h>;
-#include <mpx/comexec.h>;
-#include <mpx/device.h>;
-#include <mpx/serial.h>;
-#include <sys_req.h>;
+#include <mpx/comhand.h>
+#include <mpx/comexec.h>
+#include <mpx/device.h>
+#include <mpx/serial.h>
+#include <sys_req.h>
 
 void comhand(void) {
     while(1) {
@@ -18,7 +18,7 @@ void comhand(void) {
 
         // if the command is a shutdown:
         if (status == 1) {
-            puts("Shutting down...");
+            // put("Shutting down...");
             return;
         }
     } 
