@@ -32,9 +32,5 @@ char* get_time(void);
 */
 void set_time(char* time);
 
-/*
-*   @brief Function which prints a list of each available command.
-*/
-void help(void);
 
 #endif

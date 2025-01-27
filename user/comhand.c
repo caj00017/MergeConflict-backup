@@ -7,6 +7,9 @@
 
 void comhand(void) {
     while(1) {
+
+        sys_req(WRITE, COM1, "@ ", sizeof("@ ")); // Adds the @ before each command
+
         char buf[100] = { 0 };
         sys_req(READ, COM1, buf, sizeof(buf));
         
@@ -20,6 +23,7 @@ void comhand(void) {
         // if the command is a shutdown:
         if (status == 1) {
             // put("Shutting down...");
+            sys_req(WRITE, COM1, "\nShutting down...\n", sizeof("\nShutting down...\n"));
             return;
         }
 
