@@ -15,8 +15,8 @@ int comexec(char buf[]) {
     if (strcmp(buf, "version") == 0) {
         // "error: implicit declaration of function 'puts' is invalid in C99"
         // another function must be used
-        char test[2] = "IO";
-        sys_req(WRITE,COM1, test, sizeof(test));
+        char msg[100] = "\nVersion 1.0\nCompilation Date: 1/27/2025";
+        sys_req(WRITE,COM1, msg, sizeof(msg));
         // serial_out(COM1, test, 8); 
         return 0;
     }
@@ -36,8 +36,8 @@ int comexec(char buf[]) {
         // printf("Time set to %s", buf);
         return 0;
     }
-    if (strcmp(buf, "help") == 0) {
-        // help();
+    if (strcmp(buf, "@ help") == 0) {
+        help();
         return 0;
     } 
 
@@ -64,7 +64,15 @@ int comexec(char buf[]) {
 //     // Set time
 // }
 
-// void help(void) {
-//     // Print list of commands
-//     return;
-// }
+void help(void) {
+
+    // Print list of commands
+    sys_req(WRITE, COM1, "\n@ help\t\tPrints a complete list of each available command.", sizeof("@ help\tPrints a complete list of each available command."));
+    sys_req(WRITE, COM1, "\n@ version\tPrints the current version of the program.", sizeof("@ version\tPrints the current version of the program."));
+    sys_req(WRITE, COM1, "\n@ get_date\tPrints the current date set by the user.", sizeof("@ get_date\tPrints the current date set by the user."));
+    sys_req(WRITE, COM1, "\n@ set_date\tSets the current date.", sizeof("@ set_date\tSets the current date."));
+    sys_req(WRITE, COM1, "\n@ get_time\tPrints the current time set by the user.", sizeof("@ get_time\tPrints the current time set by the user."));
+    sys_req(WRITE, COM1, "\n@ set_time\tSets the current time.", sizeof("@ set_time\tSets the current time."));
+
+    return;
+}

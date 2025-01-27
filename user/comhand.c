@@ -10,11 +10,10 @@ void comhand(void) {
         char buf[100] = { 0 };
         sys_req(READ, COM1, buf, sizeof(buf));
         
-
         /* the following simply echoes the input */
         // sys_req(WRITE, COM1, buf, nread);
 
-        //use this abywhere else 
+        //use this anywhere else 
         /* process the command */
         int status = comexec(buf);
         
@@ -23,6 +22,13 @@ void comhand(void) {
             // put("Shutting down...");
             return;
         }
+
+        // if the command is not recognized by comexec:
+        if (status == -1) {
+            char* message = "\nError: Invalid command";
+            sys_req(WRITE, COM1, message, sizeof(message));
+        }
+
         char test[1] = "\n";
         sys_req(WRITE, COM1, test, sizeof(test));
     } 
