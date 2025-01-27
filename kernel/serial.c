@@ -66,13 +66,19 @@ int serial_poll(device dev, char *buffer, size_t len)
 	int pos = 0;
 	int exit_return = 0;
 
-	while(sizeof(buffer) < len || exit_return == 1) /* looping while the buffer size is less than the total length */ {
+	while (sizeof(buffer) < len && exit_return == 0) /* looping while the buffer size is less than the total length */ {
 		if(inb(dev + LSR) & 1) /* checks to see if their is a byte to read */ {
+
 			char c = inb(dev); //reads the byte using inb
 			const char *c_ptr = &(c);
-			if(atoi(c_ptr) == 10){  //checks for escape sqeuence and then exits
+
+			//Check for Escape Sequence 
+			if((c == '\n') || (c == '\r')){  //checks for escape sqeuence and then exits
+				return sizeof(buffer);
 				exit_return = 1;
 			}
+
+			//Check for ASCII 
 			if(atoi(c_ptr) >= 32 || atoi(c_ptr) <= 126){ 
 				buffer[pos] = c; //adds the char to the buffer
 				outb(dev, buffer[pos]);//prints the char to the terminal

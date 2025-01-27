@@ -3,7 +3,7 @@
 #include <string.h>
 #include <mpx/serial.h>
 #include <mpx/device.h>
-
+#include <sys_req.h>
 
 int comexec(char buf[]) {
     // Code for executing commands
@@ -15,8 +15,9 @@ int comexec(char buf[]) {
     if (strcmp(buf, "version") == 0) {
         // "error: implicit declaration of function 'puts' is invalid in C99"
         // another function must be used
-
-        serial_out(COM1, "Version1", 8); 
+        char test[2] = "IO";
+        sys_req(WRITE,COM1, test, sizeof(test));
+        // serial_out(COM1, test, 8); 
         return 0;
     }
     if (strcmp(buf, "get_date") == 0) {
