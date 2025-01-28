@@ -13,4 +13,10 @@
 */
 int atoi(const char *s);
 
+
+/**
+ * Convert an integer to an ASCII string
+ */
+char* itoa(int num, char* str, int base);
+
 #endif

@@ -4,6 +4,11 @@
 #include <mpx/serial.h>
 #include <mpx/device.h>
 #include <sys_req.h>
+#include <mpx/io.h>
+#include <mpx/interrupts.h>
+#include <stdlib.h>
+
+char bcdToChar(unsigned char bcd);
 
 int comexec(char buf[]) {
     // Code for executing commands
@@ -21,10 +26,31 @@ int comexec(char buf[]) {
         return 0;
     }
     if (strcmp(buf, "get_date") == 0) {
+        outb(0x70, inb(0x70) | 0x80);
+        char str[100];
+        char *date_ptr;
+        char slash[1];
+        slash[0] = '/';
+        outb(0x70, 0x08);
+        date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+        sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
+        sys_req(WRITE, COM1, slash, sizeof(slash));
+        outb(0x70, 0x07);
+        date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+        sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
+        sys_req(WRITE, COM1, slash, sizeof(slash));
+        outb(0x70, 0x09);
+        date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+        sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
+        // char test[100];
+        // itoa(10);
+        // sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
         // printf("%s", get_date());
         return 0;
     }
     if (strcmp(buf, "set_date") == 0) {
+        cli();
+        outb(COM1+0x70, 0x0A);
         // printf("Date set to %s", buf);
         return 0;
     }
@@ -54,6 +80,55 @@ int comexec(char buf[]) {
     // Invalid command. There may be different logic for this in the future.
     return -1;
 }
+
+char bcdToChar(unsigned char bcd){
+    int decimal = (bcd >> 4) * 10 + (bcd & 0x0F);
+    return decimal + '0';
+}
+
+
+// int bcdToDecimal(const char* bcd){
+//     int length = strlen(bcd);
+
+//     int check = 0;
+//     int check0 = 0;
+//     int num = 0;
+//     int sum = 0;
+//     int mul = 0;
+//     int rev = 0;
+
+
+//     for(int i = length - 1; i >= 0; i--){
+//         sum += (bcd[i] - '0') * mul;
+//         mul = mul * 2;
+//         check++;
+
+//         if(check == 4 || i == 0) {
+//             if(sum == 0 && check0 == 0) {
+//                 num = 1;
+//                 check0 = 1;
+//             }
+//             else {
+//                 num = num * 10 + sum;
+//             }
+
+//             check = 0;
+//             sum = 0;
+//             mul = 0;
+//         }
+//     }
+
+//     while(num > 0){
+//         rev = rev * 10 + (num % 10);
+//         num = num / 10;
+//     }
+
+//     if(check0 == 1){
+//         return rev - 1;
+//     }
+
+//     return rev;
+// }
 
 // The following functions await implementation.
 // comexec.c does not compile without partial implementation of these functions.
