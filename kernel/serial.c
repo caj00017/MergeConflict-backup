@@ -2,6 +2,7 @@
 #include <mpx/serial.h>
 #include <sys_req.h>
 #include <stdlib.h>
+#include <string.h>
 
 enum uart_registers {
 	RBR = 0,	// Receive Buffer
@@ -65,6 +66,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 {
 	int pos = 0;
 	int exit_return = 0;
+	int return_length = 0;
 
 	while (sizeof(buffer) < len && exit_return == 0) /* looping while the buffer size is less than the total length */ {
 		if(inb(dev + LSR) & 1) /* checks to see if their is a byte to read */ {
@@ -72,18 +74,74 @@ int serial_poll(device dev, char *buffer, size_t len)
 			char c = inb(dev); //reads the byte using inb
 			const char *c_ptr = &(c);
 
+			if(c == '\177')
+			{
+				pos--;
+				buffer[pos] = ' ';
+				for(int i = pos; i< (return_length-1) ; i++) {
+					buffer[i] = buffer[i + 1];
+				}
+				return_length--;
+				// sys_req(WRITE,COM1,"BACKSPACE",9);
+				continue;
+				
+			}
 			//Check for Escape Sequence 
 			if((c == '\n') || (c == '\r')){  //checks for escape sqeuence and then exits
 				return sizeof(buffer);
 				exit_return = 1;
 			}
 
-			//Check for ASCII 
+			//Check for Special Character
+			if(c == '\033'){
+				//Assemble Special String Combination
+				char special_key[4] = {c, inb(dev), inb(dev),'\0'};
+
+				// sys_req(WRITE,COM1, special_key , 3);
+
+				if(strcmp(special_key,"\033[A") == 0){
+					//UP Arrow
+					// sys_req(WRITE,COM1, "UP" , 2);
+				}
+				else if(strcmp(special_key, "\033[B") == 0){
+					//Down Arrow
+					// sys_req(WRITE,COM1, "DOWN" , 4);
+				}
+				else if(strcmp(special_key, "\033[C") == 0){
+					pos++;
+					//Right Arrow
+					// sys_req(WRITE,COM1, "RIGHT" , 5);
+				}
+				else if(strcmp(special_key, "\033[D") == 0){
+					pos--;
+					//Left Arrow
+					// sys_req(WRITE,COM1, "LEFT" , 4);
+				}
+				else if(strcmp(special_key, "\033[3") == 0){
+					inb(dev);
+					
+					//Delete
+					buffer[pos] = ' ';
+
+					for(int i = pos; i< (return_length-1) ; i++) {
+					buffer[i] = buffer[i + 1];
+					}
+					return_length--;
+					
+					// sys_req(WRITE,COM1, "DEL" , 3);
+				}
+				continue;
+			}
+
+			//Check for Basic ASCII
 			if(atoi(c_ptr) >= 32 || atoi(c_ptr) <= 126){ 
 				buffer[pos] = c; //adds the char to the buffer
 				outb(dev, buffer[pos]);//prints the char to the terminal
 				pos++;  //updates position in buffer
+				return_length++;
+				continue;
 			}
+			
 		}
 	}
 

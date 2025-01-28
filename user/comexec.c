@@ -22,6 +22,7 @@ int comexec(char buf[]) {
         // another function must be used
         char msg[100] = "\nVersion 1.0\nCompilation Date: 1/27/2025";
         sys_req(WRITE,COM1, msg, sizeof(msg));
+
         // serial_out(COM1, test, 8); 
         return 0;
     }
@@ -73,7 +74,7 @@ int comexec(char buf[]) {
         return 0;
     } 
     else {
-        sys_req(WRITE, COM1, "\nError: Invalid command.");
+        sys_req(WRITE, COM1, "\nError: Invalid command.", sizeof("\nError: Invalid command."));
         return 2;
     }
 
