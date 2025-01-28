@@ -48,7 +48,7 @@ int comexec(char buf[]) {
         return 0;
     } 
     else {
-        sys_req(WRITE, COM1, "\nError: Invalid command.");
+        sys_req(WRITE, COM1, "\nError: Invalid command.", sizeof("\nError: Invalid command."));
         return 2;
     }
 
