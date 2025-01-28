@@ -77,8 +77,8 @@ int serial_poll(device dev, char *buffer, size_t len)
 			if(c == '\177')
 			{
 				pos--;
-				buffer[pos] = ' ';
-				for(int i = pos; i< (return_length-1) ; i++) {
+				buffer[pos] = '\0';
+				for(int i = pos; i< (return_length) ; i++) {
 					buffer[i] = buffer[i + 1];
 				}
 				return_length--;
@@ -121,9 +121,9 @@ int serial_poll(device dev, char *buffer, size_t len)
 					inb(dev);
 					
 					//Delete
-					buffer[pos] = ' ';
+					buffer[pos] = '\0';
 
-					for(int i = pos; i< (return_length-1) ; i++) {
+					for(int i = pos; i< (return_length) ; i++) {
 					buffer[i] = buffer[i + 1];
 					}
 					return_length--;
@@ -135,6 +135,22 @@ int serial_poll(device dev, char *buffer, size_t len)
 
 			//Check for Basic ASCII
 			if(atoi(c_ptr) >= 32 || atoi(c_ptr) <= 126){ 
+				
+				//Check if there is a character where you are inserting
+				unsigned i = pos;
+				char next_char = buffer[pos];
+				char next2_char;
+				//Shift all chars to the right of position one index
+				while (buffer[i] !='\0' && i< len-1){
+					next2_char = buffer[i+1];
+					buffer[i+1] = next_char;
+					next_char = next2_char;
+					i++;
+				}
+				
+
+
+				//Return back to pos and print new char
 				buffer[pos] = c; //adds the char to the buffer
 				outb(dev, buffer[pos]);//prints the char to the terminal
 				pos++;  //updates position in buffer
