@@ -28,17 +28,12 @@ int comexec(char buf[]) {
         // return 0 indicating successful command execution
         return 0;
     }
-<<<<<<< HEAD
-    if (strcmp(buf, "get_date") == 0) {
-
-        //disabling the NMI bit
-        outb(0x70, inb(0x70) | 0x80);  
-=======
 
     // "get_date" logic
     else if (strcmp(buf, "get_date") == 0) {
-        outb(0x70, inb(0x70) | 0x80);
->>>>>>> fb208e955a3b50e1a72d732f0c0e99dcaad621d4
+
+        //disabling the NMI bit
+        outb(0x70, inb(0x70) | 0x80);  
         char str[100];
         char *date_ptr;
         char slash[1];
@@ -78,16 +73,20 @@ int comexec(char buf[]) {
     }
 
     // "set_date" logic - not yet implemented
-    else if (strcmp(buf, "set_date") == 0) {
+    else if (contains(buf, "set_date") == 0) {
+
+        // disable interrupts
         cli();
-        outb(0x70, 0x08);
-        outb(0x70, 0x06);
-        outb(0x70, 0x09);
-        // printf("Date set to %s", buf);
+
+        // outb(0x70, 0x08);
+        // outb(0x70, 0x06);
+        // outb(0x70, 0x09);
+
         return 0;
     }
-<<<<<<< HEAD
-    if (strcmp(buf, "get_time") == 0) {
+
+    // "get_time" logic
+    else if (strcmp(buf, "get_time") == 0) {
 
         //disabling the NMI bit
         outb(0x70, inb(0x70) | 0x80);
@@ -121,12 +120,6 @@ int comexec(char buf[]) {
             }
             time_ptr = (itoa(seconds, str, 10));
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
-=======
-
-    // "get_time" logic - not yet implemented
-    else if (strcmp(buf, "get_time") == 0) {
->>>>>>> fb208e955a3b50e1a72d732f0c0e99dcaad621d4
-        // printf("%s", get_time());
         return 0;
     }
 
