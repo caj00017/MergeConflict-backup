@@ -27,32 +27,88 @@ int comexec(char buf[]) {
         return 0;
     }
     if (strcmp(buf, "get_date") == 0) {
-        outb(0x70, inb(0x70) | 0x80);
+
+        //disabling the NMI bit
+        outb(0x70, inb(0x70) | 0x80);  
         char str[100];
         char *date_ptr;
         char slash[1];
-        slash[0] = '/';
-        outb(0x70, 0x08);
-        date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-        sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
-        sys_req(WRITE, COM1, slash, sizeof(slash));
+            slash[0] = '/';
+        sys_req(WRITE, COM1, "\n", sizeof("\n"));
+
+        //accessing the month bit
+        outb(0x70, 0x08);      
+
+            //changing the bit from bcd to a char ptr                      
+            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));  
+
+             //writing the month and a slash to the terminal
+            sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));         
+            sys_req(WRITE, COM1, slash, sizeof(slash));            
+
+        //accessing the day bit
         outb(0x70, 0x07);
-        date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-        sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
-        sys_req(WRITE, COM1, slash, sizeof(slash));
-        outb(0x70, 0x09);
-        date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-        sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
-        // printf("%s", get_date());
+
+            //changing the bit from bcd to a char ptr                             
+            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+
+            //writing the day and a slash to the terminal
+            sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
+            sys_req(WRITE, COM1, slash, sizeof(slash));
+
+        //accessing the year bit
+        outb(0x70, 0x09);  
+
+            //changing the bit from bcd to a char ptr                             
+            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+
+            //writing the year to the terminal
+            sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
+        
         return 0;
     }
     if (strcmp(buf, "set_date") == 0) {
         cli();
-        outb(COM1+0x70, 0x0A);
+        outb(0x70, 0x08);
+        outb(0x70, 0x06);
+        outb(0x70, 0x09);
         // printf("Date set to %s", buf);
         return 0;
     }
     if (strcmp(buf, "get_time") == 0) {
+
+        //disabling the NMI bit
+        outb(0x70, inb(0x70) | 0x80);
+        char str[100];
+        char *time_ptr;
+        char colon[1];
+        colon[0] = ':';
+        sys_req(WRITE, COM1, "\n", sizeof("\n"));
+
+        //accessing the hour bit
+        outb(0x70, 0x04);
+
+            //changing the hour bit from bcd to a char ptr
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10));
+
+            //writing the hour bit and a colon to the terminal
+            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
+            sys_req(WRITE, COM1, colon, sizeof(colon));
+        outb(0x70, 0x02);
+
+            //changing the minute bit from bcd to a char ptr
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
+            sys_req(WRITE, COM1, colon, sizeof(colon));
+        outb(0x70, 0x00);
+
+            //changing the second bit from bcd to a char ptr
+            int seconds = bcdToChar(inb(0x71)) - 48;
+            if(seconds < 10){
+                sys_req(WRITE, COM1, "0", sizeof("0"));
+            }
+            time_ptr = (itoa(seconds, str, 10));
+            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
         // printf("%s", get_time());
         return 0;
     }
