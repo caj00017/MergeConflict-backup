@@ -26,7 +26,9 @@ int comexec(char buf[]) {
         // serial_out(COM1, test, 8); 
         return 0;
     }
-    if (strcmp(buf, "get_date") == 0) {
+
+    // "get_date" logic
+    else if (strcmp(buf, "get_date") == 0) {
 
         //disabling the NMI bit
         outb(0x70, inb(0x70) | 0x80);  
@@ -69,15 +71,22 @@ int comexec(char buf[]) {
         
         return 0;
     }
-    if (strcmp(buf, "set_date") == 0) {
+
+    // "set_date" logic - not yet implemented
+    else if (contains(buf, "set_date") == 0) {
+
+        // disable interrupts
         cli();
-        outb(0x70, 0x08);
-        outb(0x70, 0x06);
-        outb(0x70, 0x09);
-        // printf("Date set to %s", buf);
+
+        // outb(0x70, 0x08);
+        // outb(0x70, 0x06);
+        // outb(0x70, 0x09);
+
         return 0;
     }
-    if (strcmp(buf, "get_time") == 0) {
+
+    // "get_time" logic
+    else if (strcmp(buf, "get_time") == 0) {
 
         //disabling the NMI bit
         outb(0x70, inb(0x70) | 0x80);
@@ -111,7 +120,6 @@ int comexec(char buf[]) {
             }
             time_ptr = (itoa(seconds, str, 10));
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
-        // printf("%s", get_time());
         return 0;
     }
     if (strcmp(buf, "set_time") == 0) {

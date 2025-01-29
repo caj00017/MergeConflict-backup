@@ -75,3 +75,30 @@ char *strtok(char * restrict s1, const char * restrict s2)
 	tok_tmp = NULL;
 	return s1;
 }
+
+int contains(const char *str1, const char *str2) {
+	int str1_len = strlen(str1);
+	int str2_len = strlen(str2);
+	int j = 0;
+
+	for(int i = 0; i < str1_len; i++){
+	    
+	if(j == str2_len){
+		return 0;
+	}
+	    
+	if(str1[i] == str2[j]){
+		j++;
+	}
+	else {
+		j = 0;
+	}
+	
+	}
+	if (j == str2_len) {
+		return 0;
+	}
+	else {
+		return 1;
+	}
+}
