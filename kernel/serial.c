@@ -69,7 +69,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 	int return_length = 0;
 
 	while (sizeof(buffer) < len && exit_return == 0) /* looping while the buffer size is less than the total length */ {
-		if(inb(dev + LSR) & 1) /* checks to see if their is a byte to read */ {
+		if(inb(dev + LSR) & 1) /* checks to see if there is a byte to read */ {
 
 			char c = inb(dev); //reads the byte using inb
 			const char *c_ptr = &(c);

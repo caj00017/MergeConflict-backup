@@ -32,5 +32,11 @@ char* get_time(void);
 */
 void set_time(char* time);
 
+/*
+*   @brief Function which converts a BCD value to a char.
+*   @param bcd The BCD value to be converted to char.
+*   @author Tanner Forbes
+*/
+char bcdToChar(unsigned char bcd);
 
 #endif
