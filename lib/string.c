@@ -114,3 +114,28 @@ int contains(const char *str1, const char *str2) {
 		return 1;
 	}
 }
+
+char* substr(char* str, int index) {
+    
+	// get size of substring
+	int size = strlen(str) - index;
+
+	// allocate memory for substring
+	char* substr = sys_alloc_mem(size);
+	if (substr == NULL) {
+		return "ERROR";
+	}
+
+	// copy characters from str to substr
+	int j = index;
+	for (int i = 0; i < size; i++) {
+		substr[i] = str[j];
+		j++;
+	}
+	
+	// null terminate substr
+	substr[size] = '\0';
+
+	// return the substring
+	return substr;
+}

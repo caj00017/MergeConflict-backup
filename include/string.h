@@ -56,4 +56,13 @@ char* strtok(char * restrict s1, const char * restrict s2);
 */
 int contains(const char *str1, const char *str2);
 
+/*
+* @brief Returns a substring beginning at a specific index
+* @param str1 The string to be copied from
+* @param index The index to begin copying from
+* @return The substring produced from str1
+* @authors Chris Jones
+*/
+char* substr(char* str1, int index);
+
 #endif

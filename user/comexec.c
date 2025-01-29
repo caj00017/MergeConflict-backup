@@ -78,9 +78,14 @@ int comexec(char buf[]) {
         // disable interrupts
         cli();
 
+        // logic for setting date
+
         // outb(0x70, 0x08);
         // outb(0x70, 0x06);
         // outb(0x70, 0x09);
+
+        // re-enable interrupts
+        sti();
 
         return 0;
     }
@@ -105,12 +110,16 @@ int comexec(char buf[]) {
             //writing the hour bit and a colon to the terminal
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
             sys_req(WRITE, COM1, colon, sizeof(colon));
+
+        // accessing the minute bit
         outb(0x70, 0x02);
 
             //changing the minute bit from bcd to a char ptr
             time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
             sys_req(WRITE, COM1, colon, sizeof(colon));
+
+        // accessing the second bit 
         outb(0x70, 0x00);
 
             //changing the second bit from bcd to a char ptr
@@ -120,12 +129,25 @@ int comexec(char buf[]) {
             }
             time_ptr = (itoa(seconds, str, 10));
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
+
+        // return 0 indicating success
         return 0;
     }
 
     // "set_time" logic - not yet implemented 
-    else if (strcmp(buf, "set_time") == 0) {
-        // printf("Time set to %s", buf);
+    else if (contains(buf, "set_time") == 0) {
+       // disable interrupts
+        cli();
+
+        // logic for setting time
+
+        // outb(0x70, 0x08);
+        // outb(0x70, 0x06);
+        // outb(0x70, 0x09);
+
+        // re-enable interrupts
+        sti();
+
         return 0;
     }
 
