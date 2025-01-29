@@ -76,6 +76,12 @@ int serial_poll(device dev, char *buffer, size_t len)
 
 			if(c == '\177')
 			{
+				//Check if there is anything to delete
+				if(pos == 0){
+					inb(dev);
+					continue;
+				}
+
 				pos--;
 				buffer[pos] = '\0';
 				for(int i = pos; i< (return_length) ; i++) {
@@ -86,6 +92,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 				continue;
 				
 			}
+
 			//Check for Escape Sequence 
 			if((c == '\n') || (c == '\r')){  //checks for escape sqeuence and then exits
 				return sizeof(buffer);
