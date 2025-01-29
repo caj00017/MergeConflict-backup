@@ -77,27 +77,39 @@ char *strtok(char * restrict s1, const char * restrict s2)
 }
 
 int contains(const char *str1, const char *str2) {
+
+	// initialize length values for strings
 	int str1_len = strlen(str1);
 	int str2_len = strlen(str2);
+
+	// initialize increment variable 
 	int j = 0;
 
-	for(int i = 0; i < str1_len; i++){
+	// loop for length of str1
+	for(int i = 0; i < str1_len; i++) {
+		// if the increment variable is the same length as str2, str2 is found.
+		if(j == str2_len){
+			return 0;
+		}
 	    
-	if(j == str2_len){
-		return 0;
-	}
-	    
-	if(str1[i] == str2[j]){
-		j++;
-	}
-	else {
-		j = 0;
+		// if the characters at this index of both strings are the same, increment j.
+		if(str1[i] == str2[j]){
+			j++;
+		}
+
+		// otherwise, set j back to 0
+		else {
+			j = 0;
+		}
 	}
 	
-	}
+	
+	// if the increment variable is the same length as str2, str2 is found.
 	if (j == str2_len) {
 		return 0;
 	}
+
+	// otherwise, return 1.
 	else {
 		return 1;
 	}

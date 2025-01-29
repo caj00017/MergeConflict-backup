@@ -47,6 +47,13 @@ size_t strlen(const char *s);
 */
 char* strtok(char * restrict s1, const char * restrict s2);
 
+/*
+* @brief Indicates whether str1 contains str2
+* @param str1 The outer string to search
+* @param str2 The inner string to find
+* @return 0 if str2 was found, 1 otherwise
+* @authors Tanner Forbes, Chris Jones
+*/
 int contains(const char *str1, const char *str2);
 
 #endif
