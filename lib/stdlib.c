@@ -66,4 +66,10 @@ char* itoa(int num, char* str, int base){
 	
 }
 
+// Implementation for bcdToChar
+char bcdToChar(unsigned char bcd){
+    int decimal = (bcd >> 4) * 10 + (bcd & 0x0F);
+    return decimal + '0';
+}
+
 

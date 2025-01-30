@@ -19,4 +19,12 @@ int atoi(const char *s);
  */
 char* itoa(int num, char* str, int base);
 
+/*
+*   Convert a bcd value to char
+*   @param bcd the BCD value to be converted
+*   @returns char value derived from BCD
+*   @author Tanner Forbes
+*/
+char bcdToChar(unsigned char bcd);
+
 #endif

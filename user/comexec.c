@@ -13,7 +13,7 @@
 int comexec(char buf[]) {
 
     // "shutdown" logic
-    if (strcmp(buf, "shutdown") == 0) {
+    if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
 
         // return 1 indicating comhand loop break
         return 1;
@@ -139,7 +139,7 @@ int comexec(char buf[]) {
         sys_req(WRITE, COM1, "\nPlease enter the time to be set (HH:MM): ", sizeof("\nPlease enter the time to be set (HH:MM): "));
     }
 
-    // "set_time" logic - not yet implemented 
+    // "set_time" logic - not yet implemented (IP - Chris Jones)
     else if (contains(buf, "set_time") == 1) {
        // disable interrupts
         cli();
@@ -150,17 +150,24 @@ int comexec(char buf[]) {
             sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM)", sizeof("\nInvalid time or format. (HH:MM)"));
         }
         else {
+            char hr_chars[2] = {time[0], time[1]}; // first 2 chars = hour value
+            char min_chars[2] = {time[3], time[4]}; // last 2 chars = minute value
+
+            // Compilation error due to unused variables. Implementation WIP. 
+            // int hour = atoi(hr_chars);
+            // int minute = atoi(min_chars);
+
             sys_req(WRITE, COM1, "\nTime Received: ", sizeof("\nTime Received: "));
             sys_req(WRITE, COM1, time, 50);
 
-            char hr[2] = {time[0], time[1]};
-            char min[2] = {time[2], time[3]};
+            sys_req(WRITE, COM1, "\nBuffer: ", sizeof("\nBuffer: "));
+            sys_req(WRITE, COM1, buf, 50); 
 
             sys_req(WRITE, COM1, "\nHour Received: ", sizeof("\tHour Received: "));
-            sys_req(WRITE, COM1, hr, 50);
+            sys_req(WRITE, COM1, hr_chars, 2);
 
             sys_req(WRITE, COM1, "\nMinute Received: ", sizeof("\nMinute Received: "));
-            sys_req(WRITE, COM1, min, 50);
+            sys_req(WRITE, COM1, min_chars, 2);
         }
 
         /* Testing
@@ -210,10 +217,4 @@ int comexec(char buf[]) {
 
     // Unreachable code. comexec.c will not compile without this line.
     return -1;
-}
-
-// Implementation for bcdToChar
-char bcdToChar(unsigned char bcd){
-    int decimal = (bcd >> 4) * 10 + (bcd & 0x0F);
-    return decimal + '0';
 }
