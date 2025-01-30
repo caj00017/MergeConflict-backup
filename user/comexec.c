@@ -7,6 +7,7 @@
 #include <mpx/io.h>
 #include <mpx/interrupts.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 // Implementation for comexec
 int comexec(char buf[]) {
@@ -73,7 +74,7 @@ int comexec(char buf[]) {
     }
 
     // "set_date" logic - not yet implemented
-    else if (contains(buf, "set_date") == 0) {
+    else if (contains(buf, "set_date") == 1) {
 
         // disable interrupts
         cli();
@@ -134,10 +135,41 @@ int comexec(char buf[]) {
         return 0;
     }
 
+    else if (strcmp(buf, "set_time") == 0) {
+        sys_req(WRITE, COM1, "\nPlease enter the time to be set (HH:MM): ", sizeof("\nPlease enter the time to be set (HH:MM): "));
+    }
+
     // "set_time" logic - not yet implemented 
-    else if (contains(buf, "set_time") == 0) {
+    else if (contains(buf, "set_time") == 1) {
        // disable interrupts
         cli();
+
+        char* time = substr(buf, 9);
+
+        if (contains(time, ":") == 0 || strlen(time) != 5 || isNumeric(strtok(time, ":")) == 0) {
+            sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM)", sizeof("\nInvalid time or format. (HH:MM)"));
+        }
+        else {
+            sys_req(WRITE, COM1, "\nTime Received: ", sizeof("\nTime Received: "));
+            sys_req(WRITE, COM1, time, 50);
+
+            char hr[2] = {time[0], time[1]};
+            char min[2] = {time[2], time[3]};
+
+            sys_req(WRITE, COM1, "\nHour Received: ", sizeof("\tHour Received: "));
+            sys_req(WRITE, COM1, hr, 50);
+
+            sys_req(WRITE, COM1, "\nMinute Received: ", sizeof("\nMinute Received: "));
+            sys_req(WRITE, COM1, min, 50);
+        }
+
+        /* Testing
+        sys_req(WRITE, COM1, "\nReceived time value: ", sizeof("\nReceived time value: "));
+        sys_req(WRITE, COM1, time, 50);
+
+        sys_req(WRITE, COM1, "\nBuffer: ", sizeof("\nBuffer: "));
+        sys_req(WRITE, COM1, buf, 50); 
+        */
 
         // logic for setting time
 

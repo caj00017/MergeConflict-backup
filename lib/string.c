@@ -1,4 +1,6 @@
 #include <string.h>
+#include <memory.h>
+#include <ctype.h>
 
 /* memcpy() and memset() are in core.c */
 
@@ -89,7 +91,7 @@ int contains(const char *str1, const char *str2) {
 	for(int i = 0; i < str1_len; i++) {
 		// if the increment variable is the same length as str2, str2 is found.
 		if(j == str2_len){
-			return 0;
+			return 1;
 		}
 	    
 		// if the characters at this index of both strings are the same, increment j.
@@ -106,19 +108,19 @@ int contains(const char *str1, const char *str2) {
 	
 	// if the increment variable is the same length as str2, str2 is found.
 	if (j == str2_len) {
-		return 0;
+		return 1;
 	}
 
 	// otherwise, return 1.
 	else {
-		return 1;
+		return 0;
 	}
 }
 
 char* substr(char* str, int index) {
     
 	// get size of substring
-	int size = strlen(str) - index;
+	size_t size = strlen(str) - index;
 
 	// allocate memory for substring
 	char* substr = sys_alloc_mem(size);
@@ -128,7 +130,7 @@ char* substr(char* str, int index) {
 
 	// copy characters from str to substr
 	int j = index;
-	for (int i = 0; i < size; i++) {
+	for (size_t i = 0; i < size; i++) {
 		substr[i] = str[j];
 		j++;
 	}
@@ -138,4 +140,13 @@ char* substr(char* str, int index) {
 
 	// return the substring
 	return substr;
+}
+
+int isNumeric(char* str) {
+	for (size_t i = 0; i < strlen(str); i++) {
+		if (isdigit(str[i]) == 0) {
+			return 0; // false
+		}
+	}
+	return 1; // true
 }
