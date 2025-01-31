@@ -74,6 +74,13 @@ int serial_poll(device dev, char *buffer, size_t len)
 			char c = inb(dev); //reads the byte using inb
 			const char *c_ptr = &(c);
 
+			//Keep buffer updated for each button pressed
+			sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r"));
+			sys_req(WRITE, COM1, "@", sizeof("@"));
+			sys_req(WRITE, COM1, " ", sizeof(" "));
+			sys_req(WRITE, COM1, buffer, return_length);
+
+
 			if(c == '\177')
 			{
 				//Check if there is anything to delete
