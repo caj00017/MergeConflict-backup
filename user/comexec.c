@@ -76,10 +76,10 @@ int comexec(char buf[]) {
     }
 
     else if (strcmp(buf, "set_date") == 0) {
-        sys_req(WRITE, COM1, "\nPlease enter the date to be set (MM/DD/YY): ", sizeof("\nPlease enter the time to be set (MM/DD/YY): "));
+        sys_req(WRITE, COM1, "\nPlease enter the date to be set (MM/DD/YY): ", sizeof("\nPlease enter the date to be set (MM/DD/YY): "));
     }
 
-    // "set_date" logic - not yet implemented
+    // "set_date" logic - not yet implemented (IP: Tanner Forbes)
     else if (contains(buf, "set_date") == 1) {
 
         // disable interrupts
@@ -88,21 +88,18 @@ int comexec(char buf[]) {
         char* date = substr(buf, 9);
 
         if (contains(date, "/") == 0 || strlen(date) != 5 || isNumeric(strtok(date, "/")) == 0) {
-            sys_req(WRITE, COM1, "\nInvalid time or format. (MM/DD/YY)", sizeof("\nInvalid time or format. (MM/DD/YY)"));
+            sys_req(WRITE, COM1, "\nInvalid date or format. (MM/DD/YY)", sizeof("\nInvalid date or format. (MM/DD/YY)"));
         }
         else {
-            char mth_chars[2] = {date[0], date[1]}; // first 2 chars = month value
-            char day_chars[2] = {date[3], date[4]}; // next 2 chars = day value
-            char year_chars[2] = {date[6], date[7]}; // last 2 chars = year value
+            // char mth_chars[2] = {date[0], date[1]}; // first 2 chars = month value
+            // char day_chars[2] = {date[3], date[4]}; // next 2 chars = day value
+            // char year_chars[2] = {date[6], date[7]}; // last 2 chars = year value
 
             
 
-date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10)); 
             outb(0x70, 0x08);
 
-            char* month_ptr = (atoi())
 
-            outb(0x71, )
 
         
 
@@ -113,6 +110,7 @@ date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
         sti();
 
         return 0;
+    }
     }
 
     // "get_time" logic
@@ -165,28 +163,48 @@ date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
     // "set_time" logic - not yet implemented (IP - Chris Jones)
     else if (contains(buf, "set_time") == 1) {
+
        // disable interrupts
         cli();
 
+        // derive time string from the buffer
         char* time = substr(buf, 9);
 
+        // check for invalid format (invalid time check pending)
         if (charCount(time, ':') != 2 || strlen(time) != 8 || isNumeric(strtok(time, ":")) == 0) {
-            sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM)", sizeof("\nInvalid time or format. (HH:MM)"));
+            sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
         }
         else {
             char hr_chars[2] = {time[0], time[1]}; // first 2 chars = hour value
             char min_chars[2] = {time[3], time[4]}; // next 2 chars (skipping ':') = minute value
             char sec_chars[2] = {time[6], time[7]}; // last 2 chars = second value
 
-            // Compilation error due to unused variables. Implementation WIP. 
-            // unsigned int hour = (unsigned int)atoi(hr_chars);
-            // unsigned int minute = (unsigned int)atoi(min_chars);
+            // retrieve int values for hour, minute, and second
+            unsigned int hour = (unsigned int)atoi(hr_chars);
+            unsigned int minute = (unsigned int)atoi(min_chars);
+            unsigned int second = (unsigned int)atoi(sec_chars);
 
-            sys_req(WRITE, COM1, "\nTime Received: ", sizeof("\nTime Received: "));
-            sys_req(WRITE, COM1, time, 50);
+            // convert each time value to BCD
+            unsigned int hour_BCD = intToBCD(hour);
+            unsigned int minute_BCD = intToBCD(minute);
+            unsigned int second_BCD = intToBCD(second);
 
-            sys_req(WRITE, COM1, "\nBuffer: ", sizeof("\nBuffer: "));
-            sys_req(WRITE, COM1, buf, 50); 
+            // write each BCD value to the corresponding register - this does not work
+            outb(0x70, 0x04);
+            outb(0x71, hour_BCD);
+
+            outb(0x70, 0x02);
+            outb(0x71, minute_BCD);
+
+            outb(0x70, 0x00);
+            outb(0x71, second_BCD);
+
+            /* The following sys_req WRITE statements are for testing purposes only */
+            // sys_req(WRITE, COM1, "\nTime Received: ", sizeof("\nTime Received: "));
+            // sys_req(WRITE, COM1, time, 50);
+
+            // sys_req(WRITE, COM1, "\nBuffer: ", sizeof("\nBuffer: "));
+            // sys_req(WRITE, COM1, buf, 50);
 
             sys_req(WRITE, COM1, "\nHour Received: ", sizeof("\tHour Received: "));
             sys_req(WRITE, COM1, hr_chars, 2);
@@ -196,15 +214,8 @@ date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
             sys_req(WRITE, COM1, "\nSecond Received: ", sizeof("\nSecond Received: "));
             sys_req(WRITE, COM1, sec_chars, 2);
+            /*----------------------------------------------------------------------*/
         }
-
-        /* Testing
-        sys_req(WRITE, COM1, "\nReceived time value: ", sizeof("\nReceived time value: "));
-        sys_req(WRITE, COM1, time, 50);
-
-        sys_req(WRITE, COM1, "\nBuffer: ", sizeof("\nBuffer: "));
-        sys_req(WRITE, COM1, buf, 50); 
-        */
 
         // logic for setting time
 
