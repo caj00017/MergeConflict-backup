@@ -10,6 +10,7 @@
 #include <ctype.h>
 
 char bcdToChar(unsigned char bcd);
+int get_time();
 
 int comexec(char buf[]) {
     // Code for executing commands
@@ -179,10 +180,10 @@ int comexec(char buf[]) {
             char min_chars[2] = {time[3], time[4]}; // next 2 chars (skipping ':') = minute value
             char sec_chars[2] = {time[6], time[7]}; // last 2 chars = second value
 
-            // retrieve int values for hour, minute, and second
-            unsigned int hour = (unsigned int)atoi(hr_chars);
-            unsigned int minute = (unsigned int)atoi(min_chars);
-            unsigned int second = (unsigned int)atoi(sec_chars);
+            // retrieve int values for hour, minute, and second (+ offsets)
+            unsigned int hour = (unsigned int)atoi(hr_chars) + 5;
+            unsigned int minute = (unsigned int)atoi(min_chars) - 18;
+            unsigned int second = (unsigned int)atoi(sec_chars) + 4;
 
             // convert each time value to BCD
             unsigned int hour_BCD = intToBCD(hour);
@@ -214,7 +215,12 @@ int comexec(char buf[]) {
 
             sys_req(WRITE, COM1, "\nSecond Received: ", sizeof("\nSecond Received: "));
             sys_req(WRITE, COM1, sec_chars, 2);
+
+            sys_req(WRITE, COM1, "\nCurrent Time: ", sizeof("\nCurrent Time: "));
+            get_time();
             /*----------------------------------------------------------------------*/
+
+            
         }
 
         // logic for setting time
@@ -245,4 +251,46 @@ int comexec(char buf[]) {
 
     // Invalid command. There may be different logic for this in the future.
     return -1;
+}
+
+int get_time() {
+    //disabling the NMI bit
+        outb(0x70, inb(0x70) | 0x80);
+        char str[100];
+        char *time_ptr;
+        char colon[1];
+        colon[0] = ':';
+        sys_req(WRITE, COM1, "\n", sizeof("\n"));
+
+        //accessing the hour bit
+        outb(0x70, 0x04);
+
+            //changing the hour bit from bcd to a char ptr
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10));
+
+            //writing the hour bit and a colon to the terminal
+            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
+            sys_req(WRITE, COM1, colon, sizeof(colon));
+
+        // accessing the minute bit
+        outb(0x70, 0x02);
+
+            //changing the minute bit from bcd to a char ptr
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
+            sys_req(WRITE, COM1, colon, sizeof(colon));
+
+        // accessing the second bit 
+        outb(0x70, 0x00);
+
+            //changing the second bit from bcd to a char ptr
+            int seconds = bcdToChar(inb(0x71)) - 48;
+            if(seconds < 10){
+                sys_req(WRITE, COM1, "0", sizeof("0"));
+            }
+            time_ptr = (itoa(seconds, str, 10));
+            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
+
+        // return 0 indicating success
+        return 0;
 }
