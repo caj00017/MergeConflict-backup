@@ -75,17 +75,39 @@ int comexec(char buf[]) {
         return 0;
     }
 
+    else if (strcmp(buf, "set_date") == 0) {
+        sys_req(WRITE, COM1, "\nPlease enter the date to be set (MM/DD/YY): ", sizeof("\nPlease enter the time to be set (MM/DD/YY): "));
+    }
+
     // "set_date" logic - not yet implemented
     else if (contains(buf, "set_date") == 1) {
 
         // disable interrupts
         cli();
 
-        // logic for setting date
+        char* date = substr(buf, 9);
 
-        // outb(0x70, 0x08);
-        // outb(0x70, 0x06);
-        // outb(0x70, 0x09);
+        if (contains(date, "/") == 0 || strlen(date) != 5 || isNumeric(strtok(date, "/")) == 0) {
+            sys_req(WRITE, COM1, "\nInvalid time or format. (MM/DD/YY)", sizeof("\nInvalid time or format. (MM/DD/YY)"));
+        }
+        else {
+            char mth_chars[2] = {date[0], date[1]}; // first 2 chars = month value
+            char day_chars[2] = {date[3], date[4]}; // next 2 chars = day value
+            char year_chars[2] = {date[6], date[7]}; // last 2 chars = year value
+
+            
+
+date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10)); 
+            outb(0x70, 0x08);
+
+            char* month_ptr = (atoi())
+
+            outb(0x71, )
+
+        
+
+
+        // logic for setting date
 
         // re-enable interrupts
         sti();

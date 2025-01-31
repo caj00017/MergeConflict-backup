@@ -73,4 +73,7 @@ char* substr(char* str1, int index);
 */
 int isNumeric(char* str);
 
+
+int indexOf(char* str, char searched_char);
+
 #endif

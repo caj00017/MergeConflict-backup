@@ -150,3 +150,12 @@ int isNumeric(char* str) {
 	}
 	return 1; // true
 }
+
+int indexOf(char* str, char searched_char){
+	for(size_t i = 0; i < strlen(str); i++){
+		if(str[i] == searched_char){
+			return i;
+		}
+	}
+	return -1;
+}
