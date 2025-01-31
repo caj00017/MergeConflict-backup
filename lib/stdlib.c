@@ -66,4 +66,16 @@ char bcdToChar(unsigned char bcd){
     return decimal + '0';
 }
 
+// Implementation for intToBCD
+unsigned int intToBCD(unsigned int num) {
+    unsigned int ones = 0;
+    unsigned int tens = 0;
+    unsigned int temp = 0;
+
+    ones = num % 10; 
+	temp = num / 10;
+    tens = temp << 4; 
+    return (tens + ones);
+}
+
 
