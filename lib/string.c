@@ -1,4 +1,6 @@
 #include <string.h>
+#include <memory.h>
+#include <ctype.h>
 
 /* memcpy() and memset() are in core.c */
 
@@ -77,28 +79,74 @@ char *strtok(char * restrict s1, const char * restrict s2)
 }
 
 int contains(const char *str1, const char *str2) {
+
+	// initialize length values for strings
 	int str1_len = strlen(str1);
 	int str2_len = strlen(str2);
+
+	// initialize increment variable 
 	int j = 0;
 
-	for(int i = 0; i < str1_len; i++){
+	// loop for length of str1
+	for(int i = 0; i < str1_len; i++) {
+		// if the increment variable is the same length as str2, str2 is found.
+		if(j == str2_len){
+			return 1;
+		}
 	    
-	if(j == str2_len){
-		return 0;
-	}
-	    
-	if(str1[i] == str2[j]){
-		j++;
-	}
-	else {
-		j = 0;
+		// if the characters at this index of both strings are the same, increment j.
+		if(str1[i] == str2[j]){
+			j++;
+		}
+
+		// otherwise, set j back to 0
+		else {
+			j = 0;
+		}
 	}
 	
-	}
+	
+	// if the increment variable is the same length as str2, str2 is found.
 	if (j == str2_len) {
-		return 0;
-	}
-	else {
 		return 1;
 	}
+
+	// otherwise, return 1.
+	else {
+		return 0;
+	}
+}
+
+char* substr(char* str, int index) {
+    
+	// get size of substring
+	size_t size = strlen(str) - index;
+
+	// allocate memory for substring
+	char* substr = sys_alloc_mem(size);
+	if (substr == NULL) {
+		return "ERROR";
+	}
+
+	// copy characters from str to substr
+	int j = index;
+	for (size_t i = 0; i < size; i++) {
+		substr[i] = str[j];
+		j++;
+	}
+	
+	// null terminate substr
+	substr[size] = '\0';
+
+	// return the substring
+	return substr;
+}
+
+int isNumeric(char* str) {
+	for (size_t i = 0; i < strlen(str); i++) {
+		if (isdigit(str[i]) == 0) {
+			return 0; // false
+		}
+	}
+	return 1; // true
 }

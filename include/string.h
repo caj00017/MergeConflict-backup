@@ -47,6 +47,30 @@ size_t strlen(const char *s);
 */
 char* strtok(char * restrict s1, const char * restrict s2);
 
+/*
+* @brief Indicates whether str1 contains str2
+* @param str1 The outer string to search
+* @param str2 The inner string to find
+* @return 1 if str2 was found, 0 otherwise
+* @authors Tanner Forbes, Chris Jones
+*/
 int contains(const char *str1, const char *str2);
+
+/*
+* @brief Returns a substring beginning at a specific index
+* @param str1 The string to be copied from
+* @param index The index to begin copying from
+* @return The substring produced from str1
+* @author Chris Jones
+*/
+char* substr(char* str1, int index);
+
+/*
+* @brief Determines whether a given string is entirely numeric.
+* @param str The string to be tested
+* @return 0 for false, 1 for true
+* @author Chris Jones
+*/
+int isNumeric(char* str);
 
 #endif
