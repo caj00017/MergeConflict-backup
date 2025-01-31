@@ -82,15 +82,16 @@ int serial_poll(device dev, char *buffer, size_t len)
 			{
 				//Check if there is anything to delete
 				if(pos == 0){
-					inb(dev);
 					continue;
 				}
 
 				pos--;
 				buffer[pos] = '\0';
-				for(int i = pos; i< (return_length) ; i++) {
+
+				for(int i = pos; i < (return_length-1) ; i++) {
 					buffer[i] = buffer[i + 1];
 				}
+				
 				return_length--;
 				// sys_req(WRITE,COM1,"BACKSPACE",9);
 
@@ -129,18 +130,18 @@ int serial_poll(device dev, char *buffer, size_t len)
 				else if(strcmp(special_key, "\033[C") == 0){
 					if(pos < return_length) {
 						pos++;
+						//escape sequence to move cursor right
+						sys_req(WRITE, COM1, "\033[1C", sizeof("\033[1D"));
 					}
-					//escape sequence to move cursor right
-					sys_req(WRITE, COM1, "\033[1C", sizeof("\033[1D"));
 					//Right Arrow
 					// sys_req(WRITE,COM1, "RIGHT" , 5);
 				}
 				else if(strcmp(special_key, "\033[D") == 0){
 					if(pos > 0) {
 						pos--;
+						//escape sequence to move cursor left
+						sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D"));
 					}
-					//escape sequence to move cursor left
-					sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D"));
 					//Left Arrow
 					// sys_req(WRITE,COM1, "LEFT" , 4);
 				}
@@ -148,13 +149,18 @@ int serial_poll(device dev, char *buffer, size_t len)
 					while(!(inb(dev + LSR) & 1));
 					inb(dev);
 					
-					//Delete
-					buffer[pos] = '\0';
+					if(pos != return_length ){
+						//Delete and shift character to the right
+						buffer[pos] = '\0';
+						
+						for(int i = pos; i < return_length - 1 ; i++) {
+							buffer[i] = buffer[i + 1];
+						}
 
-					for(int i = pos; i< (return_length) ; i++) {
-					buffer[i] = buffer[i + 1];
+						//reduce the return_length by 1 as we deleted a character
+						return_length--;
 					}
-					return_length--;
+					
 
 					//Keep buffer updated for each button pressed
 					buffer_refresh(buffer, return_length, pos);
@@ -179,8 +185,6 @@ int serial_poll(device dev, char *buffer, size_t len)
 					i++;
 				}
 				
-
-
 				//Return back to pos and print new char
 				buffer[pos] = c; //adds the char to the buffer
 				outb(dev, buffer[pos]);//prints the char to the terminal
@@ -214,6 +218,7 @@ void buffer_refresh(char *buffer, int buf_length, int pos) {
 	sys_req(WRITE, COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
 	sys_req(WRITE, COM1, " ", sizeof(" ")); //^^^
 	sys_req(WRITE, COM1, buffer, buf_length); //this reprints the buffer
+	
 	for(int i = buf_length; i > pos; i--) {
 		sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
 	}
