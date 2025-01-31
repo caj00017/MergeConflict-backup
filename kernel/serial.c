@@ -129,18 +129,18 @@ int serial_poll(device dev, char *buffer, size_t len)
 				else if(strcmp(special_key, "\033[C") == 0){
 					if(pos < return_length) {
 						pos++;
+						//escape sequence to move cursor right
+						sys_req(WRITE, COM1, "\033[1C", sizeof("\033[1D"));
 					}
-					//escape sequence to move cursor right
-					sys_req(WRITE, COM1, "\033[1C", sizeof("\033[1D"));
 					//Right Arrow
 					// sys_req(WRITE,COM1, "RIGHT" , 5);
 				}
 				else if(strcmp(special_key, "\033[D") == 0){
 					if(pos > 0) {
 						pos--;
+						//escape sequence to move cursor left
+						sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D"));
 					}
-					//escape sequence to move cursor left
-					sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D"));
 					//Left Arrow
 					// sys_req(WRITE,COM1, "LEFT" , 4);
 				}
@@ -214,6 +214,7 @@ void buffer_refresh(char *buffer, int buf_length, int pos) {
 	sys_req(WRITE, COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
 	sys_req(WRITE, COM1, " ", sizeof(" ")); //^^^
 	sys_req(WRITE, COM1, buffer, buf_length); //this reprints the buffer
+	
 	for(int i = buf_length; i > pos; i--) {
 		sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
 	}
