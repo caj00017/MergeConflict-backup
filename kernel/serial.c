@@ -74,12 +74,6 @@ int serial_poll(device dev, char *buffer, size_t len)
 			char c = inb(dev); //reads the byte using inb
 			const char *c_ptr = &(c);
 
-			//Keep buffer updated for each button pressed
-			sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r"));
-			sys_req(WRITE, COM1, "@", sizeof("@"));
-			sys_req(WRITE, COM1, " ", sizeof(" "));
-			sys_req(WRITE, COM1, buffer, return_length);
-
 
 			if(c == '\177')
 			{
@@ -96,6 +90,12 @@ int serial_poll(device dev, char *buffer, size_t len)
 				}
 				return_length--;
 				// sys_req(WRITE,COM1,"BACKSPACE",9);
+
+				//Keep buffer updated for each button pressed
+				sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r"));
+				sys_req(WRITE, COM1, "@", sizeof("@"));
+				sys_req(WRITE, COM1, " ", sizeof(" "));
+				sys_req(WRITE, COM1, buffer, return_length);
 				continue;
 				
 			}
@@ -141,6 +141,12 @@ int serial_poll(device dev, char *buffer, size_t len)
 					buffer[i] = buffer[i + 1];
 					}
 					return_length--;
+
+					//Keep buffer updated for each button pressed
+					sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r"));
+					sys_req(WRITE, COM1, "@", sizeof("@"));
+					sys_req(WRITE, COM1, " ", sizeof(" "));
+					sys_req(WRITE, COM1, buffer, return_length);
 					
 					// sys_req(WRITE,COM1, "DEL" , 3);
 				}
@@ -169,6 +175,12 @@ int serial_poll(device dev, char *buffer, size_t len)
 				outb(dev, buffer[pos]);//prints the char to the terminal
 				pos++;  //updates position in buffer
 				return_length++;
+
+				//Keep buffer updated for each button pressed
+				sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r"));
+				sys_req(WRITE, COM1, "@", sizeof("@"));
+				sys_req(WRITE, COM1, " ", sizeof(" "));
+				sys_req(WRITE, COM1, buffer, return_length);
 				continue;
 			}
 			
