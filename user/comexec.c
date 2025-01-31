@@ -146,16 +146,17 @@ int comexec(char buf[]) {
 
         char* time = substr(buf, 9);
 
-        if (contains(time, ":") == 0 || strlen(time) != 5 || isNumeric(strtok(time, ":")) == 0) {
+        if (charCount(time, ':') != 2 || strlen(time) != 8 || isNumeric(strtok(time, ":")) == 0) {
             sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM)", sizeof("\nInvalid time or format. (HH:MM)"));
         }
         else {
             char hr_chars[2] = {time[0], time[1]}; // first 2 chars = hour value
-            char min_chars[2] = {time[3], time[4]}; // last 2 chars = minute value
+            char min_chars[2] = {time[3], time[4]}; // next 2 chars (skipping ':') = minute value
+            char sec_chars[2] = {time[6], time[7]}; // last 2 chars = second value
 
             // Compilation error due to unused variables. Implementation WIP. 
-            // int hour = atoi(hr_chars);
-            // int minute = atoi(min_chars);
+            // unsigned int hour = (unsigned int)atoi(hr_chars);
+            // unsigned int minute = (unsigned int)atoi(min_chars);
 
             sys_req(WRITE, COM1, "\nTime Received: ", sizeof("\nTime Received: "));
             sys_req(WRITE, COM1, time, 50);
@@ -168,6 +169,9 @@ int comexec(char buf[]) {
 
             sys_req(WRITE, COM1, "\nMinute Received: ", sizeof("\nMinute Received: "));
             sys_req(WRITE, COM1, min_chars, 2);
+
+            sys_req(WRITE, COM1, "\nSecond Received: ", sizeof("\nSecond Received: "));
+            sys_req(WRITE, COM1, sec_chars, 2);
         }
 
         /* Testing

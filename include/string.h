@@ -73,4 +73,12 @@ char* substr(char* str1, int index);
 */
 int isNumeric(char* str);
 
+/*
+*   @brief Function which returns the amount of a specific character within a string.
+*   @param str The String to be searched
+*   @param c The character to be identified
+*   @author Chris Jones
+*/
+int charCount(char* str, char c);   
+
 #endif
