@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <ctype.h>
-#include <stdbool.h>
 
 int atoi(const char *s)
 {
@@ -31,7 +30,6 @@ int atoi(const char *s)
 
 char* itoa(int num, char* str, int base){
 	int i = 0;
-	bool Negative = false;
 
 	if(num == 0){
 		str[i++] = '0';
@@ -43,10 +41,6 @@ char* itoa(int num, char* str, int base){
 		int rem = num % base;
 		str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
 		num = num / base;
-	}
-
-	if(Negative){
-		str[i++] = '-';
 	}
 
 	str[i] = '\0';
@@ -70,6 +64,18 @@ char* itoa(int num, char* str, int base){
 char bcdToChar(unsigned char bcd){
     int decimal = (bcd >> 4) * 10 + (bcd & 0x0F);
     return decimal + '0';
+}
+
+// Implementation for intToBCD
+unsigned int intToBCD(unsigned int num) {
+    unsigned int ones = 0;
+    unsigned int tens = 0;
+    unsigned int temp = 0;
+
+    ones = num % 10; 
+	temp = num / 10;
+    tens = temp << 4; 
+    return (tens + ones);
 }
 
 
