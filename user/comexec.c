@@ -21,7 +21,7 @@ int comexec(char buf[]) {
         // return 1 indicating comhand loop break
         return 1;
     }
-    if (strcmp(buf, "version") == 0) {
+    if (strcmp(buf, "version") == 0 || strcmp(buf, "v") == 0) {
         // "error: implicit declaration of function 'puts' is invalid in C99"
         // another function must be used
         char msg[100] = "\nVersion 1.0\nCompilation Date: 1/27/2025";
@@ -32,7 +32,7 @@ int comexec(char buf[]) {
     }
 
     // "get_date" logic
-    else if (strcmp(buf, "get_date") == 0) {
+    else if (strcmp(buf, "get_date") == 0 || strcmp(buf, "gd") == 0) {
 
         //disabling the NMI bit
         outb(0x70, inb(0x70) | 0x80);  
@@ -115,7 +115,7 @@ int comexec(char buf[]) {
     }
 
     // "get_time" logic
-    else if (strcmp(buf, "get_time") == 0) {
+    else if (strcmp(buf, "get_time") == 0 || strcmp(buf, "gt") == 0) {
 
         //disabling the NMI bit
         outb(0x70, inb(0x70) | 0x80);
@@ -180,10 +180,10 @@ int comexec(char buf[]) {
             char min_chars[2] = {time[3], time[4]}; // next 2 chars (skipping ':') = minute value
             char sec_chars[2] = {time[6], time[7]}; // last 2 chars = second value
 
-            // retrieve int values for hour, minute, and second (+ offsets)
-            unsigned int hour = (unsigned int)atoi(hr_chars) + 5;
-            unsigned int minute = (unsigned int)atoi(min_chars) - 18;
-            unsigned int second = (unsigned int)atoi(sec_chars) + 4;
+            // retrieve int values for hour, minute, and second
+            unsigned int hour = (unsigned int)atoi(hr_chars);
+            unsigned int minute = (unsigned int)atoi(min_chars);
+            unsigned int second = (unsigned int)atoi(sec_chars);
 
             // convert each time value to BCD
             unsigned int hour_BCD = intToBCD(hour);
@@ -253,6 +253,8 @@ int comexec(char buf[]) {
     return -1;
 }
 
+
+// this function is for debugging purposes only
 int get_time() {
     //disabling the NMI bit
         outb(0x70, inb(0x70) | 0x80);
