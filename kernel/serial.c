@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+//Function protos
+void buffer_refresh(char *buffer, int buf_length, int pos);
+
 enum uart_registers {
 	RBR = 0,	// Receive Buffer
 	THR = 0,	// Transmitter Holding
@@ -92,10 +95,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 				// sys_req(WRITE,COM1,"BACKSPACE",9);
 
 				//Keep buffer updated for each button pressed
-				sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r"));
-				sys_req(WRITE, COM1, "@", sizeof("@"));
-				sys_req(WRITE, COM1, " ", sizeof(" "));
-				sys_req(WRITE, COM1, buffer, return_length);
+				buffer_refresh(buffer, return_length, pos);
 				continue;
 				
 			}
@@ -108,8 +108,13 @@ int serial_poll(device dev, char *buffer, size_t len)
 
 			//Check for Special Character
 			if(c == '\033'){
+
+				while(!(inb(dev + LSR) & 1));
+				char d = inb(dev);
+				while(!(inb(dev + LSR) & 1));
+				char e = inb(dev);
 				//Assemble Special String Combination
-				char special_key[4] = {c, inb(dev), inb(dev),'\0'};
+				char special_key[4] = {c, d, e,'\0'};
 
 				// sys_req(WRITE,COM1, special_key , 3);
 
@@ -122,16 +127,25 @@ int serial_poll(device dev, char *buffer, size_t len)
 					// sys_req(WRITE,COM1, "DOWN" , 4);
 				}
 				else if(strcmp(special_key, "\033[C") == 0){
-					pos++;
+					if(pos < return_length) {
+						pos++;
+					}
+					//escape sequence to move cursor right
+					sys_req(WRITE, COM1, "\033[1C", sizeof("\033[1D"));
 					//Right Arrow
 					// sys_req(WRITE,COM1, "RIGHT" , 5);
 				}
 				else if(strcmp(special_key, "\033[D") == 0){
-					pos--;
+					if(pos > 0) {
+						pos--;
+					}
+					//escape sequence to move cursor left
+					sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D"));
 					//Left Arrow
 					// sys_req(WRITE,COM1, "LEFT" , 4);
 				}
 				else if(strcmp(special_key, "\033[3") == 0){
+					while(!(inb(dev + LSR) & 1));
 					inb(dev);
 					
 					//Delete
@@ -143,10 +157,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 					return_length--;
 
 					//Keep buffer updated for each button pressed
-					sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r"));
-					sys_req(WRITE, COM1, "@", sizeof("@"));
-					sys_req(WRITE, COM1, " ", sizeof(" "));
-					sys_req(WRITE, COM1, buffer, return_length);
+					buffer_refresh(buffer, return_length, pos);
 					
 					// sys_req(WRITE,COM1, "DEL" , 3);
 				}
@@ -177,10 +188,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 				return_length++;
 
 				//Keep buffer updated for each button pressed
-				sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r"));
-				sys_req(WRITE, COM1, "@", sizeof("@"));
-				sys_req(WRITE, COM1, " ", sizeof(" "));
-				sys_req(WRITE, COM1, buffer, return_length);
+				buffer_refresh(buffer, return_length, pos);
 				continue;
 			}
 			
@@ -199,4 +207,14 @@ int serial_poll(device dev, char *buffer, size_t len)
 
 	// THIS MUST BE CHANGED TO RETURN THE CORRECT VALUE
 	// return (int)len;
+}
+
+void buffer_refresh(char *buffer, int buf_length, int pos) {
+	sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r")); //"\033" starts in escape sequence, "2K" clears the terminal line, "\r" prints a carraige return to get back to the beginning of the line
+	sys_req(WRITE, COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
+	sys_req(WRITE, COM1, " ", sizeof(" ")); //^^^
+	sys_req(WRITE, COM1, buffer, buf_length); //this reprints the buffer
+	for(int i = buf_length; i > pos; i--) {
+		sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
+	}
 }
