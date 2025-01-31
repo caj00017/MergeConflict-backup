@@ -82,15 +82,16 @@ int serial_poll(device dev, char *buffer, size_t len)
 			{
 				//Check if there is anything to delete
 				if(pos == 0){
-					inb(dev);
 					continue;
 				}
 
 				pos--;
 				buffer[pos] = '\0';
-				for(int i = pos; i< (return_length) ; i++) {
+
+				for(int i = pos; i < (return_length-1) ; i++) {
 					buffer[i] = buffer[i + 1];
 				}
+				
 				return_length--;
 				// sys_req(WRITE,COM1,"BACKSPACE",9);
 
@@ -148,13 +149,18 @@ int serial_poll(device dev, char *buffer, size_t len)
 					while(!(inb(dev + LSR) & 1));
 					inb(dev);
 					
-					//Delete
-					buffer[pos] = '\0';
+					if(pos != return_length ){
+						//Delete and shift character to the right
+						buffer[pos] = '\0';
+						
+						for(int i = pos; i < return_length - 1 ; i++) {
+							buffer[i] = buffer[i + 1];
+						}
 
-					for(int i = pos; i< (return_length) ; i++) {
-					buffer[i] = buffer[i + 1];
+						//reduce the return_length by 1 as we deleted a character
+						return_length--;
 					}
-					return_length--;
+					
 
 					//Keep buffer updated for each button pressed
 					buffer_refresh(buffer, return_length, pos);
@@ -179,8 +185,6 @@ int serial_poll(device dev, char *buffer, size_t len)
 					i++;
 				}
 				
-
-
 				//Return back to pos and print new char
 				buffer[pos] = c; //adds the char to the buffer
 				outb(dev, buffer[pos]);//prints the char to the terminal
