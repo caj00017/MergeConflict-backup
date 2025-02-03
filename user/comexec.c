@@ -8,6 +8,7 @@
 #include <mpx/interrupts.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <memory.h>
 
 char bcdToChar(unsigned char bcd);
 int get_time();
@@ -41,7 +42,7 @@ int comexec(char buf[]) {
 
         //creating a slash char to put between the months/days/years
         char slash[1];
-            slash[0] = '/';
+        slash[0] = '/';
         sys_req(WRITE, COM1, "\n", sizeof("\n"));
 
         //accessing the month bit
@@ -50,9 +51,16 @@ int comexec(char buf[]) {
             //changing the bit from bcd to a char ptr                      
             date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));  
 
-             //writing the month and a slash to the terminal
-            sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));         
-            sys_req(WRITE, COM1, slash, sizeof(slash));            
+            // write the month to the terminal (size checking)
+            if (atoi(date_ptr) <= 9) {
+                sys_req(WRITE, COM1, date_ptr, 1);
+            }
+            else {
+                sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));   
+            }
+
+             //writing the month and a slash to the terminal      
+            sys_req(WRITE, COM1, slash, sizeof(slash));     
 
         //accessing the day bit
         outb(0x70, 0x07);
@@ -60,8 +68,15 @@ int comexec(char buf[]) {
             //changing the bit from bcd to a char ptr                             
             date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
-            //writing the day and a slash to the terminal
-            sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
+            // write the day to the terminal (size checking)
+            if (atoi(date_ptr) <= 9) {
+                sys_req(WRITE, COM1, date_ptr, 1);
+            }
+            else {
+                sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));   
+            }
+            
+            // write a slash to the terminal
             sys_req(WRITE, COM1, slash, sizeof(slash));
 
         //accessing the year bit
@@ -74,6 +89,8 @@ int comexec(char buf[]) {
             sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
         
         return 0;
+
+
     }
 
     else if (strcmp(buf, "set_date") == 0) {
@@ -116,45 +133,7 @@ int comexec(char buf[]) {
 
     // "get_time" logic
     else if (strcmp(buf, "get_time") == 0 || strcmp(buf, "gt") == 0) {
-
-        //disabling the NMI bit
-        outb(0x70, inb(0x70) | 0x80);
-        char str[100];
-        char *time_ptr;
-        char colon[1];
-        colon[0] = ':';
-        sys_req(WRITE, COM1, "\n", sizeof("\n"));
-
-        //accessing the hour bit
-        outb(0x70, 0x04);
-
-            //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-
-            //writing the hour bit and a colon to the terminal
-            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
-            sys_req(WRITE, COM1, colon, sizeof(colon));
-
-        // accessing the minute bit
-        outb(0x70, 0x02);
-
-            //changing the minute bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
-            sys_req(WRITE, COM1, colon, sizeof(colon));
-
-        // accessing the second bit 
-        outb(0x70, 0x00);
-
-            //changing the second bit from bcd to a char ptr
-            int seconds = bcdToChar(inb(0x71)) - 48;
-            if(seconds < 10){
-                sys_req(WRITE, COM1, "0", sizeof("0"));
-            }
-            time_ptr = (itoa(seconds, str, 10));
-            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
-
-        // return 0 indicating success
+        get_time();
         return 0;
     }
 
@@ -186,7 +165,7 @@ int comexec(char buf[]) {
             unsigned int minute = (unsigned int)atoi(min_chars);
             unsigned int second = (unsigned int)atoi(sec_chars);
 
-            if (hour > 23 || hour < 1 || minute > 59 || minute < 0 || second > 59 || second < 0) {
+            if (hour > 23 || hour < 0 || minute > 59 || minute < 0 || second > 59 || second < 0) {
                 sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
                 return -1;
             }
@@ -206,34 +185,10 @@ int comexec(char buf[]) {
             outb(0x70, 0x00);
             outb(0x71, second_BCD);
 
-            /* The following sys_req WRITE statements are for testing purposes only */
-            // sys_req(WRITE, COM1, "\nTime Received: ", sizeof("\nTime Received: "));
-            // sys_req(WRITE, COM1, time, 50);
-
-            // sys_req(WRITE, COM1, "\nBuffer: ", sizeof("\nBuffer: "));
-            // sys_req(WRITE, COM1, buf, 50);
-
-            sys_req(WRITE, COM1, "\nHour Received: ", sizeof("\tHour Received: "));
-            sys_req(WRITE, COM1, hr_chars, 2);
-
-            sys_req(WRITE, COM1, "\nMinute Received: ", sizeof("\nMinute Received: "));
-            sys_req(WRITE, COM1, min_chars, 2);
-
-            sys_req(WRITE, COM1, "\nSecond Received: ", sizeof("\nSecond Received: "));
-            sys_req(WRITE, COM1, sec_chars, 2);
-
-            sys_req(WRITE, COM1, "\nCurrent Time: ", sizeof("\nCurrent Time: "));
+            sys_req(WRITE, COM1, "\nTime set to: ", sizeof("\nTime set to: "));
             get_time();
             /*----------------------------------------------------------------------*/
-
-            
         }
-
-        // logic for setting time
-
-        // outb(0x70, 0x08);
-        // outb(0x70, 0x06);
-        // outb(0x70, 0x09);
 
         // re-enable interrupts
         sti();
@@ -252,15 +207,12 @@ int comexec(char buf[]) {
     } 
     else {
         sys_req(WRITE, COM1, "\nError: Invalid command.", sizeof("\nError: Invalid command."));
-        return 2;
+        return -1;
     }
-
-    // Invalid command. There may be different logic for this in the future.
-    return -1;
 }
 
 
-// this function is for debugging purposes only
+// I created this function for debugging purposes. 
 int get_time() {
     //disabling the NMI bit
         outb(0x70, inb(0x70) | 0x80);

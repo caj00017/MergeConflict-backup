@@ -27,12 +27,6 @@ void comhand(void) {
             return;
         }
 
-        // if the command is not recognized by comexec:
-        if (status == -1) {
-            char* message = "\nError: Invalid command";
-            sys_req(WRITE, COM1, message, sizeof(message));
-        }
-
         char test[1] = "\n";
         sys_req(WRITE, COM1, test, sizeof(test));
     } 
