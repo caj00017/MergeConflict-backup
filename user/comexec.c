@@ -87,25 +87,30 @@ int comexec(char buf[]) {
 
         char* date = substr(buf, 9);
 
-        if (contains(date, "/") == 0 || strlen(date) != 5 || isNumeric(strtok(date, "/")) == 0) {
+        if (contains(date, "/") == 0 || strlen(date) != 8 || isNumeric(strtok(date, "/")) == 0) {
             sys_req(WRITE, COM1, "\nInvalid time or format. (MM/DD/YY)", sizeof("\nInvalid time or format. (MM/DD/YY)"));
         }
         else {
-            char mth_chars[2] = {date[0], date[1]}; // first 2 chars = month value
-            char day_chars[2] = {date[3], date[4]}; // next 2 chars = day value
-            char year_chars[2] = {date[6], date[7]}; // last 2 chars = year value
 
-            
-
-date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10)); 
+            const char* month_tens = &(date[0]);
+            const char* month_ones = &(date[1]);
+            int month = atoi(month_tens) + atoi(month_ones);
             outb(0x70, 0x08);
+            outb(0x71, intToBCD(month));
 
-            char* month_ptr = (atoi())
 
-            outb(0x71, )
+            const char* day_tens = &(date[3]);
+            const char* day_ones = &(date[4]);
+            int day = atoi(day_tens) + atoi(day_ones);
+            outb(0x70, 0x07);
+            outb(0x71, intToBCD(day));
 
-        
 
+            const char* year_tens = &(date[6]);
+            const char* year_ones = &(date[7]);
+            int year = atoi(year_tens) + atoi(year_ones);
+            outb(0x70, 0x09);
+            outb(0x71, intToBCD(year));
 
         // logic for setting date
 
@@ -113,6 +118,7 @@ date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
         sti();
 
         return 0;
+    }
     }
 
     // "get_time" logic
