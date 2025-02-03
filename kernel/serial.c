@@ -3,6 +3,7 @@
 #include <sys_req.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mpx/serial.h>
 
 //Function protos
 void buffer_refresh(char *buffer, int buf_length, int pos);
@@ -71,7 +72,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 	int pos = 0;
 	int exit_return = 0;
 	//Size of the buffer
-	int return_length = 0;
+	int entry_length = 0;
 
 	while (sizeof(buffer) < len && exit_return == 0) /* looping while the buffer size is less than the total length */ {
 		if(inb(dev + LSR) & 1) /* checks to see if there is a byte to read */ {
@@ -80,7 +81,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 			const char *c_ptr = &(c);
 
 			// checking for a backspace key
-			if(c == '\177')
+			if(c == BACKSPACE)
 			{
 				//Check if there is anything to delete
 				if(pos == 0){
@@ -93,29 +94,29 @@ int serial_poll(device dev, char *buffer, size_t len)
 				buffer[pos] = '\0';
 
 				//Loop through the buffer and shift all characters to the left to fill the gap of the deleted char if it's not on the end of the buffer
-				for(int i = pos; i < (return_length-1) ; i++) {
+				for(int i = pos; i < (entry_length-1) ; i++) {
 					buffer[i] = buffer[i + 1];
 				}
 				
 				//Adjust the size of the buffer
-				return_length--;
+				entry_length--;
 
 				//Keep buffer updated for each button pressed
-				buffer_refresh(buffer, return_length, pos);
+				buffer_refresh(buffer, entry_length, pos);
 				//Continue back to the top of the while loop to check for all possibilites again
 				continue;
 				
 			}
 
 			//Check for Escape Sequence (Enter key)
-			if((c == '\n') || (c == '\r')){  //checks for escape sqeuence and then exits
+			if((c == CARRAGE_RETURN) || (c == NEWLINE)){  //checks for escape sqeuence and then exits
 				//If we hit the enter key, we want to return the length of the buffer to the command handler
 				return sizeof(buffer);
 				exit_return = 1;
 			}
 
 			//Check for Special Character (Arrow Keys, Delete Key)
-			if(c == '\033'){
+			if(c == ESCAPE_SEQUENCE){
 				
 				//Retrieves addtional characters for matching string
 				while(!(inb(dev + LSR) & 1));
@@ -129,19 +130,19 @@ int serial_poll(device dev, char *buffer, size_t len)
 				// sys_req(WRITE,COM1, special_key , 3);
 
 				//Up Arrow key
-				if(strcmp(special_key,"\033[A") == 0){
+				if(strcmp(special_key, UP_ARROW) == 0){
 
 					//make these remember the last few (3) commands that we typed
 				}
 				//Down Arrow key
-				else if(strcmp(special_key, "\033[B") == 0){
+				else if(strcmp(special_key, DOWN_ARROW) == 0){
 
 					//make these remember the last few (3) commands that we typed
 				}
 				//Right Arrow key
-				else if(strcmp(special_key, "\033[C") == 0){
+				else if(strcmp(special_key, RIGHT_ARROW) == 0){
 					//if the cursor tries to go past the end of the buffer, don't let it add to the position counter
-					if(pos < return_length) {
+					if(pos < entry_length) {
 						//If we can go further right, increment the position counter
 						pos++;
 						//escape sequence to move cursor right (which prints a character to the terminal to move the cursor right)
@@ -149,7 +150,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 					}
 				}
 				//Left Arrow key
-				else if(strcmp(special_key, "\033[D") == 0){
+				else if(strcmp(special_key, LEFT_ARROW) == 0){
 					//if the cursor tries to go past the beginning of the buffer, don't let it subtract from the position counter
 					if(pos > 0) {
 						//If we can go further left, decrement the position counter to keep track of cursor position
@@ -159,26 +160,26 @@ int serial_poll(device dev, char *buffer, size_t len)
 					}
 				}
 				//Delete key
-				else if(strcmp(special_key, "\033[3") == 0){
+				else if(strcmp(special_key, DELETE_KEY) == 0){
 					//Retrieves additional characters for matching string
 					while(!(inb(dev + LSR) & 1));
 					inb(dev);
 					
-					if(pos != return_length ){
+					if(pos != entry_length ){
 						//Delete and shift character to the right
 						buffer[pos] = '\0';
 						
-						for(int i = pos; i < return_length - 1 ; i++) {
+						for(int i = pos; i < entry_length - 1 ; i++) {
 							buffer[i] = buffer[i + 1];
 						}
 
-						//reduce the return_length by 1 as we deleted a character
-						return_length--;
+						//reduce the entry_length by 1 as we deleted a character
+						entry_length--;
 					}
 					
 
 					//Keep buffer updated for each button pressed
-					buffer_refresh(buffer, return_length, pos);
+					buffer_refresh(buffer, entry_length, pos);
 				}
 				//Go back to the beginning of the while loop to check for more entry possibilities
 				continue;
@@ -203,10 +204,10 @@ int serial_poll(device dev, char *buffer, size_t len)
 				buffer[pos] = c; //adds the char to the buffer
 				outb(dev, buffer[pos]);//prints the char to the terminal
 				pos++;  //updates position in buffer
-				return_length++;
+				entry_length++;
 
 				//Keep buffer updated for each button pressed
-				buffer_refresh(buffer, return_length, pos);
+				buffer_refresh(buffer, entry_length, pos);
 				continue;
 			}
 			
@@ -214,17 +215,6 @@ int serial_poll(device dev, char *buffer, size_t len)
 	}
 
 	return sizeof(buffer);
-	// insert your code to gather keyboard input via the technique of polling.
-	// You must validate each key and handle special keys such as delete, back space, and
-	// arrow keys
-
-	// REMOVE THIS -- IT ONLY EXISTS TO AVOID UNUSED PARAMETER WARNINGS
-	// Failure to remove this comment and the following line *will* result in
-	// losing points for inattention to detail
-	// (void)dev; (void)buffer;
-
-	// THIS MUST BE CHANGED TO RETURN THE CORRECT VALUE
-	// return (int)len;
 }
 
 void buffer_refresh(char *buffer, int buf_length, int pos) {
