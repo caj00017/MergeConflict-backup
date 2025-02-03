@@ -67,8 +67,10 @@ int serial_out(device dev, const char *buffer, size_t len)
 
 int serial_poll(device dev, char *buffer, size_t len)
 {
+	//The pos variable keeps track of the index position of the cursor in the buffer while being displayed in the terminal window
 	int pos = 0;
 	int exit_return = 0;
+	//Size of the buffer
 	int return_length = 0;
 
 	while (sizeof(buffer) < len && exit_return == 0) /* looping while the buffer size is less than the total length */ {
@@ -77,75 +79,88 @@ int serial_poll(device dev, char *buffer, size_t len)
 			char c = inb(dev); //reads the byte using inb
 			const char *c_ptr = &(c);
 
-
+			// checking for a backspace key
 			if(c == '\177')
 			{
 				//Check if there is anything to delete
 				if(pos == 0){
 					continue;
 				}
-
+				
+				//Adjust the position of the cursor when we delete a char from the buffer
 				pos--;
+				//Add a null terminator to the buffer to delete the last char deleted from the buffer
 				buffer[pos] = '\0';
 
+				//Loop through the buffer and shift all characters to the left to fill the gap of the deleted char if it's not on the end of the buffer
 				for(int i = pos; i < (return_length-1) ; i++) {
 					buffer[i] = buffer[i + 1];
 				}
 				
+				//Adjust the size of the buffer
 				return_length--;
-				// sys_req(WRITE,COM1,"BACKSPACE",9);
 
 				//Keep buffer updated for each button pressed
 				buffer_refresh(buffer, return_length, pos);
+				//Continue back to the top of the while loop to check for all possibilites again
 				continue;
 				
 			}
 
-			//Check for Escape Sequence 
+			//Check for Escape Sequence (Enter key)
 			if((c == '\n') || (c == '\r')){  //checks for escape sqeuence and then exits
+				//If we hit the enter key, we want to return the length of the buffer to the command handler
 				return sizeof(buffer);
 				exit_return = 1;
 			}
 
-			//Check for Special Character
+			//Check for Special Character (Arrow Keys, Delete Key)
 			if(c == '\033'){
-
+				
+				//Retrieves addtional characters for matching string
 				while(!(inb(dev + LSR) & 1));
 				char d = inb(dev);
 				while(!(inb(dev + LSR) & 1));
 				char e = inb(dev);
+
 				//Assemble Special String Combination
 				char special_key[4] = {c, d, e,'\0'};
 
 				// sys_req(WRITE,COM1, special_key , 3);
 
+				//Up Arrow key
 				if(strcmp(special_key,"\033[A") == 0){
-					//UP Arrow
-					// sys_req(WRITE,COM1, "UP" , 2);
+
+					//make these remember the last few (3) commands that we typed
 				}
+				//Down Arrow key
 				else if(strcmp(special_key, "\033[B") == 0){
-					//Down Arrow
-					// sys_req(WRITE,COM1, "DOWN" , 4);
+
+					//make these remember the last few (3) commands that we typed
 				}
+				//Right Arrow key
 				else if(strcmp(special_key, "\033[C") == 0){
+					//if the cursor tries to go past the end of the buffer, don't let it add to the position counter
 					if(pos < return_length) {
+						//If we can go further right, increment the position counter
 						pos++;
-						//escape sequence to move cursor right
+						//escape sequence to move cursor right (which prints a character to the terminal to move the cursor right)
 						sys_req(WRITE, COM1, "\033[1C", sizeof("\033[1D"));
 					}
-					//Right Arrow
-					// sys_req(WRITE,COM1, "RIGHT" , 5);
 				}
+				//Left Arrow key
 				else if(strcmp(special_key, "\033[D") == 0){
+					//if the cursor tries to go past the beginning of the buffer, don't let it subtract from the position counter
 					if(pos > 0) {
+						//If we can go further left, decrement the position counter to keep track of cursor position
 						pos--;
-						//escape sequence to move cursor left
+						//escape sequence to move cursor left (which prints a character to the terminal to move the cursor left)
 						sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D"));
 					}
-					//Left Arrow
-					// sys_req(WRITE,COM1, "LEFT" , 4);
 				}
+				//Delete key
 				else if(strcmp(special_key, "\033[3") == 0){
+					//Retrieves additional characters for matching string
 					while(!(inb(dev + LSR) & 1));
 					inb(dev);
 					
@@ -164,9 +179,8 @@ int serial_poll(device dev, char *buffer, size_t len)
 
 					//Keep buffer updated for each button pressed
 					buffer_refresh(buffer, return_length, pos);
-					
-					// sys_req(WRITE,COM1, "DEL" , 3);
 				}
+				//Go back to the beginning of the while loop to check for more entry possibilities
 				continue;
 			}
 
@@ -219,6 +233,7 @@ void buffer_refresh(char *buffer, int buf_length, int pos) {
 	sys_req(WRITE, COM1, " ", sizeof(" ")); //^^^
 	sys_req(WRITE, COM1, buffer, buf_length); //this reprints the buffer
 	
+	//This loop moves the cursor back to the position it was at before the buffer was refreshed, since every time that the buffer is reprinted, the cursor is moved back to the front of the line
 	for(int i = buf_length; i > pos; i--) {
 		sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
 	}
