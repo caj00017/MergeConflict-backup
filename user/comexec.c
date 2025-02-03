@@ -166,7 +166,7 @@ int comexec(char buf[]) {
         sys_req(WRITE, COM1, "\nPlease enter the time to be set (HH:MM): ", sizeof("\nPlease enter the time to be set (HH:MM): "));
     }
 
-    // "set_time" logic - not yet implemented (IP - Chris Jones)
+    // "set_time" logic
     else if (contains(buf, "set_time") == 1) {
 
        // disable interrupts
@@ -187,7 +187,7 @@ int comexec(char buf[]) {
 
             // check for invalid times / characters 
             if (strcmp(hr_chars, "23") > 0 || strcmp(hr_chars, "0") < 0   
-            || strcmp(min_chars, "59") > 0 || strcmp(min_chars, "0") < 0
+            || strcmp(min_chars, "59") > 0 || strcmp(min_chars, "0") < 0  
             || strcmp(sec_chars, "59") > 0 || strcmp(sec_chars, "0") < 0) 
             {
                 sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
@@ -195,7 +195,7 @@ int comexec(char buf[]) {
             }
 
             // retrieve int values for hour, minute, and second
-            unsigned int hour = (unsigned int)atoi(hr_chars);
+            unsigned int hour = (unsigned int)atoi(hr_chars) + 5; // +5 offset
             unsigned int minute = (unsigned int)atoi(min_chars);
             unsigned int second = (unsigned int)atoi(sec_chars);
 
@@ -255,7 +255,7 @@ int get_time() {
         outb(0x70, 0x04);
 
             //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10)); // -5 offset
 
             //writing the hour bit and a colon to the terminal
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
