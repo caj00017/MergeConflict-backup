@@ -4,6 +4,51 @@
 #include <stddef.h>
 #include <mpx/device.h>
 
+/** 
+    @brief Character Code for Up Arrow Key
+*/
+#define UP_ARROW "\033[A"
+
+/** 
+    @brief Character Code for Down Arrow Key
+*/
+#define DOWN_ARROW "\033[B"
+
+/** 
+    @brief Character Code for Right Arrow Key
+*/
+#define RIGHT_ARROW "\033[C"
+
+/** 
+    @brief Character Code for Left Arrow Key
+*/
+#define LEFT_ARROW "\033[D"
+
+/** 
+    @brief Character Code for Delete Key
+*/
+#define DELETE_KEY "\033[3"
+
+/** 
+    @brief Character Code for Backspace Key
+*/
+#define BACKSPACE '\177'
+
+/** 
+    @brief Character Code for Enter Newline Key
+*/
+#define NEWLINE '\n'
+
+/** 
+    @brief Character Code for Enter Carrage Return Key
+*/
+#define CARRAGE_RETURN '\r'
+
+/** 
+    @brief Character Code for Escape Sequence
+*/
+#define ESCAPE_SEQUENCE '\033'
+
 /**
  @file mpx/serial.h
  @brief Kernel functions and constants for handling serial I/O

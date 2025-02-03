@@ -15,7 +15,6 @@ void comhand(void) {
         
         /* the following simply echoes the input */
         // sys_req(WRITE, COM1, buf, nread);
-
         //use this anywhere else 
         /* process the command */
         int status = comexec(buf);

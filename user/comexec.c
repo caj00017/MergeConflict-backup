@@ -14,12 +14,37 @@ char bcdToChar(unsigned char bcd);
 int get_time();
 
 int comexec(char buf[]) {
-    // Code for executing commands
-
+    
     // "shutdown" logic
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
+        sys_req(WRITE, COM1, "\n", sizeof("\n"));
+        int first = 1;
+        while (1)
+        {
+            
+            char response[100] = { 0 };
+            if(first== 1){
+                first++;
+                sys_req(WRITE, COM1, "@ Are you sure you want to shutdown? (y or n)", sizeof("@ Are you sure you want to shutdown? (y or n)"));
+            }
 
-        // return 1 indicating comhand loop break
+            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            sys_req(READ, COM1, response, sizeof(response));
+
+            if(strcmp(response, "y") == 0 || strcmp(response, "yes") == 0 ){
+                return 1;
+            }
+            else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
+                return 0;
+            }
+            else{
+                sys_req(WRITE, COM1, "\n", sizeof("\n"));
+                sys_req(WRITE, COM1, "@ Please retype your response: (y or n)", sizeof("@ Please retype your response: (y or n)"));
+                continue;
+            }
+        }
+        
+        
         return 1;
     }
     if (strcmp(buf, "version") == 0 || strcmp(buf, "v") == 0) {
@@ -203,6 +228,7 @@ int comexec(char buf[]) {
         sys_req(WRITE, COM1, "\n@ set_date\tSets the current date.", sizeof("@ set_date\tSets the current date."));
         sys_req(WRITE, COM1, "\n@ get_time\tPrints the current time set by the user.", sizeof("@ get_time\tPrints the current time set by the user."));
         sys_req(WRITE, COM1, "\n@ set_time\tSets the current time.", sizeof("@ set_time\tSets the current time."));
+        sys_req(WRITE, COM1, "\n@ shutdown\tExits the program.", sizeof("\n@ shutdown\tExits the program."));
         return 0;
     } 
     else {

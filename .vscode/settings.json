@@ -2,6 +2,7 @@
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
         "*.embeddedhtml": "html",
-        "comhand.h": "c"
+        "comhand.h": "c",
+        "mtpext.h": "c"
     }
 }
