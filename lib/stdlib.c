@@ -74,8 +74,8 @@ unsigned int intToBCD(unsigned int num) {
 
     ones = num % 10; 
 	temp = num / 10;
-    tens = temp << 4; 
-    return (tens + ones);
+    tens = (temp << 4) | ones; 
+    return tens;
 }
 
 

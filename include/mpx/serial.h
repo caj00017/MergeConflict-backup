@@ -35,4 +35,12 @@ int serial_out(device dev, const char *buffer, size_t len);
 
 int serial_poll(device dev, char *buffer, size_t len);
 
+/**
+ * Refreshes the buffer in the terminal window after a key is pressed
+ * @param buffer The buffer to print to the terminal window
+ * @param buf_length The length of the buffer to be printed to the terminal window
+ * @param pos The position of the cursor in the terminal window
+ */
+void buffer_refresh(char *buffer, int buf_length, int pos);
+
 #endif
