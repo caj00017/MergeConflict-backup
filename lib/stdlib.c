@@ -78,14 +78,4 @@ unsigned int intToBCD(unsigned int num) {
     return tens;
 }
 
-// unsigned int DECtoBCD(unsigned int DEC){
-// unsigned int temph;
-// unsigned int templ;
-// unsigned int myData;
-// templ = DEC % 10;
-// temph = DEC / 10;
-// myData = (temph << 4) | templ;
-// return myData; //Return myData
-// }
-
 

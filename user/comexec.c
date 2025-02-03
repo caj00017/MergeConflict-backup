@@ -129,7 +129,7 @@ int comexec(char buf[]) {
         outb(0x70, 0x04);
 
             //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10));
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
             //writing the hour bit and a colon to the terminal
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
@@ -174,16 +174,22 @@ int comexec(char buf[]) {
         // check for invalid format (invalid time check pending)
         if (charCount(time, ':') != 2 || strlen(time) != 8 || isNumeric(strtok(time, ":")) == 0) {
             sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
+            return -1;
         }
         else {
-            char hr_chars[2] = {time[0], time[1]}; // first 2 chars = hour value
-            char min_chars[2] = {time[3], time[4]}; // next 2 chars (skipping ':') = minute value
-            char sec_chars[2] = {time[6], time[7]}; // last 2 chars = second value
+            char hr_chars[3] = {time[0], time[1], '\0'}; // first 2 chars = hour value
+            char min_chars[3] = {time[3], time[4], '\0'}; // next 2 chars (skipping ':') = minute value
+            char sec_chars[3] = {time[6], time[7], '\0'}; // last 2 chars = second value
 
             // retrieve int values for hour, minute, and second
             unsigned int hour = (unsigned int)atoi(hr_chars);
             unsigned int minute = (unsigned int)atoi(min_chars);
             unsigned int second = (unsigned int)atoi(sec_chars);
+
+            if (hour > 23 || hour < 1 || minute > 59 || minute < 0 || second > 59 || second < 0) {
+                sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
+                return -1;
+            }
 
             // convert each time value to BCD
             unsigned int hour_BCD = intToBCD(hour);
@@ -268,7 +274,7 @@ int get_time() {
         outb(0x70, 0x04);
 
             //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10));
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
             //writing the hour bit and a colon to the terminal
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
