@@ -185,34 +185,37 @@ int comexec(char buf[]) {
             char min_chars[3] = {time[3], time[4], '\0'}; // next 2 chars (skipping ':') = minute value
             char sec_chars[3] = {time[6], time[7], '\0'}; // last 2 chars = second value
 
+            // check for invalid times / characters 
+            if (strcmp(hr_chars, "23") > 0 || strcmp(hr_chars, "0") < 0   
+            || strcmp(min_chars, "59") > 0 || strcmp(min_chars, "0") < 0
+            || strcmp(sec_chars, "59") > 0 || strcmp(sec_chars, "0") < 0) 
+            {
+                sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
+                return -1;
+            }
+
             // retrieve int values for hour, minute, and second
             unsigned int hour = (unsigned int)atoi(hr_chars);
             unsigned int minute = (unsigned int)atoi(min_chars);
             unsigned int second = (unsigned int)atoi(sec_chars);
-
-            if (hour > 23 || hour < 0 || minute > 59 || minute < 0 || second > 59 || second < 0) {
-                sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
-                return -1;
-            }
 
             // convert each time value to BCD
             unsigned int hour_BCD = intToBCD(hour);
             unsigned int minute_BCD = intToBCD(minute);
             unsigned int second_BCD = intToBCD(second);
 
-            // write each BCD value to the corresponding register - this does not work
+            // write each BCD value to the corresponding register
             outb(0x70, 0x04);
-            outb(0x71, hour_BCD);
+            outb(0x71, hour_BCD); // hour
 
             outb(0x70, 0x02);
-            outb(0x71, minute_BCD);
+            outb(0x71, minute_BCD); // minute
 
             outb(0x70, 0x00);
-            outb(0x71, second_BCD);
+            outb(0x71, second_BCD); // second
 
             sys_req(WRITE, COM1, "\nTime set to: ", sizeof("\nTime set to: "));
             get_time();
-            /*----------------------------------------------------------------------*/
         }
 
         // re-enable interrupts
@@ -238,7 +241,7 @@ int comexec(char buf[]) {
 }
 
 
-// I created this function for debugging purposes. 
+// I created this function for debugging purposes. We could give each command its own function if we want. - Chris
 int get_time() {
     //disabling the NMI bit
         outb(0x70, inb(0x70) | 0x80);
@@ -263,6 +266,12 @@ int get_time() {
 
             //changing the minute bit from bcd to a char ptr
             time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+
+            // append 0 to avoid (HH:M:SS) error
+            if (atoi(time_ptr) <= 9) {
+                sys_req(WRITE, COM1, "0", sizeof("0"));
+            }
+
             sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
             sys_req(WRITE, COM1, colon, sizeof(colon));
 
