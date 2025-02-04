@@ -14,4 +14,6 @@
 */
 int comexec(char buf[]);
 
+int get_time();
+
 #endif
