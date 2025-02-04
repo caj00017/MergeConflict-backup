@@ -126,8 +126,16 @@ int get_time(void) {
             //changing the hour bit from bcd to a char ptr
             time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10)); // -5 offset
 
-            //writing the hour bit and a colon to the terminal
-            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
+            // write the hour to the terminal (size checking)
+            if (atoi(time_ptr) <= 9) {
+                sys_req(WRITE, COM1, "0", sizeof("0"));
+                sys_req(WRITE, COM1, time_ptr, 1);
+            }
+            else {
+                sys_req(WRITE, COM1, time_ptr, 2);
+            }
+
+            //writing a colon to the terminal
             sys_req(WRITE, COM1, colon, sizeof(colon));
 
         // accessing the minute bit
@@ -136,24 +144,31 @@ int get_time(void) {
             //changing the minute bit from bcd to a char ptr
             time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
-            // append 0 to avoid (HH:M:SS) error
+            // write the minute to the terminal (size checking)
             if (atoi(time_ptr) <= 9) {
                 sys_req(WRITE, COM1, "0", sizeof("0"));
+                sys_req(WRITE, COM1, time_ptr, 1);
+            }
+            else {
+                sys_req(WRITE, COM1, time_ptr, 2);
             }
 
-            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
             sys_req(WRITE, COM1, colon, sizeof(colon));
 
         // accessing the second bit 
         outb(0x70, 0x00);
 
             //changing the second bit from bcd to a char ptr
-            int seconds = bcdToChar(inb(0x71)) - 48;
-            if(seconds < 10){
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+
+            // write the second to the terminal (size checking)
+            if (atoi(time_ptr) <= 9) {
                 sys_req(WRITE, COM1, "0", sizeof("0"));
+                sys_req(WRITE, COM1, time_ptr, 1);
             }
-            time_ptr = (itoa(seconds, str, 10));
-            sys_req(WRITE, COM1, time_ptr, sizeof(time_ptr));
+            else {
+                sys_req(WRITE, COM1, time_ptr, 2);
+            }
 
         // return 0 indicating success
         return 0;
@@ -239,7 +254,7 @@ int get_date(void){
                 sys_req(WRITE, COM1, date_ptr, 1);
             }
             else {
-                sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));   
+                sys_req(WRITE, COM1, date_ptr, 2);   
             }
 
              //writing the month and a slash to the terminal      
@@ -256,7 +271,7 @@ int get_date(void){
                 sys_req(WRITE, COM1, date_ptr, 1);
             }
             else {
-                sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));   
+                sys_req(WRITE, COM1, date_ptr, 2);   
             }
             
             // write a slash to the terminal
@@ -269,7 +284,7 @@ int get_date(void){
             date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
             //writing the year to the terminal
-            sys_req(WRITE, COM1, date_ptr, sizeof(date_ptr));
+            sys_req(WRITE, COM1, date_ptr, 2);
 
     //returning 0 indicates success   
     return 0;
