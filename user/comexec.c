@@ -17,27 +17,37 @@ int comexec(char buf[]) {
     
     // "shutdown" logic
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
+        //Write a newline to command line.
         sys_req(WRITE, COM1, "\n", sizeof("\n"));
+
+        //Create variable for a one time only command per shutdown call
         int first = 1;
+
+        //Loop as long as the person keeps mispelling / failed entry
         while (1)
         {
-            
+            //Character response for double check
             char response[100] = { 0 };
+
+            //For first time, write instructions
             if(first== 1){
                 first++;
                 sys_req(WRITE, COM1, "@ Are you sure you want to shutdown? (y or n)", sizeof("@ Are you sure you want to shutdown? (y or n)"));
             }
 
+            //Write formatting for entry and read from the command line
             sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
             sys_req(READ, COM1, response, sizeof(response));
 
+            //Check to see if the person want to shutdown (y) or continue running program(n)
             if(strcmp(response, "y") == 0 || strcmp(response, "yes") == 0 ){
-                return 1;
+                return 1; //exit and end the program
             }
             else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
-                return 0;
+                return 0; //exit and continue running program
             }
             else{
+                //If they don't response with the proper entry, give repeated instructions and loop again.
                 sys_req(WRITE, COM1, "\n", sizeof("\n"));
                 sys_req(WRITE, COM1, "@ Please retype your response: (y or n)", sizeof("@ Please retype your response: (y or n)"));
                 continue;
