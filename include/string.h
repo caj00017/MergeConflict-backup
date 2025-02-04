@@ -47,7 +47,7 @@ size_t strlen(const char *s);
 */
 char* strtok(char * restrict s1, const char * restrict s2);
 
-/*
+/**
 * @brief Indicates whether str1 contains str2
 * @param str1 The outer string to search
 * @param str2 The inner string to find
@@ -56,7 +56,7 @@ char* strtok(char * restrict s1, const char * restrict s2);
 */
 int contains(const char *str1, const char *str2);
 
-/*
+/**
 * @brief Returns a substring beginning at a specific index
 * @param str1 The string to be copied from
 * @param index The index to begin copying from
@@ -65,7 +65,7 @@ int contains(const char *str1, const char *str2);
 */
 char* substr(char* str1, int index);
 
-/*
+/**
 * @brief Determines whether a given string is entirely numeric.
 * @param str The string to be tested
 * @return 0 for false, 1 for true
@@ -73,11 +73,11 @@ char* substr(char* str1, int index);
 */
 int isNumeric(char* str);
 
-/*
-*   @brief Function which returns the amount of a specific character within a string.
-*   @param str The String to be searched
-*   @param c The character to be identified
-*   @author Chris Jones
+/**
+* @brief Function which returns the amount of a specific character within a string.
+* @param str The String to be searched
+* @param c The character to be identified
+* @author Chris Jones
 */
 int charCount(char* str, char c);   
 
