@@ -81,7 +81,13 @@ int isNumeric(char* str);
 */
 int charCount(char* str, char c);   
 
-
+/*
+*   @brief Function which returns the index of a specific character within a string.
+*   @param str The String to be searched
+*   @param searched_char The char to search for
+*   @return Index of the specified char.
+*   @author Tanner Forbes
+*/
 int indexOf(char* str, char searched_char);
 
 #endif

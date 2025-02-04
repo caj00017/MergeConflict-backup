@@ -85,6 +85,7 @@ int serial_poll(device dev, char *buffer, size_t len);
  * @param buffer The buffer to print to the terminal window
  * @param buf_length The length of the buffer to be printed to the terminal window
  * @param pos The position of the cursor in the terminal window
+ * @author Evan Humphrey
  */
 void buffer_refresh(char *buffer, int buf_length, int pos);
 
