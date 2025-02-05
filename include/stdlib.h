@@ -32,7 +32,7 @@ char bcdToChar(unsigned char bcd);
 
 /**
 * @brief Function which converts an int to a BCD value
-* @param num The int value to be converted to BCD
+* @param num The unsigned int value (0-99 only) to be converted to BCD
 * @return the BCD value derived from the int 
 * @author Chris Jones
 */

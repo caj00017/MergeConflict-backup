@@ -68,14 +68,18 @@ char bcdToChar(unsigned char bcd){
 
 // Implementation for intToBCD
 unsigned int intToBCD(unsigned int num) {
-    unsigned int ones = 0;
-    unsigned int tens = 0;
-    unsigned int temp = 0;
 
-    ones = num % 10; 
-	temp = num / 10;
-    tens = (temp << 4) | ones; 
-    return tens;
+	// tens digit = int / 10
+	unsigned int tens = num / 10;
+
+	// ones digit = remainder of int / 10
+    unsigned int ones = num % 10; 
+
+	// bit shift the tens digit left by 4, combine with ones
+    unsigned int bcd = (tens << 4) | ones; 
+
+	// return BCD
+    return bcd;
 }
 
 
