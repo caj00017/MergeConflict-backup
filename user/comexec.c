@@ -351,14 +351,14 @@ int set_date(char buf[]) {
 
             //write each BCD value to the corresponding register
             
-            outb(0x70, 0x09); //accessing the month register
-            outb(0x71, year_BCD); //writing the month BCD to the month register
+            outb(0x70, 0x09); //accessing the year register
+            outb(0x71, year_BCD); //writing the year BCD to the month register
 
-            outb(0x70, 0x08); //accessing the day register
-            outb(0x71, month_BCD); //writing the day BCD to the day register
+            outb(0x70, 0x08); //accessing the month register
+            outb(0x71, month_BCD); //writing the month BCD to the day register
 
-            outb(0x70, 0x07); //accessing the year register
-            outb(0x71, day_BCD); //writing the year BCD to the year register
+            outb(0x70, 0x07); //accessing the day register
+            outb(0x71, day_BCD); //writing the day BCD to the year register
 
             sys_req(WRITE, COM1, "\nDate set to: ", sizeof("\nDate set to: "));
             get_date();
