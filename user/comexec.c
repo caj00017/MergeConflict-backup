@@ -313,34 +313,34 @@ int set_date(char buf[]) {
 
             //checking for valid month input
             if(month > 12){
-                sys_req(WRITE, COM1, "\nInvalid Month", sizeof("\nInvalid Month"));
+                sys_req(WRITE, COM1, "\nInvalid Month. Please input a month between 01-12.", sizeof("\nInvalid Month. Please input a month between 01-12."));
                 return -1;
             }
             //checking for valid day input for months with 31 days in them
             else if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12){
                 if(day > 31 || day < 1){
-                    sys_req(WRITE, COM1, "\nInvalid Day", sizeof("\nInvalid Day"));
+                    sys_req(WRITE, COM1, "\nInvalid Day. Please input a day between 01-31.", sizeof("\nInvalid Day. Please input a day between 01-31."));
                     return -1;
                 }
             }
             //checking for valid day input for months with 30 days in them
             else if(month == 4 || month == 6 || month == 9 || month == 11){
                 if(day > 30 || day < 1){
-                    sys_req(WRITE, COM1, "\nInvalid Day", sizeof("\nInvalid Day"));
+                    sys_req(WRITE, COM1, "\nInvalid Day. Please input a day between 01-30.", sizeof("\nInvalid Day. Please input a day between 01-30."));
                     return -1;
                 }
             }
             //checking for valid day input for february during a leap year
             else if(month == 2 && (year % 4) == 0 ){
                 if(day > 29 || day < 1){
-                    sys_req(WRITE, COM1, "\nInvalid Day", sizeof("\nInvalid Day"));
+                    sys_req(WRITE, COM1, "\nInvalid Day. Please input a day between 01-29.", sizeof("\nInvalid Day. Please input a day between 01-29."));
                     return -1;
                 }
             }
             //checking for valid day input for february not during a leap year
             else if(month == 2){
                   if(day > 28 || day < 1){
-                    sys_req(WRITE, COM1, "\nInvalid Day", sizeof("\nInvalid Day"));
+                    sys_req(WRITE, COM1, "\nInvalid Day. Please input a day between 01-28.", sizeof("\nInvalid Day. Please input a day between 01-28."));
                     return -1;
                 }
             }
