@@ -6,6 +6,7 @@
 #include <sys_req.h>
 
 void comhand(void) {
+    sys_req(WRITE, COM1, "@ Type 'help' to see list of commands\n", sizeof("@ Type 'help' to see list of commands\n"));
     while(1) {
 
         // Add the @ before each command

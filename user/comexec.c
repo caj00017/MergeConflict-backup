@@ -80,6 +80,7 @@ int shutdown(void) {
             return 1; //exit and end the program
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
+            sys_req(WRITE, COM1, "\n@ Returning to Usual Operations...", sizeof("\n@ Returning to Usual Operations..."));
             return 0; //exit and continue running program
         }
         else{
