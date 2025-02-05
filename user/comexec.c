@@ -25,7 +25,8 @@ int comexec(char buf[]) {
         return 0;
     }
     else if (strcmp(buf, "set_date") == 0) {
-        sys_req(WRITE, COM1, "\nPlease enter the date to be set (MM/DD/YY): ", sizeof("\nPlease enter the date to be set (MM/DD/YY): "));
+        sys_req(WRITE, COM1, "\nPlease enter the date to be set (set_date MM/DD/YY): ", sizeof("\nPlease enter the date to be set (set_date MM/DD/YY): "));
+        return 0;
     }
     else if (contains(buf, "set_date") == 1) {
         set_date(buf);
@@ -36,7 +37,8 @@ int comexec(char buf[]) {
         return 0;
     }
     else if (strcmp(buf, "set_time") == 0) {
-        sys_req(WRITE, COM1, "\nPlease enter the time to be set (HH:MM): ", sizeof("\nPlease enter the time to be set (HH:MM): "));
+        sys_req(WRITE, COM1, "\nPlease enter the time to be set (set_time HH:MM): ", sizeof("\nPlease enter the time to be set (set_time HH:MM): "));
+        return 0;
     }
     else if (contains(buf, "set_time") == 1) {
         set_time(buf);
@@ -80,6 +82,7 @@ int shutdown(void) {
             return 1; //exit and end the program
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
+            sys_req(WRITE, COM1, "\n@ Returning to Usual Operations...", sizeof("\n@ Returning to Usual Operations..."));
             return 0; //exit and continue running program
         }
         else{
@@ -106,7 +109,7 @@ int help(void) {
 }
 
 int version(void) {
-    char msg[100] = "\nVersion 1.0\nCompilation Date: 1/27/2025";
+    char msg[100] = "\nVersion 1.0\nCompilation Date: 2/7/2025";
     sys_req(WRITE,COM1, msg, sizeof(msg));
     return 0;
 }
@@ -184,7 +187,7 @@ int set_time(char buf[]) {
 
         // check for invalid format (invalid time check pending)
         if (charCount(time, ':') != 2 || strlen(time) != 8 || isNumeric(strtok(time, ":")) == 0) {
-            sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
+            sys_req(WRITE, COM1, "\nInvalid set_time format. (set_time HH:MM:SS)", sizeof("\nInvalid set_time format. (set_time HH:MM:SS)"));
             return -1;
         }
         else {
@@ -197,12 +200,12 @@ int set_time(char buf[]) {
             || strcmp(min_chars, "59") > 0 || strcmp(min_chars, "0") < 0  
             || strcmp(sec_chars, "59") > 0 || strcmp(sec_chars, "0") < 0) 
             {
-                sys_req(WRITE, COM1, "\nInvalid time or format. (HH:MM:SS)", sizeof("\nInvalid time or format. (HH:MM:SS)"));
+                sys_req(WRITE, COM1, "\nInvalid time. (set_time [00-23]:[00-59]:[00-59])", sizeof("\nInvalid time. (set_time [00-23]:[00-59]:[00-59])"));
                 return -1;
             }
 
             // retrieve int values for hour, minute, and second
-            unsigned int hour = (unsigned int)atoi(hr_chars) + 5; // +5 offset
+            unsigned int hour = (unsigned int)atoi(hr_chars) + 5; // +5 for EST
             unsigned int minute = (unsigned int)atoi(min_chars);
             unsigned int second = (unsigned int)atoi(sec_chars);
 
@@ -300,7 +303,7 @@ int set_date(char buf[]) {
 
         //checking to make sure the date is in a valid format
         if (contains(date, "/") == 0 || strlen(date) != 8 || isNumeric(strtok(date, "/")) == 0) {
-            sys_req(WRITE, COM1, "\nInvalid date or format. (MM/DD/YY)", sizeof("\nInvalid date or format. (MM/DD/YY)"));
+            sys_req(WRITE, COM1, "\nInvalid set_date format. (set_date MM/DD/YY)", sizeof("\nInvalid set_date format. (set_date MM/DD/YY)"));
         }
         else {
             char mth_chars[3] = {date[0], date[1], '\0'}; // first 2 chars = month value
