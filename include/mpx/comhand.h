@@ -1,9 +1,9 @@
 #ifndef COMHAND
 #define COMHAND
 
-/*
-*   @brief Function which scans for commands and passes them to comexec to process. 
-*   @authors Izaak Whetsell
+/**
+* @brief Function which scans for commands and passes them to comexec to process. 
+* @authors Izaak Whetsell
 */
 void comhand(void);
 

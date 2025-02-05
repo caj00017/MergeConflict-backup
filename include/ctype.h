@@ -13,11 +13,11 @@
 */
 int isspace(int c);
 
-/*
-@brief Determines if a character is a digit.
-@param c Character to check
-@return 1 if digit, 0 otherwise.
-@author Chris Jones
+/**
+* @brief Determines if a character is a digit.
+* @param c Character to check
+* @return 1 if digit, 0 otherwise.
+* @author Chris Jones
 */
 int isdigit(char c);
 
