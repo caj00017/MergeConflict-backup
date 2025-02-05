@@ -11,6 +11,9 @@
 #include <memory.h>
 
 int comexec(char buf[]) {
+
+    char date[19] = "set_date 02/04/2025";
+    set_date(date);
     
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
         int status = shutdown();
@@ -284,13 +287,13 @@ int set_date(char buf[]) {
         char* date = substr(buf, 9);
 
         //checking to make sure the date is in a valid format
-        if (contains(date, "/") == 0 || strlen(date) != 8 || isNumeric(strtok(date, "/")) == 0) {
-            sys_req(WRITE, COM1, "\nInvalid date or format. (MM/DD/YY)", sizeof("\nInvalid date or format. (MM/DD/YY)"));
+        if (contains(date, "/") == 0 || strlen(date) != 10 || isNumeric(strtok(date, "/")) == 0) {
+            sys_req(WRITE, COM1, "\nInvalid date or format. (MM/DD/YYYY)", sizeof("\nInvalid date or format. (MM/DD/YYYY)"));
         }
         else {
             char mth_chars[3] = {date[0], date[1], '\0'}; // first 2 chars = month value
             char day_chars[3] = {date[3], date[4], '\0'}; // next 2 chars = day value
-            char year_chars[3] = {date[6], date[7], '\0'}; // last 2 chars = year value
+            char year_chars[5] = {date[6], date[7], date[8], date[9], '\0'}; // last 2 chars = year value
 
             unsigned int month = (unsigned int)atoi(mth_chars); //converting the month char to a unsigned int
             unsigned int day = (unsigned int)atoi(day_chars); //converting the day char to a unsigned int
@@ -336,14 +339,14 @@ int set_date(char buf[]) {
 
             //write each BCD value to the corresponding register
             
-            outb(0x70, 0x08); //accessing the month register
-            outb(0x71, month_BCD); //writing the month BCD to the month register
+            outb(0x70, 0x09); //accessing the month register
+            outb(0x71, year_BCD); //writing the month BCD to the month register
 
-            outb(0x70, 0x07); //accessing the day register
-            outb(0x71, day_BCD); //writing the day BCD to the day register
+            outb(0x70, 0x08); //accessing the day register
+            outb(0x71, month_BCD); //writing the day BCD to the day register
 
-            outb(0x70, 0x09); //accessing the year register
-            outb(0x71, year_BCD); //writing the year BCD to the year register
+            outb(0x70, 0x07); //accessing the year register
+            outb(0x71, day_BCD); //writing the year BCD to the year register
 
             sys_req(WRITE, COM1, "\nDate set to: ", sizeof("\nDate set to: "));
             get_date();
