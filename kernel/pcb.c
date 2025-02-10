@@ -60,7 +60,7 @@ int set_dispatch_mode(pcb* pcb, int dispatch_mode) {
     return 0;
 }
 
-int get_stack_location(pcb* pcb) {
+unsigned char* get_stack_location(pcb* pcb) {
     return pcb.stack_location;
 }
 

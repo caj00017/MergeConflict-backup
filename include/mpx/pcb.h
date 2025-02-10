@@ -14,8 +14,8 @@ typedef struct {
     int state; /* 0-7 */
     int execution_mode; /*  */
     int dispatch_mode; /*  */
-    char* stack;
-    void* stack_location; // points to the final byte in the stack
+    unsigned char* stack;
+    unsigned char* stack_location; // points to the final byte in the stack
     pcb* next_node;
     pcb* prev_node;
 } pcb;
@@ -125,18 +125,18 @@ int set_dispatch_mode(pcb* pcb, int dispatch_mode);
 /**
  * @brief Get the stack location of the pcb
  * @param pcb* pcb The pcb to get the stack location of
- * @returns void* The stack location of the pcb
+ * @returns unsigned char* The stack location of the pcb
  * @author Chris Jones
  */
-void* get_stack_location(pcb* pcb);
+unsigned char* get_stack_location(pcb* pcb);
 
 /**
  * @brief Set the stack location of the pcb
  * @param pcb* pcb The pcb to set the stack location of
- * @param void* stack_location The stack location to set
+ * @param unsigned char* stack_location The stack location to set
  * @returns Status code
  */
-int set_stack_location(pcb* pcb, void* stack_location);
+int set_stack_location(pcb* pcb, unsigned char* stack_location);
 
 /**
  * @brief Get the next node in the pcb queue
