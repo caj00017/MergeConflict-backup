@@ -49,7 +49,7 @@ int get_class(pcb* pcb);
  * @brief Set the class of the pcb
  * @param pcb* pcb The pcb to set the class of
  * @param int class The class to set
- * @returns Status code
+ * @returns Status code (0 success, -1 invalid class)
  * @author Chris Jones
  */
 int set_class(pcb* pcb, int class);
@@ -66,7 +66,7 @@ int get_priority(pcb* pcb);
  * @brief Set the priority of the pcb
  * @param pcb* pcb The pcb to set the priority of
  * @param int priority The priority to set
- * @returns Status code
+ * @returns Status code (0 success, -1 invalid priority level)
  * @author Chris Jones
  */
 int set_priority(pcb* pcb, int priority);
@@ -83,7 +83,7 @@ int get_state(pcb* pcb);
  * @brief Set the state of the pcb
  * @param pcb* pcb The pcb to set the state of
  * @param int state The state to set
- * @returns Status code
+ * @returns Status code (0 success, -1 invalid state)
  * @author Chris Jones
  */
 int set_state(pcb* pcb, int state);
