@@ -56,7 +56,7 @@ int comexec(char buf[]) {
 }
 
 int shutdown(void) {
- //Write a newline to command line.
+    //Write a newline to command line.
     sys_req(WRITE, COM1, "\n", sizeof("\n"));
 
     //Create variable for a one time only command per shutdown call
