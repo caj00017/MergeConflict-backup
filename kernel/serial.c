@@ -127,8 +127,6 @@ int serial_poll(device dev, char *buffer, size_t len)
 				//Assemble Special String Combination
 				char special_key[4] = {c, d, e,'\0'};
 
-				// sys_req(WRITE,COM1, special_key , 3);
-
 				//Up Arrow key
 				if(strcmp(special_key, UP_ARROW) == 0){
 
@@ -146,7 +144,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 						//If we can go further right, increment the position counter
 						pos++;
 						//escape sequence to move cursor right (which prints a character to the terminal to move the cursor right)
-						sys_req(WRITE, COM1, "\033[1C", sizeof("\033[1D"));
+						serial_out(COM1, "\033[1C", sizeof("\033[1D"));
 					}
 				}
 				//Left Arrow key
@@ -156,7 +154,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 						//If we can go further left, decrement the position counter to keep track of cursor position
 						pos--;
 						//escape sequence to move cursor left (which prints a character to the terminal to move the cursor left)
-						sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D"));
+						serial_out(COM1, "\033[1D", sizeof("\033[1D"));
 					}
 				}
 				//Delete key
@@ -218,13 +216,13 @@ int serial_poll(device dev, char *buffer, size_t len)
 }
 
 void buffer_refresh(char *buffer, int buf_length, int pos) {
-	sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r")); //"\033" starts in escape sequence, "2K" clears the terminal line, "\r" prints a carraige return to get back to the beginning of the line
-	sys_req(WRITE, COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
-	sys_req(WRITE, COM1, " ", sizeof(" ")); //^^^
-	sys_req(WRITE, COM1, buffer, buf_length); //this reprints the buffer
+	serial_out(COM1, "\033[2K\r", sizeof("\033[2K\r")); //"\033" starts in escape sequence, "2K" clears the terminal line, "\r" prints a carraige return to get back to the beginning of the line
+	serial_out(COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
+	serial_out(COM1, " ", sizeof(" ")); //^^^
+	serial_out(COM1, buffer, buf_length); //this reprints the buffer
 	
 	//This loop moves the cursor back to the position it was at before the buffer was refreshed, since every time that the buffer is reprinted, the cursor is moved back to the front of the line
 	for(int i = buf_length; i > pos; i--) {
-		sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
+		serial_out(COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
 	}
 }
