@@ -21,6 +21,9 @@ int get_class(pcb* pcb) {
 }
 
 int set_class(pcb* pcb, int class) {
+    if (class == 0 || class == 1) {
+        return -1; // invalid class
+    }
     pcb.class = class;
     return 0;
 }
@@ -30,6 +33,9 @@ int get_priority(pcb* pcb) {
 }
 
 int set_priority(pcb* pcb, int priority) {
+    if (priority < 0 || priority > 9) {
+        return -1; // invalid priority
+    }
     pcb.priority = priority;
     return 0;
 }
@@ -39,6 +45,9 @@ int get_state(pcb* pcb) {
 }
 
 int set_state(pcb* pcb, int state) {
+    if (state < 0 || state > 7) {
+        return -1; // invalid state
+    }
     pcb.state = state;
     return 0;
 }
@@ -61,11 +70,11 @@ int set_dispatch_mode(pcb* pcb, int dispatch_mode) {
     return 0;
 }
 
-int get_stack_location(pcb* pcb) {
+unsigned char* get_stack_location(pcb* pcb) {
     return pcb.stack_location;
 }
 
-int set_stack_location(pcb* pcb, void* stack_location) {
+int set_stack_location(pcb* pcb, unsigned char* stack_location) {
     pcb.stack_location = stack_location;
     return 0;
 }
