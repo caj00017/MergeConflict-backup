@@ -172,4 +172,18 @@ pcb* get_prev_node(pcb* pcb);
  */
 int set_prev_node(pcb* pcb, pcb* prev_node);
 
+/**
+ * @brief Allocate memory for a pcb
+ * @returns pcb pointer to new allocated memory
+ * @author Tanner Forbes
+ */
+pcb* pcb_allocate(void);
+
+/**
+ * @brief Frees memory used by a given pcb
+ * @param free_pcb* pcb to free memory of
+ * @returns int which indicates 0 on sucesss and 1 on error
+ */
+int pcb_free(struct pcb* free_pcb);
+
 #endif

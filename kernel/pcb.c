@@ -1,4 +1,5 @@
 #include <mpx/pcb.h>
+#include <memory.h>
 
 /**
  * @file pcb.c 
@@ -85,5 +86,19 @@ pcb* get_prev_node(pcb* pcb) {
 int set_prev_node(pcb* pcb, pcb* prev_node) {
     pcb.prev_node = prev_node;
     return 0;
+}
+
+pcb* pcb_allocate(void){
+    pcb* new_pcb = (pcb*)sys_alloc_mem(sizeof(pcb));
+    return new_pcb;
+}
+
+int pcb_free(struct pcb* free_pcb){
+    if(sys_free_mem(free_pcb)){
+        return 0;
+    }
+    else{
+        return 1;
+    }
 }
 
