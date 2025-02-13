@@ -215,6 +215,15 @@ int show_PCB(char* name){
  */
 int show_ready_PCB(void){
     //For each process in Ready State, display the process
+    queue* ready = return_queue(0);
+    pcb* current = ready->head;
+    if (current == NULL) {
+        sys_req(WRITE, COM1, "No processes in ready queue", sizeof("No processes in ready queue"));
+    }
+    while (current != NULL) {
+        show_PCB(current->name);
+        current = current->next;
+    }
 
     return 0;
 }
@@ -225,6 +234,15 @@ int show_ready_PCB(void){
  */
 int show_blocked_PCB(void){
     //For each process in Blocked State, display the process
+    queue* blocked = return_queue(1);
+    pcb* current = blocked->head;
+    if (current == NULL) {
+        sys_req(WRITE, COM1, "No processes in blocked queue", sizeof("No processes in blocked queue"));
+    }
+    while (current != NULL) {
+        show_PCB(current->name);
+        current = current->next;
+    }
 
     return 0;
 }
@@ -235,6 +253,14 @@ int show_blocked_PCB(void){
  */
 int show_all_PCB(void){
     //Show each processes
+
+    // Ready
+    sys_req(WRITE, COM1, "Ready Processes:", sizeof("Ready Processes:"));
+    show_ready_PCB();
+
+    // Blocked
+    sys_req(WRITE, COM1, "Blocked Processes:", sizeof("Blocked Processes:"));
+    show_blocked_PCB();
 
     return 0;
 }
