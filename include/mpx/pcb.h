@@ -29,7 +29,6 @@ typedef struct queue {
 /**
  * @brief Allocate memory for a pcb
  * @returns pcb pointer to new allocated memory
- * @author Tanner Forbes
  */
 pcb* pcb_allocate(void);
 

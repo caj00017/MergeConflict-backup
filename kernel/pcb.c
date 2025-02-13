@@ -12,11 +12,22 @@ pcb* pcb_allocate(void){
     return new_pcb;
 }
 
-int pcb_free(struct pcb* free_pcb){
-    if(sys_free_mem(free_pcb)){
+int pcb_free(pcb* pcbPtr){
+    
+    //check if ptr is null
+    if(pcbPtr == NULL){
+        return 1;
+    }
+
+    //attempt to free memory from Ptr
+    if(sys_free_mem(pcbPtr)){
+        
+        //return 0 on success
         return 0;
     }
     else{
+
+        //return 1 on failure
         return 1;
     }
 }
