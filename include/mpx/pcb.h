@@ -7,6 +7,16 @@
  * @authors Chris Jones, Evan Humphrey, Tanner Forbes
  */
 
+/**
+ * @brief PCB states
+ */
+enum pcb_state {READY_SUS, // =0
+                READY_NOT_SUS, // =1
+                RUNNING, // =2
+                BLOCKED_SUS, // =3
+                BLOCKED_NOT_SUS, // =4
+                };
+
 typedef struct pcb {
     char* name;
     int class; /* 0 - user process, 1 - kernel process */
@@ -21,7 +31,7 @@ typedef struct pcb {
 } pcb;
 
 typedef struct queue {
-    char* queue_type;
+    int queue_type; // 0 - ready, 1 - blocked
     pcb* head;
     pcb* tail;
 } queue;
