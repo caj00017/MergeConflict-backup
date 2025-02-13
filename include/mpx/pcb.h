@@ -31,7 +31,7 @@ typedef struct pcb {
 } pcb;
 
 typedef struct queue {
-    char* queue_type;
+    int queue_type; // 0 - ready, 1 - blocked
     queue* next;
     pcb* head;
 } queue;
