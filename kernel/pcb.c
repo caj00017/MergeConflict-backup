@@ -7,8 +7,6 @@
  * @authors Chris Jones
  */
 
-
-
 pcb* pcb_allocate(void){
     pcb* new_pcb = (pcb*)sys_alloc_mem(sizeof(pcb));
     return new_pcb;

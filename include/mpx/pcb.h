@@ -4,7 +4,7 @@
 /**
  * @file pcb.h 
  * @brief Header file for pcb struct, getters/setters for fields
- * @authors Chris Jones
+ * @authors Chris Jones, Evan Humphrey, Tanner Forbes
  */
 
 typedef struct pcb {
@@ -20,7 +20,11 @@ typedef struct pcb {
     struct pcb* prev_node;
 } pcb;
 
-
+typedef struct queue {
+    char* queue_type;
+    queue* next;
+    pcb* head;
+} queue;
 
 /**
  * @brief Allocate memory for a pcb
