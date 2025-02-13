@@ -7,95 +7,96 @@
  * @authors Chris Jones
  */
 
-char* get_name(pcb* pcb) {
-    return pcb.name;
+char* get_name(pcb* pcbPtr) {
+    return pcbPtr.name;
 }
 
-int set_name(pcb* pcb, char* name) {
-    pcb.name = name;
+int set_name(pcb* pcbPtr, char* name) {
+    pcbPtr.name = name;
     return 0;
 }
 
-int get_class(pcb* pcb) {
-    return pcb.class;
+int get_class(pcb* pcbPtr) {
+    return pcbPtr.class;
 }
 
-int set_class(pcb* pcb, int class) {
+int set_class(pcb* pcbPtr, int class) {
     if (class == 0 || class == 1) {
         return -1; // invalid class
     }
-    pcb.class = class;
+    pcbPtr.class = class;
     return 0;
 }
 
-int get_priority(pcb* pcb) {
-    return pcb.priority;
+int get_priority(pcb* pcbPtr) {
+    return pcbPtr.priority;
 }
 
-int set_priority(pcb* pcb, int priority) {
+int set_priority(pcb* pcbPtr, int priority) {
     if (priority < 0 || priority > 9) {
         return -1; // invalid priority
     }
-    pcb.priority = priority;
+    pcbPtr.priority = priority;
     return 0;
 }
 
-int get_state(pcb* pcb) {
-    return pcb.state;
+int get_state(pcb* pcbPtr) {
+    return pcbPtr.state;
 }
 
-int set_state(pcb* pcb, int state) {
+int set_state(pcb* pcbPtr, int state) {
     if (state < 0 || state > 7) {
         return -1; // invalid state
     }
-    pcb.state = state;
+    pcbPtr.state = state;
     return 0;
 }
 
-int get_execution_mode(pcb* pcb) {
-    return pcb.execution_mode;
+int get_execution_mode(pcb* pcbPtr) {
+    return pcbPtr.execution_mode;
 }
 
-int set_execution_mode(pcb* pcb, int execution_mode) {
-    pcb.execution_mode = execution_mode;
+int set_execution_mode(pcb* pcbPtr, int execution_mode) {
+    pcbPtr.execution_mode = execution_mode;
     return 0;
 }
 
-int get_dispatch_mode(pcb* pcb) {
-    return pcb.dispatch_mode;
+int get_dispatch_mode(pcb* pcbPtr) {
+    return pcbPtr.dispatch_mode;
 }
 
-int set_dispatch_mode(pcb* pcb, int dispatch_mode) {
-    pcb.dispatch_mode = dispatch_mode;
+int set_dispatch_mode(pcb* pcbPtr, int dispatch_mode) {
+    pcbPtr.dispatch_mode = dispatch_mode;
     return 0;
 }
 
-unsigned char* get_stack_location(pcb* pcb) {
-    return pcb.stack_location;
+unsigned char* get_stack_location(pcb* pcbPtr) {
+    return pcbPtr.stack_location;
 }
 
-int set_stack_location(pcb* pcb, unsigned char* stack_location) {
-    pcb.stack_location = stack_location;
+int set_stack_location(pcb* pcbPtr, unsigned char* stack_location) {
+    pcbPtr.stack_location = stack_location;
     return 0;
 }
 
-pcb* get_next_node(pcb* pcb) {
-    return pcb.next_node;
+pcb* get_next_node(pcb* pcbPtr) {
+    return pcbPtr.next_node;
 }
 
-int set_next_node(pcb* pcb, pcb* next_node) {
-    pcb.next_node = next_node;
+int set_next_node(pcb* pcbPtr, pcb* next_node) {
+    pcbPtr.next_node = next_node;
     return 0;
 }
 
-pcb* get_prev_node(pcb* pcb) {
-    return pcb.prev_node;
+pcb* get_prev_node(pcb* pcbPtr) {
+    return pcbPtr.prev_node;
 }
 
-int set_prev_node(pcb* pcb, pcb* prev_node) {
-    pcb.prev_node = prev_node;
+int set_prev_node(pcb* pcbPtr, pcb* prev_node) {
+    pcbPtr.prev_node = prev_node;
     return 0;
 }
+
 
 pcb* pcb_allocate(void){
     pcb* new_pcb = (pcb*)sys_alloc_mem(sizeof(pcb));

@@ -7,7 +7,7 @@
  * @authors Chris Jones
  */
 
-typedef struct {
+typedef struct pcb {
     char* name;
     int class; /* 0 - user process, 1 - kernel process */
     int priority; /* 0-9 */
@@ -16,8 +16,8 @@ typedef struct {
     int dispatch_mode; /*  */
     unsigned char* stack;
     unsigned char* stack_location; // points to the final byte in the stack
-    pcb* next_node;
-    pcb* prev_node;
+    struct pcb* next_node;
+    struct pcb* prev_node;
 } pcb;
 
 /**
@@ -26,7 +26,7 @@ typedef struct {
  * @returns char* The name of the pcb
  * @author Chris Jones
  */
-char* get_name(pcb* pcb);
+char* get_name(pcb* pcbPtr);
 
 /**
  * @brief Set the name of the pcb
@@ -35,7 +35,7 @@ char* get_name(pcb* pcb);
  * @returns Status code
  * @author Chris Jones
  */
-int set_name(pcb* pcb, char* name);
+int set_name(pcb* pcbPtr, char* name);
 
 /**
  * @brief Get the class of the pcb
@@ -43,7 +43,7 @@ int set_name(pcb* pcb, char* name);
  * @returns int The class of the pcb (0 - user process, 1 - kernel process)
  * @author Chris Jones
  */
-int get_class(pcb* pcb);
+int get_class(pcb* pcbPtr);
 
 /**
  * @brief Set the class of the pcb
@@ -52,7 +52,7 @@ int get_class(pcb* pcb);
  * @returns Status code (0 success, -1 invalid class)
  * @author Chris Jones
  */
-int set_class(pcb* pcb, int class);
+int set_class(pcb* pcbPtr, int class);
 
 /**
  * @brief Get the priority of the pcb
@@ -60,7 +60,7 @@ int set_class(pcb* pcb, int class);
  * @returns int The priority level of the pcb (0-9)
  * @author Chris Jones
  */
-int get_priority(pcb* pcb);
+int get_priority(pcb* pcbPtr);
 
 /**
  * @brief Set the priority of the pcb
@@ -69,7 +69,7 @@ int get_priority(pcb* pcb);
  * @returns Status code (0 success, -1 invalid priority level)
  * @author Chris Jones
  */
-int set_priority(pcb* pcb, int priority);
+int set_priority(pcb* pcbPtr, int priority);
 
 /**
  * @brief Get the state of the pcb
@@ -77,7 +77,7 @@ int set_priority(pcb* pcb, int priority);
  * @returns int The state of the pcb (0-7)
  * @author Chris Jones
  */
-int get_state(pcb* pcb);
+int get_state(pcb* pcbPtr);
 
 /**
  * @brief Set the state of the pcb
@@ -86,7 +86,7 @@ int get_state(pcb* pcb);
  * @returns Status code (0 success, -1 invalid state)
  * @author Chris Jones
  */
-int set_state(pcb* pcb, int state);
+int set_state(pcb* pcbPtr, int state);
 
 /**
  * @brief Get the execution mode of the pcb
@@ -94,7 +94,7 @@ int set_state(pcb* pcb, int state);
  * @returns int The execution mode of the pcb
  * @author Chris Jones
  */
-int get_execution_mode(pcb* pcb);
+int get_execution_mode(pcb* pcbPtr);
 
 /**
  * @brief Set the execution mode of the pcb
@@ -103,7 +103,7 @@ int get_execution_mode(pcb* pcb);
  * @returns Status code
  * @author Chris Jones
  */
-int set_execution_mode(pcb* pcb, int execution_mode);
+int set_execution_mode(pcb* pcbPtr, int execution_mode);
 
 /**
  * @brief Get the name of the pcb
@@ -111,7 +111,7 @@ int set_execution_mode(pcb* pcb, int execution_mode);
  * @returns int The dispatch mode of the pcb
  * @author Chris Jones
  */
-int get_dispatch_mode(pcb* pcb);
+int get_dispatch_mode(pcb* pcbPtr);
 
 /**
  * @brief Set the dispatch mode of the pcb
@@ -120,7 +120,7 @@ int get_dispatch_mode(pcb* pcb);
  * @returns Status code
  * @author Chris Jones
  */
-int set_dispatch_mode(pcb* pcb, int dispatch_mode);
+int set_dispatch_mode(pcb* pcbPtr, int dispatch_mode);
 
 /**
  * @brief Get the stack location of the pcb
@@ -128,7 +128,7 @@ int set_dispatch_mode(pcb* pcb, int dispatch_mode);
  * @returns unsigned char* The stack location of the pcb
  * @author Chris Jones
  */
-unsigned char* get_stack_location(pcb* pcb);
+unsigned char* get_stack_location(pcb* pcbPtr);
 
 /**
  * @brief Set the stack location of the pcb
@@ -136,7 +136,7 @@ unsigned char* get_stack_location(pcb* pcb);
  * @param unsigned char* stack_location The stack location to set
  * @returns Status code
  */
-int set_stack_location(pcb* pcb, unsigned char* stack_location);
+int set_stack_location(pcb* pcbPtr, unsigned char* stack_location);
 
 /**
  * @brief Get the next node in the pcb queue
@@ -144,7 +144,7 @@ int set_stack_location(pcb* pcb, unsigned char* stack_location);
  * @returns pcb* The next node in the pcb queue
  * @author Chris Jones
  */
-pcb* get_next_node(pcb* pcb);
+pcb* get_next_node(pcb* pcbPtr);
 
 /**
  * @brief Set the next node in the pcb queue
@@ -153,7 +153,7 @@ pcb* get_next_node(pcb* pcb);
  * @returns int Status code
  * @author Chris Jones
  */
-int set_next_node(pcb* pcb, pcb* next_node);
+int set_next_node(pcb* pcbPtr, pcb* next_node);
 
 /**
  * @brief Get the previous node in the pcb queue
@@ -161,7 +161,7 @@ int set_next_node(pcb* pcb, pcb* next_node);
  * @returns pcb* The previous node in the pcb queue
  * @author Chris Jones
  */
-pcb* get_prev_node(pcb* pcb);
+pcb* get_prev_node(pcb* pcbPtr);
 
 /**
  * @brief Set the previous node in the pcb queue
@@ -170,7 +170,7 @@ pcb* get_prev_node(pcb* pcb);
  * @returns int Status code
  * @author Chris Jones
  */
-int set_prev_node(pcb* pcb, pcb* prev_node);
+int set_prev_node(pcb* pcbPtr, pcb* prev_node);
 
 /**
  * @brief Allocate memory for a pcb

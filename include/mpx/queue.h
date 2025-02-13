@@ -6,12 +6,10 @@
  * @authors Evan Humphrey, Chris Jones
  */
 
-typedef struct {
+typedef struct queue {
     char* queue_type;
     queue* next;
-    pcb* next_p;
-    pcb* head;
-    pcb* tail;
+
 } queue;
 
 /**

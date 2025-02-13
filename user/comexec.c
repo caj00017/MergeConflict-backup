@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <memory.h>
 #include <mpx/time.h>
+#include <mpx/user_pcb.h>
 
 int comexec(char buf[]) {
     
@@ -17,7 +18,7 @@ int comexec(char buf[]) {
         int status = shutdown();
         return status;
     }
-    if (strcmp(buf, "version") == 0 || strcmp(buf, "v") == 0) {
+    else if (strcmp(buf, "version") == 0 || strcmp(buf, "v") == 0) {
         version();
         return 0;
     }
@@ -45,10 +46,67 @@ int comexec(char buf[]) {
         set_time(buf);
         return 0;
     }
-    if (strcmp(buf, "help") == 0) {
+
+    else if (strcmp(buf, "help") == 0) {
         help();
         return 0;
     } 
+    else if (strcmp(buf, "process_create") == 0)
+    {
+        return create_PCB("name", 1, 1);
+    }
+
+    else if (strcmp(buf, "process_delete") == 0)
+    {
+        return delete_PCB("name");
+    }
+
+    else if (strcmp(buf, "process_block") == 0)
+    {
+        return block_PCB("name");
+    }
+
+    else if (strcmp(buf, "process_unblock") == 0)
+    {
+        return unblock_PCB("name");
+    }
+
+    else if (strcmp(buf, "process_suspend") == 0)
+    {
+        return suspend_PCB("name");
+    }
+
+    else if (strcmp(buf, "process_resume") == 0)
+    {
+        return resume_PCB("name");
+    }
+
+    else if (strcmp(buf, "process_priority") == 0)
+    {
+        return set_PCB_priority("name",1);
+    }
+
+    else if (strcmp(buf, "process_show") == 0)
+    {
+        return show_PCB("name");
+    }
+
+    else if (strcmp(buf, "process_show_ready") == 0)
+    {
+        return show_ready_PCB();
+    }
+
+    else if (strcmp(buf, "process_show_blocked") == 0)
+    {
+        return show_blocked_PCB();
+    }
+
+    else if (strcmp(buf, "process_show_all") == 0)
+    {
+        return show_all_PCB();
+    }
+
+
     else {
         sys_req(WRITE, COM1, "\nError: Invalid command.", sizeof("\nError: Invalid command."));
         return -1;
@@ -114,4 +172,3 @@ int version(void) {
     sys_req(WRITE,COM1, msg, sizeof(msg));
     return 0;
 }
-
