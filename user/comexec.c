@@ -46,11 +46,13 @@ int comexec(char buf[]) {
         set_time(buf);
         return 0;
     }
-
     else if (strcmp(buf, "help") == 0) {
         help();
         return 0;
     } 
+
+    /*  PCB Functions  */
+
     else if (strcmp(buf, "process_create") == 0)
     {
         return create_PCB("name", 1, 1);
@@ -109,7 +111,7 @@ int comexec(char buf[]) {
 
     else {
         sys_req(WRITE, COM1, "\nError: Invalid command.", sizeof("\nError: Invalid command."));
-        return -1;
+        return 1;
     }
 }
 
@@ -138,11 +140,11 @@ int shutdown(void) {
 
         //Check to see if the person want to shutdown (y) or continue running program(n)
         if(strcmp(response, "y") == 0 || strcmp(response, "yes") == 0 ){
-            return 1; //exit and end the program
+            return -1; //exit and end the program
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
             sys_req(WRITE, COM1, "\n@ Returning to Usual Operations...", sizeof("\n@ Returning to Usual Operations..."));
-            return 0; //exit and continue running program
+            return 1; //exit and continue running program
         }
         else{
             //If they don't response with the proper entry, give repeated instructions and loop again.

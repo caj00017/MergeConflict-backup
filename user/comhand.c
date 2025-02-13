@@ -20,7 +20,7 @@ void comhand(void) {
         int status = comexec(buf);
         
         // if the command is a shutdown, exit command loop
-        if (status == 1) {
+        if (status == -1) {
             sys_req(WRITE, COM1, "\nShutting down...\n", sizeof("\nShutting down...\n"));
             return;
         }
