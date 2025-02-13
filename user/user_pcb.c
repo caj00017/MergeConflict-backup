@@ -1,5 +1,6 @@
-
 #include <mpx/pcb.h>
+#include <sys_req.h>
+#include <stdlib.h>
 
 /**
  * Create PCB
@@ -11,8 +12,10 @@ int create_PCB(char* name, int class, int priority){
     }
     
     //Call PCB Setup
+    pcb = pcb_setup(name, class, priority);
 
     //Insert into queue with PCB insert
+    pcb_insert(pcb);
 
     return 0;
 }
@@ -27,8 +30,10 @@ int delete_PCB(char* name){
     }
     
     //Remove from queue with pcb_remove
+    pcb_remove(pcb);
 
     //free memory with pcb_free
+    pcb_free(pcb);
 
     return 0;
 }
@@ -45,8 +50,22 @@ int block_PCB(char* name){
     }
     
     //Change to block state
+    pcb = pcb_find(name);
+    if (pcb == NULL) {
+        return 1; // pcb not found
+    }
+
+    if (pcb->state == 0) {
+        pcb->state == 3;
+    }
+    else if (pcb->state == 1) {
+        pcb->state == 4;
+    } else {
+        return 1; // pcb cannot be blocked
+    }
 
     //Put into appropriate queue
+    pcb_insert(pcb);
 
     return 0;
 }
@@ -60,10 +79,24 @@ int unblock_PCB(char* name){
     if(name == 0){
         return 1;
     }
+
+    pcb = pcb_find(name);
+    if (pcb == NULL) {
+        return 1; // pcb not found
+    }
     
     //Alter to ready
+    if (pcb->state == 3) {
+        pcb->state == 0;
+    }
+    else if (pcb->state == 4) {
+        pcb->state == 1;
+    } else {
+        return 1; // pcb cannot be unblocked
+    }
 
     //Insert into ready queue
+    pcb_insert(pcb);
 
     return 0;
 }
@@ -79,8 +112,18 @@ int suspend_PCB(char* name){
     }
     
     //Alter to suspended state
+    if (pcb->state == 1) {
+        pcb->state = 0;
+    }
+    if (pcb->state == 4) {
+        pcb->state = 3;
+    }
+    else {
+        return 1; // pcb cannot be suspended
+    }
 
     //Insert into appropriate queue
+    pcb_insert(pcb);
 
     //???Must not be system process?
 
@@ -98,8 +141,16 @@ int resume_PCB(char* name){
     }
     
     //Alter to not be suspended state
+    if (pcb->state == 0) {
+        pcb->state = 1;
+    } else if (pcb->state == 3) {
+        pcb->state = 4;
+    } else {
+        return 1; // pcb cannot be resumed
+    }
 
     //Move to correct queue
+    pcb_insert(pcb);
 
     return 0;
 }
@@ -114,9 +165,20 @@ int set_PCB_priority(char* name, int priority){
         return 1;
     }
     
-    //Change Priority
+    // get pcb
+    pcb = pcb_find(name);
+    if (pcb == NULL) {
+        return 1; // pcb not found
+    }
 
-    //Move to proper spot in queue
+    // remove pcb for reinsertion?
+    pcb_remove(pcb);
+
+    //Change Priority
+    pcb->priority = priority;
+
+    // reinsert at proper location in queue
+    pcb_insert(pcb);
 
     return 0;
 }
@@ -131,8 +193,18 @@ int show_PCB(char* name){
     if(name == 0){
         return 1;
     }
+
+    // get pcb
+    pcb = pcb_find(name);
+    if (pcb == NULL) {
+        return 1; // pcb not found
+    }
     
     //Display Name, Class, State, Suspended Status, Priority
+    sys_req(WRITE, COM1, name, sizeof(name)); // name is already char*
+    sys_req(WRITE, COM1, itoa(pcb->class), sizeof(itoa(pcb->class))); // class is int; use itoa()
+    sys_req(WRITE, COM1, itoa(pcb->state), sizeof(itoa(pcb->state))); // state is int; use itoa()
+    sys_req(WRITE, COM1, itoa(pcb->priority), sizeof(itoa(pcb->priority))); // priority is int; use itoa()
 
     return 0;
 }

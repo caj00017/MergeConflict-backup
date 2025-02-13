@@ -11,7 +11,7 @@ typedef struct pcb {
     char* name;
     int class; /* 0 - user process, 1 - kernel process */
     int priority; /* 0-9 */
-    int state; /* 0-5 */                                                //possible change to enum.
+    int state; /* 0-4 */                                               //possible change to enum.
     int execution_mode; /*  */
     int dispatch_mode; /*  */
     unsigned char* stack;
@@ -22,9 +22,27 @@ typedef struct pcb {
 
 typedef struct queue {
     char* queue_type;
-    queue* next;
     pcb* head;
+    pcb* tail;
 } queue;
+
+/**
+ * @brief Returns the queue based on the class
+ * @param class Class of the queue to return (0 - ready, 1 - blocked)
+ * @returns queue* pointer to the queue of the given class, NULL if invalid class is given
+ * @author Chris Jones
+ */
+queue* return_queue(int class);
+
+/**
+ * @brief Sets up a pcb with the given name, class, and priority
+ * @param name Name of the pcb
+ * @param class Class of the pcb
+ * @param priority Priority of the pcb
+ * @returns pcb* pointer to the new pcb
+ * @author Chris Jones
+ */
+pcb* pcb_setup(char* name, int class, int priority);
 
 /**
  * @brief Allocate memory for a pcb
