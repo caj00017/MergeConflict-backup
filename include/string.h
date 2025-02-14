@@ -91,11 +91,23 @@ int charCount(char* str, char c);
 int indexOf(char* str, char searched_char);
 
 /**
- * @brief Function that clears a string
- * @param str The string to be cleared
- * @return The cleared string
- * @author Chris Jones
+ @brief Prints passed parameter to terminal
+ @param sentence The String to be printed
+ @author Izaak Whetsell
  */
-char* clear(char* str);
+void print(const char* sentence);
+
+/**
+ @brief Prints newline to terminal
+ @author Izaak Whetsell
+ */
+void println(void);
+
+/**
+ @brief Alters the color of the string output and prints to terminal
+ @param sentence The String to be printed red
+ @author Izaak Whetsell
+ */
+void print_error(const char* sentence);
 
 #endif

@@ -1,6 +1,7 @@
 #include <string.h>
 #include <memory.h>
 #include <ctype.h>
+#include <sys_req.h>
 
 /* memcpy() and memset() are in core.c */
 
@@ -170,9 +171,22 @@ int indexOf(char* str, char searched_char){
 	return -1;
 }
 
-char* clear(char* str) {
-	for (size_t i = 0; i < strlen(str); i++) {
-		str[i] = '\0';
-	}
-	return str;
+void print(const char* sentence){
+	//Print Sentance
+	sys_req(WRITE, COM1, sentence, strlen(sentence));
+}
+
+void println(void){
+	//Print newline
+	sys_req(WRITE, COM1, "\n", strlen("\n"));
+}
+
+
+void print_error(const char* sentence){
+	//Print Red Color Code
+	sys_req(WRITE, COM1, "\x1b[31m", strlen("\x1b[31m"));
+	//Print Error
+	sys_req(WRITE, COM1, sentence, strlen(sentence));
+	//Print Color Reset
+	sys_req(WRITE, COM1, "\x1b[0m", strlen("\x1b[0m"));
 }

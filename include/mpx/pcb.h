@@ -55,7 +55,6 @@ pcb* pcb_setup(char* name, int class, int priority);
 /**
  * @brief Allocate memory for a pcb
  * @returns pcb pointer to new allocated memory
- * @author Tanner Forbes
  */
 pcb* pcb_allocate(void);
 

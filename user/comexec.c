@@ -239,9 +239,22 @@ int comexec(char buf[]) {
         return show_all_PCB();
     }
 
+    else if (strcmp(buf, "test_color") == 0)
+    {
+        println();
+        print_error("THis is an error");
+        return 0;
+    }
+
+    //Bonus Commands
+    else if (strcmp(buf, "clear") == 0) {
+        clear_screen();
+        return 5;
+    }
 
     else {
-        sys_req(WRITE, COM1, "\nError: Invalid command.", sizeof("\nError: Invalid command."));
+        println();
+        print_error("Error: Invalid command.");
         return 1;
     }
 }
@@ -303,5 +316,11 @@ int help(void) {
 int version(void) {
     char msg[100] = "\nVersion 1.0\nCompilation Date: 2/7/2025";
     sys_req(WRITE,COM1, msg, sizeof(msg));
+    return 0;
+}
+
+int clear_screen(void) {
+    sys_req(WRITE, COM1, "\033[2J", sizeof("\033[H"));
+    sys_req(WRITE, COM1, "\033[H", sizeof("\033[H"));
     return 0;
 }
