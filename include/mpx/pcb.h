@@ -22,8 +22,6 @@ typedef struct pcb {
     int class; /* 0 - user process, 1 - kernel process */
     int priority; /* 0-9 */
     int state; /* 0-4 */                                               //possible change to enum.
-    int execution_mode; /*  */
-    int dispatch_mode; /*  */
     unsigned char* stack;
     unsigned char* stack_location; // points to the final byte in the stack
     struct pcb* next_node;
