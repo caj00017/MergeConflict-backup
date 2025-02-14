@@ -60,11 +60,8 @@ int pcb_free(pcb* pcbPtr){
 
 pcb* pcb_find(const char * search_name){
 
-    //getting the ready queue to get the head node of
-    queue r_queue = return_queue(0);
-
     //creating a pcb pointer that begins by pointing to the queue's head
-    pcb* current_pcb = r_queue.head;
+    pcb* current_pcb = READY.head;
 
     //loops while the current pcb pointer isn't null
     while(current_pcb != NULL){
@@ -77,14 +74,11 @@ pcb* pcb_find(const char * search_name){
         }
 
         //updates the current pcb to the next pcb via it's next_node pointer
-        current_pcb == current_pcb->next_node;
+        current_pcb = current_pcb->next_node;
     }
 
-    //getting the blocked queue if the searched name isn't found
-    queue b_queue = return_queue(1);
-
     //setting the current pcb to the blocked queue's head
-    current_pcb = b_queue.head;
+    current_pcb = BLOCKED.head;
 
     //loops while current pcb is not null
     while(current_pcb != NULL){
@@ -97,7 +91,7 @@ pcb* pcb_find(const char * search_name){
         }
 
         //updates the current pcb to the next pcb pointer via the next_node pointer
-        current_pcb == current_pcb->next_node;
+        current_pcb = current_pcb->next_node;
     }
 
     // return NULL if PCB is not found
@@ -316,14 +310,14 @@ int pcb_remove(pcb* removed_pcbPtr){
     if(removed_pcbPtr->next_node == NULL){
 
         //if at the end, sets the prev_node's next_node pointer to null
-        removed_pcbPtr->prev_node->next_node == NULL;
+        removed_pcbPtr->prev_node->next_node = NULL;
     }
 
     //checking if the pcb given is at the front of the queue
     else if(removed_pcbPtr->prev_node == NULL){
 
         //if at the front, sets the next_node's prev_node pointer to null
-        removed_pcbPtr->next_node->prev_node == NULL;
+        removed_pcbPtr->next_node->prev_node = NULL;
     }
     else{
 
@@ -335,8 +329,8 @@ int pcb_remove(pcb* removed_pcbPtr){
     }
 
     //sets the removed pcb's next_node and prev_node pointers to null
-    removed_pcbPtr->next_node == NULL;
-    removed_pcbPtr->prev_node == NULL;
+    removed_pcbPtr->next_node = NULL;
+    removed_pcbPtr->prev_node = NULL;
 
     return 0;
 }
