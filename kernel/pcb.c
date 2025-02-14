@@ -311,6 +311,20 @@ int pcb_remove(pcb* removed_pcbPtr){
 
         //if at the end, sets the prev_node's next_node pointer to null
         removed_pcbPtr->prev_node->next_node = NULL;
+
+        //checks to see if the given pcb is in the ready queue
+        if(removed_pcbPtr->state == READY_SUS || removed_pcbPtr->state == READY_NOT_SUS){
+
+            //if in ready queue replaces the tail of the queue with the previous node of the given pcb
+            READY.tail = removed_pcbPtr->prev_node;
+        }
+
+        //checks to see if the given pcb is in the blocked queue
+        else if(removed_pcbPtr->state == BLOCKED_SUS || removed_pcbPtr->state == BLOCKED_NOT_SUS){
+
+            //if in blocked queue replaces the tail of the queue with the previous node of the given pcb
+            BLOCKED.tail = removed_pcbPtr->prev_node;
+        }
     }
 
     //checking if the pcb given is at the front of the queue
@@ -318,6 +332,20 @@ int pcb_remove(pcb* removed_pcbPtr){
 
         //if at the front, sets the next_node's prev_node pointer to null
         removed_pcbPtr->next_node->prev_node = NULL;
+
+        //checks to see if the given pcb is in the ready queue
+        if(removed_pcbPtr->state == READY_SUS || removed_pcbPtr->state == READY_NOT_SUS){
+
+            //if in ready queue replaces the head of the queue with the next node of the given pcb
+            READY.head = removed_pcbPtr->next_node_node;
+        }
+
+        //checks to see if the given pcb is in the blocked queue
+        else if(removed_pcbPtr->state == BLOCKED_SUS || removed_pcbPtr->state == BLOCKED_NOT_SUS){
+
+             //if in blocked queue replaces the head of the queue with the next node of the given pcb
+            BLOCKED.head = removed_pcbPtr->next_node_node;
+        }
     }
     else{
 
@@ -327,6 +355,7 @@ int pcb_remove(pcb* removed_pcbPtr){
         //sets the next node's prev_node pointer to the removed pcb's prev_node pointer
         removed_pcbPtr->next_node->prev_node = removed_pcbPtr->prev_node;
     }
+
 
     //sets the removed pcb's next_node and prev_node pointers to null
     removed_pcbPtr->next_node = NULL;
