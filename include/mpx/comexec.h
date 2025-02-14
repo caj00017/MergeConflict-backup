@@ -37,4 +37,11 @@ int help(void);
  */
 int version(void);
 
+/**
+ * @brief Clears the screen.
+ * @return Status code
+ * @author Evan Humphrey
+ */
+int clear_screen(void);
+
 #endif

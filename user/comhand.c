@@ -24,9 +24,8 @@ void comhand(void) {
             sys_req(WRITE, COM1, "\nShutting down...\n", sizeof("\nShutting down...\n"));
             return;
         }
-
-        // print newline after each command
-        char test[1] = "\n";
-        sys_req(WRITE, COM1, test, sizeof(test));
+        if(status != 5) {
+            sys_req(WRITE, COM1, "\n", sizeof("\n"));
+        }
     } 
 }

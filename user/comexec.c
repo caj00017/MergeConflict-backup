@@ -115,6 +115,12 @@ int comexec(char buf[]) {
         return 0;
     }
 
+    //Bonus Commands
+    else if (strcmp(buf, "clear") == 0) {
+        clear_screen();
+        return 5;
+    }
+
     else {
         println();
         print_error("Error: Invalid command.");
@@ -179,5 +185,11 @@ int help(void) {
 int version(void) {
     char msg[100] = "\nVersion 1.0\nCompilation Date: 2/7/2025";
     sys_req(WRITE,COM1, msg, sizeof(msg));
+    return 0;
+}
+
+int clear_screen(void) {
+    sys_req(WRITE, COM1, "\033[2J", sizeof("\033[H"));
+    sys_req(WRITE, COM1, "\033[H", sizeof("\033[H"));
     return 0;
 }
