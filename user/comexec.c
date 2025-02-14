@@ -55,7 +55,138 @@ int comexec(char buf[]) {
 
     else if (strcmp(buf, "process_create") == 0)
     {
-        return create_PCB("name", 1, 1);
+        //Write a newline to command line.
+        sys_req(WRITE, COM1, "\n", sizeof("\n"));
+
+        //Create variable for a one time only command per shutdown call
+        int first = 1;
+
+        char* name;
+        int class;
+        int priority;
+
+        // Name entry loop
+        while (1)
+        {
+            // reset reponse on each loop
+            char name_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                sys_req(WRITE, COM1, "@ Please enter the name of the process to create (or write 'cancel' to cancel): ", sizeof("@ Please enter the name of the process to create (or write 'cancel' to cancel): "));
+            }
+
+            //Write formatting for entry and read from the command line
+            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            sys_req(READ, COM1, name_response, sizeof(name_response));
+
+            // write reponse for testing purposes
+            sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
+            sys_req(WRITE, COM1, name_response, sizeof(name_response));
+
+            // check for invalid format
+            if(isNumeric(name_response)){
+                sys_req(WRITE, COM1, "\n", sizeof("\n"));
+                sys_req(WRITE, COM1, "@ Please retype your response: ", sizeof("@ Please retype your response: "));
+                continue;
+            }
+            else if (strcmp(name_response, "cancel") == 0){
+                // cancel
+                sys_req(WRITE, COM1, "\nProcess creation cancelled.", sizeof("\nProcess creation cancelled."));
+                return 0;
+            }
+            else{
+                // valid input
+                name = name_response;
+                break;
+            }
+        }
+
+        // reset first
+        first = 1;
+
+        // Class entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char class_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                sys_req(WRITE, COM1, "\n@ Please enter the class [0,1] of the process to create (or ENTER to cancel): ", sizeof("@ Please enter the class [0,1] of the process to create (or ENTER to cancel): "));
+            }
+
+            //Write formatting for entry and read from the command line
+            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            sys_req(READ, COM1, class_response, sizeof(class_response));
+
+            // write reponse for testing purposes
+            sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
+            sys_req(WRITE, COM1, class_response, sizeof(class_response));
+
+            // check for valid format
+            if(isNumeric(class_response) == 1 && atoi(class_response) >= 0 && atoi(class_response) <= 1){
+                // valid input
+                class = atoi(class_response);
+                break;
+            }
+            else{
+                // invalid input
+                sys_req(WRITE, COM1, "\n", sizeof("\n"));
+                sys_req(WRITE, COM1, "@ Please retype your response [0,1]: ", sizeof("@ Please retype your response: [0,1]"));
+                continue;
+            }
+                
+        }
+
+        // reset first
+        first = 1;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                sys_req(WRITE, COM1, "\n@ Please enter the priority [0-9] of the process to create (or ENTER to cancel): ", sizeof("@ Please enter the priority [0-9] of the process to create (or ENTER to cancel): "));
+            }
+
+            //Write formatting for entry and read from the command line
+            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+
+            // write reponse for testing purposes
+            sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
+            sys_req(WRITE, COM1, priority_response, sizeof(priority_response));
+
+            // check for invalid format
+            if(isNumeric(priority_response) == 0 || atoi(priority_response) < 0 || atoi(priority_response) > 9){
+                sys_req(WRITE, COM1, "\n", sizeof("\n"));
+                sys_req(WRITE, COM1, "@ Please retype your response [0-9]: ", sizeof("@ Please retype your response: [0-9]"));
+                continue;
+            }
+            else{
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+
+        }
+
+        int status = create_PCB(name, class, priority);
+        if (status == 1) {
+            sys_req(WRITE, COM1, "\nError creating PCB.", sizeof("\nError creating PCB."));
+            return 0; // continue running comexec
+        }
+
+        sys_req(WRITE, COM1, "\nPCB created successfully.", sizeof("\nPCB created successfully."));
+        show_PCB(name);
+        return 0;
     }
 
     else if (strcmp(buf, "process_delete") == 0)

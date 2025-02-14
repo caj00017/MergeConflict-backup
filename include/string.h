@@ -90,4 +90,12 @@ int charCount(char* str, char c);
  */
 int indexOf(char* str, char searched_char);
 
+/**
+ * @brief Function that clears a string
+ * @param str The string to be cleared
+ * @return The cleared string
+ * @author Chris Jones
+ */
+char* clear(char* str);
+
 #endif

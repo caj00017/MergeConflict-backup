@@ -169,3 +169,10 @@ int indexOf(char* str, char searched_char){
 	}
 	return -1;
 }
+
+char* clear(char* str) {
+	for (size_t i = 0; i < strlen(str); i++) {
+		str[i] = '\0';
+	}
+	return str;
+}

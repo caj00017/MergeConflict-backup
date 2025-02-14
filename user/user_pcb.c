@@ -9,9 +9,9 @@
  */
 int create_PCB(char* name, int class, int priority){
     //Check name,class, and priority are correct or not used
-    if(name == 0 || class == 0 || priority == 1){ //Placeholder so it doesn't yell at me for not using name
-        return 1;
-    }
+    // if(name == 0 || class == 0 || priority == 1){ //Placeholder so it doesn't yell at me for not using name
+    //     return 1;
+    // }
     
     //Call PCB Setup
     pcb* PCB = pcb_setup(name, class, priority);
