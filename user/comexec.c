@@ -108,9 +108,16 @@ int comexec(char buf[]) {
         return show_all_PCB();
     }
 
+    else if (strcmp(buf, "test_color") == 0)
+    {
+        println();
+        print_error("THis is an error");
+        return 0;
+    }
 
     else {
-        sys_req(WRITE, COM1, "\nError: Invalid command.", sizeof("\nError: Invalid command."));
+        println();
+        print_error("Error: Invalid command.");
         return 1;
     }
 }
