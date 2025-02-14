@@ -4,13 +4,20 @@
 #include <mpx/device.h>
 #include <mpx/serial.h>
 #include <sys_req.h>
+#include <string.h>
 
 void comhand(void) {
-    sys_req(WRITE, COM1, "@ Type 'help' to see list of commands\n", sizeof("@ Type 'help' to see list of commands\n"));
+    print("\x1b[34m");
+    print("@ ");
+    print("\x1b[0m");
+    print("Type 'help' to see list of commands\n");
     while(1) {
 
         // Add the @ before each command
-        sys_req(WRITE, COM1, "@ ", sizeof("@ ")); 
+        print("\x1b[34m");
+        print("@ ");
+        print("\x1b[0m");
+        // sys_req(WRITE, COM1, "@ ", sizeof("@ ")); 
 
         // initialize buffer and read from user
         char buf[100] = { 0 };
