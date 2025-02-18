@@ -7,17 +7,12 @@
 #include <string.h>
 
 void comhand(void) {
-    print("\x1b[34m");
     print("@ ");
-    print("\x1b[0m");
     print("Type 'help' to see list of commands\n");
     while(1) {
 
         // Add the @ before each command
-        print("\x1b[34m");
-        print("@ ");
-        print("\x1b[0m");
-        // sys_req(WRITE, COM1, "@ ", sizeof("@ ")); 
+        print_color("@ ", "blue");
 
         // initialize buffer and read from user
         char buf[100] = { 0 };

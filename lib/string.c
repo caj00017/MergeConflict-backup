@@ -190,3 +190,32 @@ void print_error(const char* sentence){
 	//Print Color Reset
 	sys_req(WRITE, COM1, "\x1b[0m", strlen("\x1b[0m"));
 }
+
+void print_color(const char* sentence, const char* color_code){
+	// Set color code from given parameter
+	if(strcmp(color_code, "green") == 0) {
+		color_code = "\x1b[32m";
+	}
+	else if(strcmp(color_code, "yellow") == 0) {
+		color_code = "\x1b[33m";
+	}
+	else if(strcmp(color_code, "blue") == 0) {
+		color_code = "\x1b[34m";
+	}
+	else if(strcmp(color_code, "magenta") == 0) {
+		color_code = "\x1b[35m";
+	}
+	else if(strcmp(color_code, "cyan") == 0) {
+		color_code = "\x1b[36m";
+	}
+	else {
+		color_code = "";
+	}
+	
+	//Print Color Code
+	sys_req(WRITE, COM1, color_code, strlen(color_code));
+	//Print Sentence
+	sys_req(WRITE, COM1, sentence, strlen(sentence));
+	//Print Color Reset
+	sys_req(WRITE, COM1, "\x1b[0m", strlen("\x1b[0m"));
+}

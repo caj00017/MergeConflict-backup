@@ -110,4 +110,12 @@ void println(void);
  */
 void print_error(const char* sentence);
 
+/**
+ @brief Alters the color of the string output and prints to terminal
+ @param sentence The String to be printed
+ @param color_code The color to be used
+ @author Evan Humphrey
+ */
+void print_color(const char* sentence, const char* color_code);
+
 #endif

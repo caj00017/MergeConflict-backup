@@ -130,12 +130,12 @@ int serial_poll(device dev, char *buffer, size_t len)
 				//Up Arrow key
 				if(strcmp(special_key, UP_ARROW) == 0){
 
-					//make these remember the last few (3) commands that we typed
+					//make these remember the last few (5) commands that we typed
 				}
 				//Down Arrow key
 				else if(strcmp(special_key, DOWN_ARROW) == 0){
 
-					//make these remember the last few (3) commands that we typed
+					//make these remember the last few (5) commands that we typed
 				}
 				//Right Arrow key
 				else if(strcmp(special_key, RIGHT_ARROW) == 0){
@@ -217,8 +217,10 @@ int serial_poll(device dev, char *buffer, size_t len)
 
 void buffer_refresh(char *buffer, int buf_length, int pos) {
 	serial_out(COM1, "\033[2K\r", sizeof("\033[2K\r")); //"\033" starts in escape sequence, "2K" clears the terminal line, "\r" prints a carraige return to get back to the beginning of the line
+	serial_out(COM1, "\x1b[34m", sizeof("\x1b[34m")); //changes the color of the @ symbol to blue
 	serial_out(COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
 	serial_out(COM1, " ", sizeof(" ")); //^^^
+	serial_out(COM1, "\x1b[0m", sizeof("\x1b[0m")); //resets the color of the terminal line to the default color
 	serial_out(COM1, buffer, buf_length); //this reprints the buffer
 	
 	//This loop moves the cursor back to the position it was at before the buffer was refreshed, since every time that the buffer is reprinted, the cursor is moved back to the front of the line
