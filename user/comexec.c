@@ -53,7 +53,7 @@ int comexec(char buf[]) {
 
     /*  PCB Functions  */
 
-    else if (strcmp(buf, "process_create") == 0)
+    else if (strcmp(buf, "process_create") == 0 || strcmp(buf, "pc") == 0)
     {
         //Write a newline to command line.
         sys_req(WRITE, COM1, "\n", sizeof("\n"));
@@ -189,52 +189,52 @@ int comexec(char buf[]) {
         return 0;
     }
 
-    else if (strcmp(buf, "process_delete") == 0)
+    else if (strcmp(buf, "process_delete") == 0 || strcmp(buf, "pd") == 0)
     {
         return delete_PCB("name");
     }
 
-    else if (strcmp(buf, "process_block") == 0)
+    else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
     {
         return block_PCB("name");
     }
 
-    else if (strcmp(buf, "process_unblock") == 0)
+    else if (strcmp(buf, "process_unblock") == 0 || strcmp(buf, "pub") == 0)
     {
         return unblock_PCB("name");
     }
 
-    else if (strcmp(buf, "process_suspend") == 0)
+    else if (strcmp(buf, "process_suspend") == 0 || strcmp(buf, "psus") == 0)
     {
         return suspend_PCB("name");
     }
 
-    else if (strcmp(buf, "process_resume") == 0)
+    else if (strcmp(buf, "process_resume") == 0 || strcmp(buf, "pres") == 0)
     {
         return resume_PCB("name");
     }
 
-    else if (strcmp(buf, "process_priority") == 0)
+    else if (strcmp(buf, "process_priority") == 0 || strcmp(buf, "pp") == 0)
     {
         return set_PCB_priority("name",1);
     }
 
-    else if (strcmp(buf, "process_show") == 0)
+    else if (strcmp(buf, "process_show") == 0 || strcmp(buf, "ps") == 0)
     {
         return show_PCB("name");
     }
 
-    else if (strcmp(buf, "process_show_ready") == 0)
+    else if (strcmp(buf, "process_show_ready") == 0 || strcmp(buf, "psr") == 0)
     {
         return show_ready_PCB();
     }
 
-    else if (strcmp(buf, "process_show_blocked") == 0)
+    else if (strcmp(buf, "process_show_blocked") == 0 || strcmp(buf, "psb") == 0)
     {
         return show_blocked_PCB();
     }
 
-    else if (strcmp(buf, "process_show_all") == 0)
+    else if (strcmp(buf, "process_show_all") == 0 || strcmp(buf, "psa") == 0)
     {
         return show_all_PCB();
     }
@@ -319,7 +319,7 @@ int help(void) {
     sys_req(WRITE, COM1, "\n@ process_delete\tpd\tDeletes a process.", sizeof("\n@ process_delete\tpd\tDeletes a process."));
     sys_req(WRITE, COM1, "\n@ process_block\t\tpb\tBlocks a process.", sizeof("\n@ process_block\t\tpb\tBlocks a process."));
     sys_req(WRITE, COM1, "\n@ process_unblock\tpub\tUnblocks a process.", sizeof("\n@ process_unblock\tpub\tUnblocks a process."));
-    sys_req(WRITE, COM1, "\n@ process_suspend\tps\tSuspends a process.", sizeof("\n@ process_suspend\tps\tSuspends a process."));
+    sys_req(WRITE, COM1, "\n@ process_suspend\tpsus\tSuspends a process.", sizeof("\n@ process_suspend\tpsus\tSuspends a process."));
     sys_req(WRITE, COM1, "\n@ process_resume\tpres\tResumes a process.", sizeof("\n@ process_resume\tpres\tResumes a process."));
     sys_req(WRITE, COM1, "\n@ process_priority\tpp\tChanges the priority of a process.", sizeof("\n@ process_priority\tpp\tChanges the priority of a process."));
     sys_req(WRITE, COM1, "\n@ process_show\t\tps\tShows information about a process.", sizeof("\n@ process_show\t\tps\tShows information about a process."));
