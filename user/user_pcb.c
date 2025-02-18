@@ -3,6 +3,7 @@
 #include <sys_req.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <string.h>
 
 /**
  * Create PCB
@@ -222,12 +223,29 @@ int show_PCB(char* name){
     if (PCB == NULL) {
         return 1; // pcb not found
     }
+
+    // non-null str for testing
+    char str[100];
+
+    char* class_str = itoa(PCB->class,str,10);
+    char* state_str = itoa(PCB->state,str,10);
+    char* priority_str = itoa(PCB->priority,str,10);
     
     //Display Name, Class, State, Suspended Status, Priority
-    sys_req(WRITE, COM1, name, sizeof(name)); // name is already char*
-    sys_req(WRITE, COM1, itoa(PCB->class,NULL,10), sizeof(itoa(PCB->class,NULL,10))); // class is int; use itoa()
-    sys_req(WRITE, COM1, itoa(PCB->state,NULL,10), sizeof(itoa(PCB->state,NULL,10))); // state is int; use itoa()
-    sys_req(WRITE, COM1, itoa(PCB->priority,NULL,10), sizeof(itoa(PCB->priority,NULL,10))); // priority is int; use itoa()
+    sys_req(WRITE, COM1, "\nName: ", sizeof("\nName: "));
+    sys_req(WRITE, COM1, PCB->name, strlen(PCB->name)); // name is already char*
+    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+
+    sys_req(WRITE, COM1, "Class: ", sizeof("Class: "));
+    sys_req(WRITE, COM1, class_str, strlen(class_str));
+    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+
+    sys_req(WRITE, COM1, "State: ", sizeof("State: "));
+    sys_req(WRITE, COM1, state_str, strlen(state_str)); 
+    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+
+    sys_req(WRITE, COM1, "Priority: ", sizeof("Priority: "));
+    sys_req(WRITE, COM1, priority_str, strlen(priority_str));
 
     return 0;
 }
@@ -241,7 +259,7 @@ int show_ready_PCB(void){
     queue* ready = return_queue(0);
     pcb* current = ready->head;
     if (current == NULL) {
-        sys_req(WRITE, COM1, "No processes in ready queue", sizeof("No processes in ready queue"));
+        sys_req(WRITE, COM1, "\nNo processes in ready queue", sizeof("\nNo processes in ready queue"));
     }
     while (current != NULL) {
         show_PCB(current->name);
@@ -260,7 +278,7 @@ int show_blocked_PCB(void){
     queue* blocked = return_queue(1);
     pcb* current = blocked->head;
     if (current == NULL) {
-        sys_req(WRITE, COM1, "No processes in blocked queue", sizeof("No processes in blocked queue"));
+        sys_req(WRITE, COM1, "\nNo processes in blocked queue", sizeof("\nNo processes in blocked queue"));
     }
     while (current != NULL) {
         show_PCB(current->name);
@@ -278,11 +296,11 @@ int show_all_PCB(void){
     //Show each processes
 
     // Ready
-    sys_req(WRITE, COM1, "Ready Processes:", sizeof("Ready Processes:"));
+    sys_req(WRITE, COM1, "\nReady Processes:", sizeof("\nReady Processes:"));
     show_ready_PCB();
 
     // Blocked
-    sys_req(WRITE, COM1, "Blocked Processes:", sizeof("Blocked Processes:"));
+    sys_req(WRITE, COM1, "\nBlocked Processes:", sizeof("\nBlocked Processes:"));
     show_blocked_PCB();
 
     return 0;
