@@ -337,14 +337,14 @@ int pcb_remove(pcb* removed_pcbPtr){
         if(removed_pcbPtr->state == READY_SUS || removed_pcbPtr->state == READY_NOT_SUS){
 
             //if in ready queue replaces the head of the queue with the next node of the given pcb
-            READY.head = removed_pcbPtr->next_node_node;
+            READY.head = removed_pcbPtr->next_node;
         }
 
         //checks to see if the given pcb is in the blocked queue
         else if(removed_pcbPtr->state == BLOCKED_SUS || removed_pcbPtr->state == BLOCKED_NOT_SUS){
 
              //if in blocked queue replaces the head of the queue with the next node of the given pcb
-            BLOCKED.head = removed_pcbPtr->next_node_node;
+            BLOCKED.head = removed_pcbPtr->next_node;
         }
     }
     else{

@@ -303,6 +303,8 @@ int shutdown(void) {
 
 int help(void) {
     // Print list of commands
+
+    // R1 commands
     sys_req(WRITE, COM1, "\n@ help\t\tPrints a complete list of each available command.", sizeof("@ help\tPrints a complete list of each available command."));
     sys_req(WRITE, COM1, "\n@ version\tPrints the current version of the program.", sizeof("@ version\tPrints the current version of the program."));
     sys_req(WRITE, COM1, "\n@ get_date\tPrints the current date set by the user.", sizeof("@ get_date\tPrints the current date set by the user."));
@@ -310,6 +312,20 @@ int help(void) {
     sys_req(WRITE, COM1, "\n@ get_time\tPrints the current time set by the user.", sizeof("@ get_time\tPrints the current time set by the user."));
     sys_req(WRITE, COM1, "\n@ set_time\tHH:MM:SS\tSets the current time.", sizeof("@ set_time\tHH:MM:SS\tSets the current time."));
     sys_req(WRITE, COM1, "\n@ shutdown\tExits the program.", sizeof("\n@ shutdown\tExits the program."));
+
+    // R2 commands
+    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+    sys_req(WRITE, COM1, "\n@ process_create\tpc\tCreates a new process.", sizeof("\n@ process_create\tpc\tCreates a new process."));
+    sys_req(WRITE, COM1, "\n@ process_delete\tpd\tDeletes a process.", sizeof("\n@ process_delete\tpd\tDeletes a process."));
+    sys_req(WRITE, COM1, "\n@ process_block\t\tpb\tBlocks a process.", sizeof("\n@ process_block\t\tpb\tBlocks a process."));
+    sys_req(WRITE, COM1, "\n@ process_unblock\tpub\tUnblocks a process.", sizeof("\n@ process_unblock\tpub\tUnblocks a process."));
+    sys_req(WRITE, COM1, "\n@ process_suspend\tps\tSuspends a process.", sizeof("\n@ process_suspend\tps\tSuspends a process."));
+    sys_req(WRITE, COM1, "\n@ process_resume\tpres\tResumes a process.", sizeof("\n@ process_resume\tpres\tResumes a process."));
+    sys_req(WRITE, COM1, "\n@ process_priority\tpp\tChanges the priority of a process.", sizeof("\n@ process_priority\tpp\tChanges the priority of a process."));
+    sys_req(WRITE, COM1, "\n@ process_show\t\tps\tShows information about a process.", sizeof("\n@ process_show\t\tps\tShows information about a process."));
+    sys_req(WRITE, COM1, "\n@ process_show_ready\tpsr\tShows all processes in the ready state.", sizeof("\n@ process_show_ready\tpsr\tShows all processes in the ready state."));
+    sys_req(WRITE, COM1, "\n@ process_show_blocked\tpsb\tShows all processes in the blocked state.", sizeof("\n@ process_show_blocked\tpsb\tShows all processes in the blocked state."));
+    sys_req(WRITE, COM1, "\n@ process_show_all\tpsa\tShows all processes.", sizeof("\n@ process_show_all\tpsa\tShows all processes."));
     return 0;
 }
 
