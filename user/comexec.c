@@ -219,34 +219,212 @@ int comexec(char buf[]) {
             return 0; // continue running comexec
         }
         else {
+            sys_req(WRITE, COM1, "\nDeleting PCB: ", sizeof("\nDeleting PCB: "));
+            sys_req(WRITE, COM1, name, strlen(name));
             delete_PCB(name);
             return 0;
         }
     }
 
+    // CJ - Note: As of Feb. 19, pcb_remove is not working, so pcb_block is unable to remove blocked PCBs from the ready queue
     else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
     {
-        return block_PCB("name");
+        char* name;
+        char response[100] = { 0 };
+        sys_req(WRITE, COM1, "\nPlease enter the name of the process to block: ", sizeof("\nPlease enter the name of the process to block: "));
+
+        //Write formatting for entry and read from the command line
+        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        sys_req(READ, COM1, response, sizeof(response));
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else if (PCB->state != READY_SUS && PCB->state != READY_NOT_SUS) {
+            sys_req(WRITE, COM1, "\nProcess is not in a ready state: ", sizeof("\nProcess is not in a ready state: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else {
+            sys_req(WRITE, COM1, "\nBlocking PCB: ", sizeof("\nBlocking PCB: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            block_PCB(name);
+            return 0;
+        }
     }
 
+    // CJ - Note: As of Feb. 19, pcb_remove is not working, so pcb_unblock is unable to remove ready PCBs from the blocked queue
+    // Side note: Executing 'psa' or any similar command after unblocking results in an infinite loop. No idea why.
     else if (strcmp(buf, "process_unblock") == 0 || strcmp(buf, "pub") == 0)
     {
-        return unblock_PCB("name");
+        char* name;
+        char response[100] = { 0 };
+        sys_req(WRITE, COM1, "\nPlease enter the name of the process to unblock: ", sizeof("\nPlease enter the name of the process to unblock: "));
+
+        //Write formatting for entry and read from the command line
+        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        sys_req(READ, COM1, response, sizeof(response));
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else if (PCB->state != BLOCKED_SUS && PCB->state != BLOCKED_NOT_SUS) {
+            sys_req(WRITE, COM1, "\nProcess is not in a blocked state: ", sizeof("\nProcess is not in a blocked state: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else {
+            sys_req(WRITE, COM1, "\nUnblocking PCB: ", sizeof("\nUnblocking PCB: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            unblock_PCB(name);
+            return 0;
+        }
     }
 
     else if (strcmp(buf, "process_suspend") == 0 || strcmp(buf, "psus") == 0)
     {
-        return suspend_PCB("name");
+        char* name;
+        char response[100] = { 0 };
+        sys_req(WRITE, COM1, "\nPlease enter the name of the process to suspend: ", sizeof("\nPlease enter the name of the process to suspend: "));
+
+        //Write formatting for entry and read from the command line
+        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        sys_req(READ, COM1, response, sizeof(response));
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else if (PCB->state != READY_NOT_SUS && PCB->state != BLOCKED_NOT_SUS) {
+            sys_req(WRITE, COM1, "\nProcess is already suspended: ", sizeof("\nProcess is already suspended: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else {
+            sys_req(WRITE, COM1, "\nSuspending PCB: ", sizeof("\nSuspending PCB: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            suspend_PCB(name);
+            return 0;
+        }
     }
 
     else if (strcmp(buf, "process_resume") == 0 || strcmp(buf, "pres") == 0)
     {
-        return resume_PCB("name");
+        char* name;
+        char response[100] = { 0 };
+        sys_req(WRITE, COM1, "\nPlease enter the name of the suspended process to resume: ", sizeof("\nPlease enter the name of the suspended process to resume: "));
+
+        //Write formatting for entry and read from the command line
+        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        sys_req(READ, COM1, response, sizeof(response));
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else if (PCB->state != READY_SUS && PCB->state != BLOCKED_SUS) {
+            sys_req(WRITE, COM1, "\nProcess cannot be resumed: ", sizeof("\nProcess cannot be resumed: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else {
+            sys_req(WRITE, COM1, "\nResuming PCB: ", sizeof("\nResuming PCB: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            resume_PCB(name);
+            return 0;
+        }
     }
 
     else if (strcmp(buf, "process_priority") == 0 || strcmp(buf, "pp") == 0)
     {
-        return set_PCB_priority("name",1);
+        char* name;
+        char response[100] = { 0 };
+        sys_req(WRITE, COM1, "\nPlease enter the name of the process to update: ", sizeof("\nPlease enter the name of the process to update: "));
+
+        //Write formatting for entry and read from the command line
+        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        sys_req(READ, COM1, response, sizeof(response));
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+
+        int first = 1;
+        int priority;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                sys_req(WRITE, COM1, "\n@ Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ", sizeof("@ Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): "));
+            }
+
+            //Write formatting for entry and read from the command line
+            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+
+            // write reponse for testing purposes
+            sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
+            sys_req(WRITE, COM1, priority_response, sizeof(priority_response));
+
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                sys_req(WRITE, COM1, "\nPriority reassignment cancelled.", sizeof("\nPriority reassignment cancelled."));
+                return 0;
+            }
+            else{
+                // invalid input
+                sys_req(WRITE, COM1, "\n", sizeof("\n"));
+                sys_req(WRITE, COM1, "@ Please retype your response [0-9]: ", sizeof("@ Please retype your response: [0-9]"));
+                continue;
+            }
+
+        }
+
+        char str[100];
+
+        sys_req(WRITE, COM1, "\nSetting priority for PCB: ", sizeof("\nSetting priority for PCB: "));
+        sys_req(WRITE, COM1, name, strlen(name));
+        sys_req(WRITE, COM1, " to ", sizeof(" to "));
+        sys_req(WRITE, COM1, itoa(priority, str, 10), sizeof(itoa(priority, str, 10)));
+
+        set_PCB_priority(name, priority);
+
+        return 0;
     }
 
     else if (strcmp(buf, "process_show") == 0 || strcmp(buf, "ps") == 0)

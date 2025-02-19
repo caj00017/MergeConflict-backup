@@ -35,13 +35,22 @@ int delete_PCB(char* name){
     }
     
     // get pcb
+    sys_req(WRITE, COM1, "\nLocating PCB: ", sizeof("\nLocating PCB: "));
+    sys_req(WRITE, COM1, name, strlen(name));
+
     pcb* PCB = pcb_find(name);
     if (PCB == NULL) {
         return 1; // pcb not found
     }
 
+    sys_req(WRITE, COM1, "\nPCB Located: ", sizeof("\nPCB Located: "));
+    sys_req(WRITE, COM1, PCB->name, strlen(PCB->name));
+
     //Remove from queue with pcb_remove
     pcb_remove(PCB);
+
+    sys_req(WRITE, COM1, "\nPCB Deleted: ", sizeof("\nPCB Deleted: "));
+    sys_req(WRITE, COM1, PCB->name, strlen(PCB->name));
 
     //free memory with pcb_free
     pcb_free(PCB);
@@ -75,8 +84,14 @@ int block_PCB(char* name){
         return 1; // pcb cannot be blocked
     }
 
-    //Put into appropriate queue
+    // Remove from ready queue
+    // pcb_remove(PCB); pcb_remove is currently not working
+
+    //Put into blocked queue
     pcb_insert(PCB);
+
+    sys_req(WRITE, COM1, "\nPCB Blocked: ", sizeof("\nPCB Blocked: "));
+    show_PCB(name);
 
     return 0;
 }
@@ -107,8 +122,14 @@ int unblock_PCB(char* name){
         return 1; // pcb cannot be unblocked
     }
 
+    // Remove from blocked queue
+    // pcb_remove(PCB); pcb_remove is currently not working
+
     //Insert into ready queue
     pcb_insert(PCB);
+
+    sys_req(WRITE, COM1, "\nPCB Unblocked: ", sizeof("\nPCB Unblocked: "));
+    show_PCB(name);
 
     return 0;
 }
@@ -140,10 +161,10 @@ int suspend_PCB(char* name){
         return 1; // pcb cannot be suspended
     }
 
-    //Insert into appropriate queue
-    pcb_insert(PCB);
-
     //???Must not be system process?
+
+    sys_req(WRITE, COM1, "\nPCB Suspended: ", sizeof("\nPCB Suspended: "));
+    show_PCB(name);
 
     return 0;
 }
@@ -173,8 +194,8 @@ int resume_PCB(char* name){
         return 1; // pcb cannot be resumed
     }
 
-    //Move to correct queue
-    pcb_insert(PCB);
+    sys_req(WRITE, COM1, "\nPCB Resumed: ", sizeof("\nPCB Resumed: "));
+    show_PCB(name);
 
     return 0;
 }
@@ -195,14 +216,18 @@ int set_PCB_priority(char* name, int priority){
         return 1; // pcb not found
     }
 
-    // remove pcb for reinsertion?
-    pcb_remove(PCB);
+    // 2/19 - pcb_remove is not working
+    // // remove pcb for reinsertion?
+    // pcb_remove(PCB);
 
     //Change Priority
     PCB->priority = priority;
 
-    // reinsert at proper location in queue
-    pcb_insert(PCB);
+    // // reinsert at proper location in queue
+    // pcb_insert(PCB);
+
+    sys_req(WRITE, COM1, "\nPCB Updated: ", sizeof("\nPCB Updated: "));
+    show_PCB(name);
 
     return 0;
 }
@@ -227,9 +252,42 @@ int show_PCB(char* name){
     // non-null str for testing
     char str[100];
 
-    char* class_str = itoa(PCB->class,str,10);
-    char* state_str = itoa(PCB->state,str,10);
+    char* class_str;
+    char* state_str;
     char* priority_str = itoa(PCB->priority,str,10);
+
+    switch(PCB->class) {
+        case 0:
+            class_str = "User";
+            break;
+        case 1:
+            class_str = "Kernel";
+            break;
+        default:
+            class_str = "Error";
+            break;
+    }
+
+    switch (PCB->state) {
+        case 0:
+            state_str = "Ready, Suspended";
+            break;
+        case 1:
+            state_str = "Ready, Not Suspended";
+            break;
+        case 2:
+            state_str = "Running";
+            break;
+        case 3:
+            state_str = "Blocked, Suspended";
+            break;
+        case 4:
+            state_str = "Blocked, Not Suspended";
+            break;
+        default:
+            state_str = "Error";
+            break;
+    }
     
     //Display Name, Class, State, Suspended Status, Priority
     sys_req(WRITE, COM1, "\nName: ", sizeof("\nName: "));

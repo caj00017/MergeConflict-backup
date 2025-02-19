@@ -10,7 +10,8 @@
 /**
  * @brief PCB states
  */
-enum pcb_state {READY_SUS, // =0
+enum pcb_state {
+                READY_SUS, // =0
                 READY_NOT_SUS, // =1
                 RUNNING, // =2
                 BLOCKED_SUS, // =3
