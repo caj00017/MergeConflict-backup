@@ -183,7 +183,7 @@ int comexec(char buf[]) {
             else{
                 // invalid input
                 sys_req(WRITE, COM1, "\n", sizeof("\n"));
-                sys_req(WRITE, COM1, "@ Please retype your response [0,1]: ", sizeof("@ Please retype your response: [0,1]"));
+                sys_req(WRITE, COM1, "@ Please retype your response [0-9]: ", sizeof("@ Please retype your response: [0-9]"));
                 continue;
             }
 

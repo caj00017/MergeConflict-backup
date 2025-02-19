@@ -10,7 +10,11 @@
 
 pcb* pcb_setup(char* name, int class, int priority) {
     pcb* new_pcb = pcb_allocate();
-    new_pcb->name = name;
+    
+    // Allocate memory and copy the name
+    new_pcb->name = (char*)sys_alloc_mem(strlen(name) + 1);
+    strcpy(new_pcb->name, name);
+
     new_pcb->class = class;
     new_pcb->priority = priority;
     new_pcb->state = 0;               //Change?

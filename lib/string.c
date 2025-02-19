@@ -79,6 +79,17 @@ char *strtok(char * restrict s1, const char * restrict s2)
 	return s1;
 }
 
+int strcpy(char* dest, const char* src) {
+    while (*src) {
+        *dest = *src;
+        dest++;
+        src++;
+    }
+    *dest = '\0';  // Null-terminate the destination string
+    return 0;
+}
+
+
 int contains(const char *str1, const char *str2) {
 
 	// initialize length values for strings

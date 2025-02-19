@@ -48,6 +48,15 @@ size_t strlen(const char *s);
 char* strtok(char * restrict s1, const char * restrict s2);
 
 /**
+ * @brief Function which copies a string from src to dest
+ * @param dest The destination string
+ * @param src The source string
+ * @return 0 on success
+ * @author Chris Jones
+ */
+int strcpy(char* dest, const char* src);
+
+/**
 * @brief Indicates whether str1 contains str2
 * @param str1 The outer string to search
 * @param str2 The inner string to find
