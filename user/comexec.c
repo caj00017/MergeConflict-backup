@@ -115,7 +115,7 @@ int comexec(char buf[]) {
             //For first time, write instructions
             if(first == 1){
                 first = 0;
-                sys_req(WRITE, COM1, "\n@ Please enter the class [0,1] of the process to create (or ENTER to cancel): ", sizeof("@ Please enter the class [0,1] of the process to create (or ENTER to cancel): "));
+                sys_req(WRITE, COM1, "\n@ Please enter the class [0,1] of the process to create (or write 'cancel' to cancel): ", sizeof("@ Please enter the class [0,1] of the process to create (or write 'cancel' to cancel): "));
             }
 
             //Write formatting for entry and read from the command line
@@ -131,6 +131,11 @@ int comexec(char buf[]) {
                 // valid input
                 class = atoi(class_response);
                 break;
+            }
+            else if (strcmp(class_response, "cancel") == 0){
+                // cancel
+                sys_req(WRITE, COM1, "\nProcess creation cancelled.", sizeof("\nProcess creation cancelled."));
+                return 0;
             }
             else{
                 // invalid input
@@ -153,7 +158,7 @@ int comexec(char buf[]) {
             //For first time, write instructions
             if(first == 1){
                 first = 0;
-                sys_req(WRITE, COM1, "\n@ Please enter the priority [0-9] of the process to create (or ENTER to cancel): ", sizeof("@ Please enter the priority [0-9] of the process to create (or ENTER to cancel): "));
+                sys_req(WRITE, COM1, "\n@ Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): ", sizeof("@ Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): "));
             }
 
             //Write formatting for entry and read from the command line
@@ -164,16 +169,22 @@ int comexec(char buf[]) {
             sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
             sys_req(WRITE, COM1, priority_response, sizeof(priority_response));
 
-            // check for invalid format
-            if(isNumeric(priority_response) == 0 || atoi(priority_response) < 0 || atoi(priority_response) > 9){
-                sys_req(WRITE, COM1, "\n", sizeof("\n"));
-                sys_req(WRITE, COM1, "@ Please retype your response [0-9]: ", sizeof("@ Please retype your response: [0-9]"));
-                continue;
-            }
-            else{
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
                 // valid input
                 priority = atoi(priority_response);
                 break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                sys_req(WRITE, COM1, "\nProcess creation cancelled.", sizeof("\nProcess creation cancelled."));
+                return 0;
+            }
+            else{
+                // invalid input
+                sys_req(WRITE, COM1, "\n", sizeof("\n"));
+                sys_req(WRITE, COM1, "@ Please retype your response [0,1]: ", sizeof("@ Please retype your response: [0,1]"));
+                continue;
             }
 
         }
@@ -191,7 +202,26 @@ int comexec(char buf[]) {
 
     else if (strcmp(buf, "process_delete") == 0 || strcmp(buf, "pd") == 0)
     {
-        return delete_PCB("name");
+        char* name;
+        char response[100] = { 0 };
+        sys_req(WRITE, COM1, "\nPlease enter the name of the process to delete: ", sizeof("\nPlease enter the name of the process to delete: "));
+
+        //Write formatting for entry and read from the command line
+        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        sys_req(READ, COM1, response, sizeof(response));
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else {
+            delete_PCB(name);
+            return 0;
+        }
     }
 
     else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
@@ -221,7 +251,30 @@ int comexec(char buf[]) {
 
     else if (strcmp(buf, "process_show") == 0 || strcmp(buf, "ps") == 0)
     {
-        return show_PCB("name");
+        char* name;
+        char response[100] = { 0 };
+        sys_req(WRITE, COM1, "\nPlease enter the name of the process to show: ", sizeof("\nPlease enter the name of the process to show: "));
+
+        //Write formatting for entry and read from the command line
+        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        sys_req(READ, COM1, response, sizeof(response));
+
+        name = response;
+
+        sys_req(WRITE, COM1, "\nLocating PCB: ", sizeof("\nLocating PCB: "));
+        sys_req(WRITE, COM1, name, strlen(name));
+        sys_req(WRITE, COM1, "...", sizeof("..."));
+        
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
+            sys_req(WRITE, COM1, name, strlen(name));
+            return 0; // continue running comexec
+        }
+        else {
+            show_PCB(name);
+            return 0;
+        }
     }
 
     else if (strcmp(buf, "process_show_ready") == 0 || strcmp(buf, "psr") == 0)

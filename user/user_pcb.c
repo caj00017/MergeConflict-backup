@@ -255,6 +255,11 @@ int show_PCB(char* name){
  * Show Ready PCBs
  */
 int show_ready_PCB(void){
+
+    sys_req(WRITE, COM1, "\n==========================", sizeof("\n=========================="));
+    sys_req(WRITE, COM1, "\nReady Processes:", sizeof("\nReady Processes:"));
+    sys_req(WRITE, COM1, "\n==========================", sizeof("\n=========================="));
+
     //For each process in Ready State, display the process
     queue* ready = return_queue(0);
     pcb* current = ready->head;
@@ -274,6 +279,11 @@ int show_ready_PCB(void){
  * Show Blocked PCBs
  */
 int show_blocked_PCB(void){
+
+    sys_req(WRITE, COM1, "\n==========================", sizeof("\n=========================="));
+    sys_req(WRITE, COM1, "\nBlocked Processes:", sizeof("\nBlocked Processes:"));
+    sys_req(WRITE, COM1, "\n==========================", sizeof("\n=========================="));
+
     //For each process in Blocked State, display the process
     queue* blocked = return_queue(1);
     pcb* current = blocked->head;
@@ -296,11 +306,9 @@ int show_all_PCB(void){
     //Show each processes
 
     // Ready
-    sys_req(WRITE, COM1, "\nReady Processes:", sizeof("\nReady Processes:"));
     show_ready_PCB();
 
     // Blocked
-    sys_req(WRITE, COM1, "\nBlocked Processes:", sizeof("\nBlocked Processes:"));
     show_blocked_PCB();
 
     return 0;
