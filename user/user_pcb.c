@@ -13,9 +13,18 @@ int create_PCB(char* name, int class, int priority){
     // if(name == 0 || class == 0 || priority == 1){ //Placeholder so it doesn't yell at me for not using name
     //     return 1;
     // }
-    
+
+    //Checks to see if PCb has already been created
+    if (pcb_find(name) != NULL)
+    {
+        println();
+        print_error("Error: PCB name already in use.");
+        return 1;
+    }
+
     //Call PCB Setup
     pcb* PCB = pcb_setup(name, class, priority);
+
 
     //Check that PCB was created
 
@@ -43,8 +52,9 @@ int delete_PCB(char* name){
     //Remove from queue with pcb_remove
     pcb_remove(PCB);
 
-    sys_req(WRITE, COM1, "\nPCB Deleted: ", sizeof("\nPCB Deleted: "));
-    sys_req(WRITE, COM1, PCB->name, strlen(PCB->name));
+    println();
+    print("PCB Deleted: ");
+    print(PCB->name);
     if (PCB->state == READY_SUS || PCB->state == READY_NOT_SUS) {
         show_ready_PCB();
     }
@@ -90,7 +100,8 @@ int block_PCB(char* name){
     //Put into blocked queue
     pcb_insert(PCB);
 
-    sys_req(WRITE, COM1, "\nPCB Blocked: ", sizeof("\nPCB Blocked: "));
+    println();
+    print("PCB Blocked: ");
     show_PCB(name);
 
     return 0;
@@ -128,7 +139,8 @@ int unblock_PCB(char* name){
     //Insert into ready queue
     pcb_insert(PCB);
 
-    sys_req(WRITE, COM1, "\nPCB Unblocked: ", sizeof("\nPCB Unblocked: "));
+    println();
+    print("PCB Unblocked: ");
     show_PCB(name);
 
     return 0;
@@ -163,7 +175,8 @@ int suspend_PCB(char* name){
 
     //???Must not be system process?
 
-    sys_req(WRITE, COM1, "\nPCB Suspended: ", sizeof("\nPCB Suspended: "));
+    println();
+    print("PCB Suspended: ");
     show_PCB(name);
 
     return 0;
@@ -194,7 +207,8 @@ int resume_PCB(char* name){
         return 1; // pcb cannot be resumed
     }
 
-    sys_req(WRITE, COM1, "\nPCB Resumed: ", sizeof("\nPCB Resumed: "));
+    println();
+    print("PCB Resumed: ");
     show_PCB(name);
 
     return 0;
@@ -226,7 +240,8 @@ int set_PCB_priority(char* name, int priority){
     // // reinsert at proper location in queue
     // pcb_insert(PCB);
 
-    sys_req(WRITE, COM1, "\nPCB Updated: ", sizeof("\nPCB Updated: "));
+    println();
+    print("PCB Updated: ");
     show_PCB(name);
 
     return 0;
@@ -290,20 +305,20 @@ int show_PCB(char* name){
     }
     
     //Display Name, Class, State, Suspended Status, Priority
-    sys_req(WRITE, COM1, "\nName: ", sizeof("\nName: "));
-    sys_req(WRITE, COM1, PCB->name, strlen(PCB->name)); // name is already char*
-    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+    print("\nName: ");
+    print(PCB->name); // name is already char*
+    println();
 
-    sys_req(WRITE, COM1, "Class: ", sizeof("Class: "));
-    sys_req(WRITE, COM1, class_str, strlen(class_str));
-    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+    print("Class: ");
+    print(class_str);
+    println();
 
-    sys_req(WRITE, COM1, "State: ", sizeof("State: "));
-    sys_req(WRITE, COM1, state_str, strlen(state_str)); 
-    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+    print("State: ");
+    print(state_str); 
+    println();
 
-    sys_req(WRITE, COM1, "Priority: ", sizeof("Priority: "));
-    sys_req(WRITE, COM1, priority_str, strlen(priority_str));
+    print("Priority: ");
+    print(priority_str);
 
     return 0;
 }
@@ -314,19 +329,21 @@ int show_PCB(char* name){
  */
 int show_ready_PCB(void){
 
-    sys_req(WRITE, COM1, "\n==========================", sizeof("\n=========================="));
-    sys_req(WRITE, COM1, "\nReady Processes:", sizeof("\nReady Processes:"));
-    sys_req(WRITE, COM1, "\n==========================", sizeof("\n=========================="));
+    print("\n==========================");
+    print("\nReady Processes:");
+    print("\n==========================");
 
     //For each process in Ready State, display the process
     queue* ready = return_queue(0);
     pcb* current = ready->head;
     if (current == NULL) {
-        sys_req(WRITE, COM1, "\nNo processes in ready queue", sizeof("\nNo processes in ready queue"));
+        println();
+        print("No processes in ready queue");
     }
     while (current != NULL) {
         show_PCB(current->name);
         current = current->next_node;
+        println();
     }
 
     return 0;
@@ -338,19 +355,21 @@ int show_ready_PCB(void){
  */
 int show_blocked_PCB(void){
 
-    sys_req(WRITE, COM1, "\n==========================", sizeof("\n=========================="));
-    sys_req(WRITE, COM1, "\nBlocked Processes:", sizeof("\nBlocked Processes:"));
-    sys_req(WRITE, COM1, "\n==========================", sizeof("\n=========================="));
+    print("\n==========================");
+    print("\nBlocked Processes:");
+    print("\n==========================");
 
     //For each process in Blocked State, display the process
     queue* blocked = return_queue(1);
     pcb* current = blocked->head;
     if (current == NULL) {
-        sys_req(WRITE, COM1, "\nNo processes in blocked queue", sizeof("\nNo processes in blocked queue"));
+        println();
+        print("No processes in blocked queue");
     }
     while (current != NULL) {
         show_PCB(current->name);
         current = current->next_node;
+        println();
     }
 
     return 0;

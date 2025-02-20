@@ -7,7 +7,7 @@
 #include <string.h>
 
 void comhand(void) {
-    print("@ ");
+    print_color("@ ","blue");
     print("Type 'help' to see list of commands\n");
     while(1) {
 

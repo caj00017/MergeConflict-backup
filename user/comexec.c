@@ -27,7 +27,7 @@ int comexec(char buf[]) {
         return 0;
     }
     else if (strcmp(buf, "set_date") == 0) {
-        sys_req(WRITE, COM1, "\nPlease enter the date to be set (set_date MM/DD/YY): ", sizeof("\nPlease enter the date to be set (set_date MM/DD/YY): "));
+        print("\nPlease enter the date to be set (set_date MM/DD/YY): ");
         return 0;
     }
     else if (contains(buf, "set_date") == 1) {
@@ -39,7 +39,7 @@ int comexec(char buf[]) {
         return 0;
     }
     else if (strcmp(buf, "set_time") == 0) {
-        sys_req(WRITE, COM1, "\nPlease enter the time to be set (set_time HH:MM): ", sizeof("\nPlease enter the time to be set (set_time HH:MM): "));
+        print("\nPlease enter the time to be set (set_time HH:MM): ");
         return 0;
     }
     else if (contains(buf, "set_time") == 1) {
@@ -56,7 +56,7 @@ int comexec(char buf[]) {
     else if (strcmp(buf, "process_create") == 0 || strcmp(buf, "pc") == 0)
     {
         //Write a newline to command line.
-        sys_req(WRITE, COM1, "\n", sizeof("\n"));
+        println();
 
         //Create variable for a one time only command per shutdown call
         int first = 1;
@@ -74,26 +74,31 @@ int comexec(char buf[]) {
             //For first time, write instructions
             if(first == 1){
                 first = 0;
-                sys_req(WRITE, COM1, "@ Please enter the name of the process to create (or write 'cancel' to cancel): ", sizeof("@ Please enter the name of the process to create (or write 'cancel' to cancel): "));
+                print_color("@ ", "blue");
+                print("Please enter the name of the process to create (or write 'cancel' to cancel): ");
             }
 
             //Write formatting for entry and read from the command line
-            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            println();
+            print_color("@ ", "blue");
             sys_req(READ, COM1, name_response, sizeof(name_response));
 
             // write reponse for testing purposes
-            sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
-            sys_req(WRITE, COM1, name_response, sizeof(name_response));
+            println();
+            print("Reponse entered: ");
+            print(name_response);
 
             // check for invalid format
             if(isNumeric(name_response)){
-                sys_req(WRITE, COM1, "\n", sizeof("\n"));
-                sys_req(WRITE, COM1, "@ Please retype your response: ", sizeof("@ Please retype your response: "));
+                println();
+                print_color("@ ", "blue");
+                print("Please retype your response: ");
                 continue;
             }
             else if (strcmp(name_response, "cancel") == 0){
                 // cancel
-                sys_req(WRITE, COM1, "\nProcess creation cancelled.", sizeof("\nProcess creation cancelled."));
+                println();
+                print("Process creation cancelled.");
                 return 0;
             }
             else{
@@ -115,16 +120,20 @@ int comexec(char buf[]) {
             //For first time, write instructions
             if(first == 1){
                 first = 0;
-                sys_req(WRITE, COM1, "\n@ Please enter the class [0,1] of the process to create (or write 'cancel' to cancel): ", sizeof("@ Please enter the class [0,1] of the process to create (or write 'cancel' to cancel): "));
+                println();
+                print_color("@ ", "blue");
+                print("Please enter the class [0,1] of the process to create (or write 'cancel' to cancel): ");
             }
 
             //Write formatting for entry and read from the command line
-            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            println();
+            print_color("@ ", "blue");
             sys_req(READ, COM1, class_response, sizeof(class_response));
 
             // write reponse for testing purposes
-            sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
-            sys_req(WRITE, COM1, class_response, sizeof(class_response));
+            println();
+            print("Reponse entered: ");
+            print(class_response);
 
             // check for valid format
             if(isNumeric(class_response) == 1 && atoi(class_response) >= 0 && atoi(class_response) <= 1){
@@ -134,13 +143,15 @@ int comexec(char buf[]) {
             }
             else if (strcmp(class_response, "cancel") == 0){
                 // cancel
-                sys_req(WRITE, COM1, "\nProcess creation cancelled.", sizeof("\nProcess creation cancelled."));
+                println();
+                print("Process creation cancelled.");
                 return 0;
             }
             else{
                 // invalid input
-                sys_req(WRITE, COM1, "\n", sizeof("\n"));
-                sys_req(WRITE, COM1, "@ Please retype your response [0,1]: ", sizeof("@ Please retype your response: [0,1]"));
+                println();
+                print_color("@ ", "blue");
+                print("Please retype your response [0,1]: ");
                 continue;
             }
                 
@@ -158,16 +169,20 @@ int comexec(char buf[]) {
             //For first time, write instructions
             if(first == 1){
                 first = 0;
-                sys_req(WRITE, COM1, "\n@ Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): ", sizeof("@ Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): "));
+                println();
+                print_color("@ ", "blue");
+                print("Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): ");
             }
 
             //Write formatting for entry and read from the command line
-            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            println();
+            print_color("@ ", "blue");
             sys_req(READ, COM1, priority_response, sizeof(priority_response));
 
             // write reponse for testing purposes
-            sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
-            sys_req(WRITE, COM1, priority_response, sizeof(priority_response));
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
 
             // check for valid format
             if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
@@ -177,13 +192,15 @@ int comexec(char buf[]) {
             }
             else if (strcmp(priority_response, "cancel") == 0){
                 // cancel
-                sys_req(WRITE, COM1, "\nProcess creation cancelled.", sizeof("\nProcess creation cancelled."));
+                println();
+                print("Process creation cancelled.");
                 return 0;
             }
             else{
                 // invalid input
-                sys_req(WRITE, COM1, "\n", sizeof("\n"));
-                sys_req(WRITE, COM1, "@ Please retype your response [0-9]: ", sizeof("@ Please retype your response: [0-9]"));
+                println();
+                print_color("@ ", "blue");
+                print("Please retype your response [0-9]: ");
                 continue;
             }
 
@@ -191,11 +208,11 @@ int comexec(char buf[]) {
 
         int status = create_PCB(name, class, priority);
         if (status == 1) {
-            sys_req(WRITE, COM1, "\nError creating PCB.", sizeof("\nError creating PCB."));
             return 0; // continue running comexec
         }
 
-        sys_req(WRITE, COM1, "\nPCB created successfully.", sizeof("\nPCB created successfully."));
+        println();
+        print("PCB created successfully.");
         show_PCB(name);
         return 0;
     }
@@ -204,23 +221,27 @@ int comexec(char buf[]) {
     {
         char* name;
         char response[100] = { 0 };
-        sys_req(WRITE, COM1, "\nPlease enter the name of the process to delete: ", sizeof("\nPlease enter the name of the process to delete: "));
+        println();
+        print("Please enter the name of the process to delete: ");
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", "blue");
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
 
         pcb* PCB = pcb_find(name);
         if (PCB == NULL) {
-            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            println();
+            print("Process not found: ");
+            print(name);
             return 0; // continue running comexec
         }
         else {
-            sys_req(WRITE, COM1, "\nDeleting PCB: ", sizeof("\nDeleting PCB: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            println();
+            print("Deleting PCB: ");
+            print(name);
             delete_PCB(name);
             return 0;
         }
@@ -231,28 +252,33 @@ int comexec(char buf[]) {
     {
         char* name;
         char response[100] = { 0 };
-        sys_req(WRITE, COM1, "\nPlease enter the name of the process to block: ", sizeof("\nPlease enter the name of the process to block: "));
+        println();
+        print("Please enter the name of the process to block: ");
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", "blue");
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
 
         pcb* PCB = pcb_find(name);
         if (PCB == NULL) {
-            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            println();
+            print("Process not found: ");
+            print(name);
             return 0; // continue running comexec
         }
         else if (PCB->state != READY_SUS && PCB->state != READY_NOT_SUS) {
-            sys_req(WRITE, COM1, "\nProcess is not in a ready state: ", sizeof("\nProcess is not in a ready state: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            println();
+            print("Process is not in a ready state: ");
+            print(name);
             return 0; // continue running comexec
         }
         else {
-            sys_req(WRITE, COM1, "\nBlocking PCB: ", sizeof("\nBlocking PCB: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            println();
+            print("Blocking PCB: ");
+            print(name);
             block_PCB(name);
             return 0;
         }
@@ -264,28 +290,33 @@ int comexec(char buf[]) {
     {
         char* name;
         char response[100] = { 0 };
-        sys_req(WRITE, COM1, "\nPlease enter the name of the process to unblock: ", sizeof("\nPlease enter the name of the process to unblock: "));
+        println();
+        print("Please enter the name of the process to unblock: ");
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", "blue");
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
 
         pcb* PCB = pcb_find(name);
         if (PCB == NULL) {
-            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            println();
+            print("Process not found: ");
+            print(name);
             return 0; // continue running comexec
         }
         else if (PCB->state != BLOCKED_SUS && PCB->state != BLOCKED_NOT_SUS) {
-            sys_req(WRITE, COM1, "\nProcess is not in a blocked state: ", sizeof("\nProcess is not in a blocked state: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            println();
+            print("Process is not in a blocked state: ");
+            print(name);
             return 0; // continue running comexec
         }
         else {
-            sys_req(WRITE, COM1, "\nUnblocking PCB: ", sizeof("\nUnblocking PCB: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            println();
+            print("Unblocking PCB: ");
+            print(name);
             unblock_PCB(name);
             return 0;
         }
@@ -295,28 +326,32 @@ int comexec(char buf[]) {
     {
         char* name;
         char response[100] = { 0 };
-        sys_req(WRITE, COM1, "\nPlease enter the name of the process to suspend: ", sizeof("\nPlease enter the name of the process to suspend: "));
+        println();
+        print("Please enter the name of the process to suspend: ");
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", "blue");
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
 
         pcb* PCB = pcb_find(name);
+        println();
+
         if (PCB == NULL) {
-            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            print("Process not found: ");
+            print(name);
             return 0; // continue running comexec
         }
         else if (PCB->state != READY_NOT_SUS && PCB->state != BLOCKED_NOT_SUS) {
-            sys_req(WRITE, COM1, "\nProcess is already suspended: ", sizeof("\nProcess is already suspended: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            print("Process is already suspended: ");
+            print(name);
             return 0; // continue running comexec
         }
         else {
-            sys_req(WRITE, COM1, "\nSuspending PCB: ", sizeof("\nSuspending PCB: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            print("Suspending PCB: ");
+            print(name);
             suspend_PCB(name);
             return 0;
         }
@@ -326,28 +361,31 @@ int comexec(char buf[]) {
     {
         char* name;
         char response[100] = { 0 };
-        sys_req(WRITE, COM1, "\nPlease enter the name of the suspended process to resume: ", sizeof("\nPlease enter the name of the suspended process to resume: "));
+        println();
+        print("Please enter the name of the suspended process to resume: ");
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", "blue");
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
 
         pcb* PCB = pcb_find(name);
+        println();
         if (PCB == NULL) {
-            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            print("Process not found: ");
+            print(name);
             return 0; // continue running comexec
         }
         else if (PCB->state != READY_SUS && PCB->state != BLOCKED_SUS) {
-            sys_req(WRITE, COM1, "\nProcess cannot be resumed: ", sizeof("\nProcess cannot be resumed: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            print("Process cannot be resumed: ");
+            print(name);
             return 0; // continue running comexec
         }
         else {
-            sys_req(WRITE, COM1, "\nResuming PCB: ", sizeof("\nResuming PCB: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            print("Resuming PCB: ");
+            print(name);
             resume_PCB(name);
             return 0;
         }
@@ -357,18 +395,22 @@ int comexec(char buf[]) {
     {
         char* name;
         char response[100] = { 0 };
-        sys_req(WRITE, COM1, "\nPlease enter the name of the process to update: ", sizeof("\nPlease enter the name of the process to update: "));
+        println();
+        print("Please enter the name of the process to update: ");
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", "blue");
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
 
         pcb* PCB = pcb_find(name);
+        println();
+
         if (PCB == NULL) {
-            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            print("Process not found: ");
+            print(name);
             return 0; // continue running comexec
         }
 
@@ -384,16 +426,20 @@ int comexec(char buf[]) {
             //For first time, write instructions
             if(first == 1){
                 first = 0;
-                sys_req(WRITE, COM1, "\n@ Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ", sizeof("@ Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): "));
+                println();
+                print_color("@ ", "blue");
+                print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
             }
 
             //Write formatting for entry and read from the command line
-            sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+            println();
+            print_color("@ ", "blue");
             sys_req(READ, COM1, priority_response, sizeof(priority_response));
 
             // write reponse for testing purposes
-            sys_req(WRITE, COM1, "\nReponse entered: ", sizeof("\nReponse entered: "));
-            sys_req(WRITE, COM1, priority_response, sizeof(priority_response));
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
 
             // check for valid format
             if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
@@ -403,13 +449,15 @@ int comexec(char buf[]) {
             }
             else if (strcmp(priority_response, "cancel") == 0){
                 // cancel
-                sys_req(WRITE, COM1, "\nPriority reassignment cancelled.", sizeof("\nPriority reassignment cancelled."));
+                println();
+                print("Priority reassignment cancelled.");
                 return 0;
             }
             else{
                 // invalid input
-                sys_req(WRITE, COM1, "\n", sizeof("\n"));
-                sys_req(WRITE, COM1, "@ Please retype your response [0-9]: ", sizeof("@ Please retype your response: [0-9]"));
+                println();
+                print_color("@ ", "blue");
+                print("Please retype your response [0-9]: ");
                 continue;
             }
 
@@ -417,10 +465,11 @@ int comexec(char buf[]) {
 
         char str[100];
 
-        sys_req(WRITE, COM1, "\nSetting priority for PCB: ", sizeof("\nSetting priority for PCB: "));
-        sys_req(WRITE, COM1, name, strlen(name));
-        sys_req(WRITE, COM1, " to ", sizeof(" to "));
-        sys_req(WRITE, COM1, itoa(priority, str, 10), sizeof(itoa(priority, str, 10)));
+        println();
+        print("Setting priority for PCB: ");
+        print(name);
+        print(" to ");
+        print(itoa(priority, str, 10));
 
         set_PCB_priority(name, priority);
 
@@ -431,22 +480,25 @@ int comexec(char buf[]) {
     {
         char* name;
         char response[100] = { 0 };
-        sys_req(WRITE, COM1, "\nPlease enter the name of the process to show: ", sizeof("\nPlease enter the name of the process to show: "));
+        println();
+        print("Please enter the name of the process to show: ");
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", "blue");
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
 
-        sys_req(WRITE, COM1, "\nLocating PCB: ", sizeof("\nLocating PCB: "));
-        sys_req(WRITE, COM1, name, strlen(name));
-        sys_req(WRITE, COM1, "...", sizeof("..."));
+        println();
+        print("Locating PCB: ");
+        print(name);
+        print("...");
         
         pcb* PCB = pcb_find(name);
         if (PCB == NULL) {
-            sys_req(WRITE, COM1, "\nProcess not found: ", sizeof("\nProcess not found: "));
-            sys_req(WRITE, COM1, name, strlen(name));
+            print("Process not found: ");
+            print(name);
             return 0; // continue running comexec
         }
         else {
@@ -473,7 +525,7 @@ int comexec(char buf[]) {
     else if (strcmp(buf, "test_color") == 0)
     {
         println();
-        print_error("THis is an error");
+        print_error("This is an error");
         return 0;
     }
 
@@ -492,7 +544,7 @@ int comexec(char buf[]) {
 
 int shutdown(void) {
     //Write a newline to command line.
-    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+    println();
 
     //Create variable for a one time only command per shutdown call
     int first = 1;
@@ -506,11 +558,13 @@ int shutdown(void) {
         //For first time, write instructions
         if(first== 1){
             first++;
-            sys_req(WRITE, COM1, "@ Are you sure you want to shutdown? (y or n)", sizeof("@ Are you sure you want to shutdown? (y or n)"));
+            print_color("@ ", "blue");
+            print("Are you sure you want to shutdown? (y or n)");
         }
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", "blue");
         sys_req(READ, COM1, response, sizeof(response));
 
         //Check to see if the person want to shutdown (y) or continue running program(n)
@@ -518,13 +572,16 @@ int shutdown(void) {
             return -1; //exit and end the program
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
-            sys_req(WRITE, COM1, "\n@ Returning to Usual Operations...", sizeof("\n@ Returning to Usual Operations..."));
+            println();
+            print_color("@ ", "blue");
+            print("Returning to Usual Operations...");
             return 1; //exit and continue running program
         }
         else{
             //If they don't response with the proper entry, give repeated instructions and loop again.
-            sys_req(WRITE, COM1, "\n", sizeof("\n"));
-            sys_req(WRITE, COM1, "@ Please retype your response: (y or n)", sizeof("@ Please retype your response: (y or n)"));
+            println();
+            print_color("@ ", "blue");
+            print("Please retype your response: (y or n)");
             continue;
         }
     
@@ -536,38 +593,77 @@ int help(void) {
     // Print list of commands
 
     // R1 commands
-    sys_req(WRITE, COM1, "\n@ help\t\tPrints a complete list of each available command.", sizeof("@ help\tPrints a complete list of each available command."));
-    sys_req(WRITE, COM1, "\n@ version\tPrints the current version of the program.", sizeof("@ version\tPrints the current version of the program."));
-    sys_req(WRITE, COM1, "\n@ get_date\tPrints the current date set by the user.", sizeof("@ get_date\tPrints the current date set by the user."));
-    sys_req(WRITE, COM1, "\n@ set_date\tMM/DD/YY\tSets the current date.", sizeof("@ set_date\tMM/DD/YY\tSets the current date."));
-    sys_req(WRITE, COM1, "\n@ get_time\tPrints the current time set by the user.", sizeof("@ get_time\tPrints the current time set by the user."));
-    sys_req(WRITE, COM1, "\n@ set_time\tHH:MM:SS\tSets the current time.", sizeof("@ set_time\tHH:MM:SS\tSets the current time."));
-    sys_req(WRITE, COM1, "\n@ shutdown\tExits the program.", sizeof("\n@ shutdown\tExits the program."));
+    println();
+    print_color("=====","blue"); // 5 equal signs
+    println();
+    print_color("@ ", "blue");
+    print("help\t\tPrints a complete list of each available command.");
+    println(); 
+    print_color("@ ", "blue");
+    print("version\tPrints the current version of the program.");
+    println(); 
+    print_color("@ ", "blue");
+    print("get_date\tPrints the current date set by the user.");
+    println(); 
+    print_color("@ ", "blue");
+    print("set_date\tMM/DD/YY\tSets the current date.");
+    println(); 
+    print_color("@ ", "blue");
+    print("get_time\tPrints the current time set by the user.");
+    println(); 
+    print_color("@ ", "blue");
+    print("set_time\tHH:MM:SS\tSets the current time.");
+    println(); 
+    print_color("@ ", "blue");
+    print("shutdown\tExits the program.");
 
     // R2 commands
-    sys_req(WRITE, COM1, "\n", sizeof("\n"));
-    sys_req(WRITE, COM1, "\n@ process_create\tpc\tCreates a new process.", sizeof("\n@ process_create\tpc\tCreates a new process."));
-    sys_req(WRITE, COM1, "\n@ process_delete\tpd\tDeletes a process.", sizeof("\n@ process_delete\tpd\tDeletes a process."));
-    sys_req(WRITE, COM1, "\n@ process_block\t\tpb\tBlocks a process.", sizeof("\n@ process_block\t\tpb\tBlocks a process."));
-    sys_req(WRITE, COM1, "\n@ process_unblock\tpub\tUnblocks a process.", sizeof("\n@ process_unblock\tpub\tUnblocks a process."));
-    sys_req(WRITE, COM1, "\n@ process_suspend\tpsus\tSuspends a process.", sizeof("\n@ process_suspend\tpsus\tSuspends a process."));
-    sys_req(WRITE, COM1, "\n@ process_resume\tpres\tResumes a process.", sizeof("\n@ process_resume\tpres\tResumes a process."));
-    sys_req(WRITE, COM1, "\n@ process_priority\tpp\tChanges the priority of a process.", sizeof("\n@ process_priority\tpp\tChanges the priority of a process."));
-    sys_req(WRITE, COM1, "\n@ process_show\t\tps\tShows information about a process.", sizeof("\n@ process_show\t\tps\tShows information about a process."));
-    sys_req(WRITE, COM1, "\n@ process_show_ready\tpsr\tShows all processes in the ready state.", sizeof("\n@ process_show_ready\tpsr\tShows all processes in the ready state."));
-    sys_req(WRITE, COM1, "\n@ process_show_blocked\tpsb\tShows all processes in the blocked state.", sizeof("\n@ process_show_blocked\tpsb\tShows all processes in the blocked state."));
-    sys_req(WRITE, COM1, "\n@ process_show_all\tpsa\tShows all processes.", sizeof("\n@ process_show_all\tpsa\tShows all processes."));
+    println();
+    print_color("@ ", "blue");
+    print("process_create\tpc\tCreates a new process.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_delete\tpd\tDeletes a process.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_block\t\tpb\tBlocks a process.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_unblock\tpub\tUnblocks a process.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_suspend\tpsus\tSuspends a process.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_resume\tpres\tResumes a process.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_priority\tpp\tChanges the priority of a process.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_show\t\tps\tShows information about a process.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_show_ready\tpsr\tShows all processes in the ready state.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_show_blocked\tpsb\tShows all processes in the blocked state.");
+    println(); 
+    print_color("@ ", "blue");
+    print("process_show_all\tpsa\tShows all processes.");
+    println();
+    print_color("=====", "blue");//5 equal signs
     return 0;
 }
 
 int version(void) {
-    char msg[100] = "\nVersion 1.0\nCompilation Date: 2/7/2025";
-    sys_req(WRITE,COM1, msg, sizeof(msg));
+    println();
+    print("Version 1.0\nCompilation Date: 2/7/2025");
     return 0;
 }
 
 int clear_screen(void) {
-    sys_req(WRITE, COM1, "\033[2J", sizeof("\033[H"));
-    sys_req(WRITE, COM1, "\033[H", sizeof("\033[H"));
+    print("\033[2J");
+    print("\033[H");
     return 0;
 }
