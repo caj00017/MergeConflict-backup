@@ -23,7 +23,7 @@ int comexec(char buf[]) {
         return 0;
     }
     else if (strcmp(buf, "get_date") == 0 || strcmp(buf, "gd") == 0) {
-        get_time();
+        get_date();
         return 0;
     }
     else if (strcmp(buf, "set_date") == 0) {
