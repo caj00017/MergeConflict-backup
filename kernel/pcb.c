@@ -310,8 +310,29 @@ int pcb_remove(pcb* removed_pcbPtr){
         return 1;
     }
 
+    // checking if this PCB is the only node in the queue
+    if (removed_pcbPtr->next_node == NULL && removed_pcbPtr->prev_node == NULL) {
+
+        // checks to see if the given pcb is in the ready queue
+        if (removed_pcbPtr->state == READY_SUS || removed_pcbPtr->state == READY_NOT_SUS) {
+            READY.head = NULL;
+            READY.tail = NULL;
+        } 
+        
+        //checks to see if the given pcb is in the blocked queue
+        else if (removed_pcbPtr->state == BLOCKED_SUS || removed_pcbPtr->state == BLOCKED_NOT_SUS) {
+            BLOCKED.head = NULL;
+            BLOCKED.tail = NULL;
+        }
+
+        // sets the removed pcb's next_node and prev_node pointers to null
+        removed_pcbPtr->next_node = NULL;
+        removed_pcbPtr->prev_node = NULL;
+        return 0;
+    }
+    
     //checking if the pcb given is at the end of the queue
-    if(removed_pcbPtr->next_node == NULL){
+    else if(removed_pcbPtr->next_node == NULL){
 
         //if at the end, sets the prev_node's next_node pointer to null
         removed_pcbPtr->prev_node->next_node = NULL;

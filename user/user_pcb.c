@@ -35,22 +35,22 @@ int delete_PCB(char* name){
     }
     
     // get pcb
-    sys_req(WRITE, COM1, "\nLocating PCB: ", sizeof("\nLocating PCB: "));
-    sys_req(WRITE, COM1, name, strlen(name));
-
     pcb* PCB = pcb_find(name);
     if (PCB == NULL) {
         return 1; // pcb not found
     }
-
-    sys_req(WRITE, COM1, "\nPCB Located: ", sizeof("\nPCB Located: "));
-    sys_req(WRITE, COM1, PCB->name, strlen(PCB->name));
 
     //Remove from queue with pcb_remove
     pcb_remove(PCB);
 
     sys_req(WRITE, COM1, "\nPCB Deleted: ", sizeof("\nPCB Deleted: "));
     sys_req(WRITE, COM1, PCB->name, strlen(PCB->name));
+    if (PCB->state == READY_SUS || PCB->state == READY_NOT_SUS) {
+        show_ready_PCB();
+    }
+    else {
+        show_blocked_PCB();
+    }
 
     //free memory with pcb_free
     pcb_free(PCB);
