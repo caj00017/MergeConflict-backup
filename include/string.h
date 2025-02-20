@@ -49,12 +49,12 @@ char* strtok(char * restrict s1, const char * restrict s2);
 
 /**
  * @brief Function which copies a string from src to dest
- * @param dest The destination string
- * @param src The source string
- * @return 0 on success
+ * @param copy The string to copy to
+ * @param str The string to copy from
+ * @return 0 success, 1 failure (null pointers)
  * @author Chris Jones
  */
-int strcpy(char* dest, const char* src);
+int strcpy(char* copy, const char* str);
 
 /**
 * @brief Indicates whether str1 contains str2

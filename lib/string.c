@@ -79,13 +79,20 @@ char *strtok(char * restrict s1, const char * restrict s2)
 	return s1;
 }
 
-int strcpy(char* dest, const char* src) {
-    while (*src) {
-        *dest = *src;
-        dest++;
-        src++;
+int strcpy(char* copy, const char* str) {
+
+    // check for invalid pointers
+    if (copy == NULL || str == NULL) {
+        return 1; // return error for bad pointers
     }
-    *dest = '\0';  // Null-terminate the destination string
+
+    while (*str != '\0') {
+		*copy = *str;  // copy char from str to copy
+		copy++;        // move temp to next char
+		str++;         // move str to next char
+    }
+
+    *copy = '\0';  // add null terminator for copy
     return 0;
 }
 
