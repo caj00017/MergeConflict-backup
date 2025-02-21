@@ -13,6 +13,7 @@
 #include <mpx/user_pcb.h>
 
 int comexec(char buf[]) {
+    buf = trim(buf);
     
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
         int status = shutdown();
