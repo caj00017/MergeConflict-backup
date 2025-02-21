@@ -85,6 +85,10 @@ int block_PCB(char* name){
         return 1; // pcb not found
     }
 
+
+    // Remove from ready queue
+    pcb_remove(PCB);// pcb_remove is currently not working
+
     if (PCB->state == 0) {
         PCB->state = 3;
     }
@@ -93,9 +97,6 @@ int block_PCB(char* name){
     } else {
         return 1; // pcb cannot be blocked
     }
-
-    // Remove from ready queue
-    // pcb_remove(PCB); pcb_remove is currently not working
 
     //Put into blocked queue
     pcb_insert(PCB);
@@ -123,6 +124,9 @@ int unblock_PCB(char* name){
         return 1; // pcb not found
     }
     
+    // Remove from blocked queue
+    pcb_remove(PCB); //pcb_remove is currently not working
+
     //Alter to ready
     if (PCB->state == 3) {
         PCB->state = 0;
@@ -132,9 +136,6 @@ int unblock_PCB(char* name){
     } else {
         return 1; // pcb cannot be unblocked
     }
-
-    // Remove from blocked queue
-    // pcb_remove(PCB); pcb_remove is currently not working
 
     //Insert into ready queue
     pcb_insert(PCB);

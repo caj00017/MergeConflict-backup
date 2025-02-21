@@ -414,6 +414,7 @@ int pcb_remove(pcb* removed_pcbPtr){
     //sets the removed pcb's next_node and prev_node pointers to null
     removed_pcbPtr->next_node = NULL;
     removed_pcbPtr->prev_node = NULL;
+    
 
     return 0;
 }

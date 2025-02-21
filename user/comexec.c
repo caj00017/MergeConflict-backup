@@ -538,7 +538,7 @@ int comexec(char buf[]) {
 
     else {
         println();
-        print_error("Error: Invalid command.");
+        print_error("Error: Invalid command. Please Re-type.");
         return 1;
     }
 }
