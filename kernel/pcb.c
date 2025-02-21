@@ -102,6 +102,9 @@ pcb* pcb_find(const char * search_name){
     return NULL; 
 }
 
+
+
+
 void pcb_insert(pcb* pcbPtr){
    //Check if we are given a valid pcbPtr
     if(pcbPtr == NULL){
@@ -163,13 +166,16 @@ void pcb_insert(pcb* pcbPtr){
             pcbPtr->next_node = tempPtr;
             pcbPtr->prev_node = tempPtr->prev_node;
 
-            tempPtr->prev_node->next_node = pcbPtr;
+            if(tempPtr->prev_node != NULL){
+                tempPtr->prev_node->next_node = pcbPtr;
+            }
             tempPtr->prev_node = pcbPtr;
+            READY.head = pcbPtr;
 
             tempPtr = NULL;
             return;
         }
-        else{
+        else{ //pcbPtr-> priority >= 5
             //Place into bottom of queue with FIFO based on each priority level
             tempPtr = READY.tail;
 
@@ -191,8 +197,11 @@ void pcb_insert(pcb* pcbPtr){
             pcbPtr->next_node = tempPtr->next_node;
             pcbPtr->prev_node = tempPtr;
 
-            tempPtr->next_node->prev_node = pcbPtr;
+            if(tempPtr->next_node != NULL){
+                tempPtr->next_node->prev_node = pcbPtr;
+            }
             tempPtr->next_node = pcbPtr;
+            READY.tail = pcbPtr;
 
             tempPtr = NULL;
             return;
@@ -203,91 +212,96 @@ void pcb_insert(pcb* pcbPtr){
     else if(pcbPtr->state == BLOCKED_SUS || pcbPtr->state == BLOCKED_NOT_SUS){
         //Place into blocked queue
 
-         //Create pointer to help iterate through queue
-         pcb* tempPtr = NULL;
+        //Create pointer to help iterate through queue
+        pcb* tempPtr = NULL;
 
-         //Case 1: No Nodes in the ready queue
-         if(BLOCKED.head == NULL && BLOCKED.tail == NULL){
-             //Set both the head and tail equal to the pcb
-             BLOCKED.head = pcbPtr;
-             BLOCKED.tail = pcbPtr;
+        //Case 1: No Nodes in the ready queue
+        if(BLOCKED.head == NULL && BLOCKED.tail == NULL){
+            //Set both the head and tail equal to the pcb
+            BLOCKED.head = pcbPtr;
+            BLOCKED.tail = pcbPtr;
  
-             return;
-         }
+            return;
+        }
  
-         //Case 2: Next item is either before or after halfway point
-         if(BLOCKED.head->priority >= 5 && pcbPtr->priority < 5){
-             //Adjust first node
-             BLOCKED.head->prev_node = pcbPtr;
-             pcbPtr->next_node = BLOCKED.head;
-             BLOCKED.head = pcbPtr;
-             return;
-         }
-         else if (BLOCKED.tail->priority < 5 && pcbPtr->priority >= 5 ){
-             //Adjust last node
-             BLOCKED.tail->next_node = pcbPtr;
-             pcbPtr->prev_node = BLOCKED.tail;
-             BLOCKED.tail = pcbPtr;
-             return;
-         }
+        //Case 2: Next item is either before or after halfway point
+        if(BLOCKED.head->priority >= 5 && pcbPtr->priority < 5){
+            //Adjust first node
+            BLOCKED.head->prev_node = pcbPtr;
+            pcbPtr->next_node = BLOCKED.head;
+            BLOCKED.head = pcbPtr;
+            return;
+        }
+        else if (BLOCKED.tail->priority < 5 && pcbPtr->priority >= 5 ){
+            //Adjust last node
+            BLOCKED.tail->next_node = pcbPtr;
+            pcbPtr->prev_node = BLOCKED.tail;
+            BLOCKED.tail = pcbPtr;
+            return;
+        }
+  
+        //Place into ready queue using head and tail to make sorting easier.
+        if(pcbPtr->priority < 5){
+            //Place into top of queue with FIFO based on each priority level
+            tempPtr = BLOCKED.head;
  
+            //Shift the position of the temp pointer until we are that the one we want to append.
+            while(pcbPtr->priority >= tempPtr->priority){
+                if(tempPtr->next_node == NULL){
+                    //Reached end, add node
+                    tempPtr->next_node = pcbPtr;
+                    pcbPtr->prev_node = tempPtr;
+                    BLOCKED.tail = pcbPtr;
+                    tempPtr = NULL;
+                    return;
+                }
+                tempPtr = tempPtr->next_node;
+            }
  
-         //Place into ready queue using head and tail to make sorting easier.
-         if(pcbPtr->priority < 5){
-             //Place into top of queue with FIFO based on each priority level
-             tempPtr = BLOCKED.head;
+            //Proper place has been located, move pointers to insert item
+            pcbPtr->next_node = tempPtr;
+            pcbPtr->prev_node = tempPtr->prev_node;
  
-             //Shift the position of the temp pointer until we are that the one we want to append.
-             while(pcbPtr->priority >= tempPtr->priority){
-                 if(tempPtr->next_node == NULL){
-                     //Reached end, add node
-                     tempPtr->next_node = pcbPtr;
-                     pcbPtr->prev_node = tempPtr;
-                     BLOCKED.tail = pcbPtr;
-                     tempPtr = NULL;
-                     return;
-                 }
-                 tempPtr = tempPtr->next_node;
-             }
+            if(tempPtr->prev_node != NULL){
+               tempPtr->prev_node->next_node = pcbPtr;
+            }
+            tempPtr->prev_node = pcbPtr;
+            BLOCKED.head = pcbPtr;
  
-             //Proper place has been located, move pointers to insert item
-             pcbPtr->next_node = tempPtr;
-             pcbPtr->prev_node = tempPtr->prev_node;
+            tempPtr = NULL;
+            return;
+        }
+        else{
+            //Place into bottom of queue with FIFO based on each priority level
+            tempPtr = BLOCKED.tail;
  
-             tempPtr->prev_node->next_node = pcbPtr;
-             tempPtr->prev_node = pcbPtr;
- 
-             tempPtr = NULL;
-             return;
-         }
-         else{
-             //Place into bottom of queue with FIFO based on each priority level
-             tempPtr = BLOCKED.tail;
- 
-             //Shift the position of the temp pointer until we are that the one we want to append.
-             while(pcbPtr->priority < tempPtr->priority){
+            //Shift the position of the temp pointer until we are that the one we want to append.
+            while(pcbPtr->priority < tempPtr->priority){
                  
-                 if(tempPtr->prev_node == NULL){
-                     //Reached start, add node.
-                     tempPtr->prev_node = pcbPtr;
-                     pcbPtr->next_node = tempPtr;
-                     tempPtr = NULL;
-                     BLOCKED.head = pcbPtr;
-                     return;
-                 }
-                 tempPtr = tempPtr->prev_node;
-             }
+                if(tempPtr->prev_node == NULL){
+                    //Reached start, add node.
+                    tempPtr->prev_node = pcbPtr;
+                    pcbPtr->next_node = tempPtr;
+                    tempPtr = NULL;
+                    BLOCKED.head = pcbPtr;
+                    return;
+                }
+                tempPtr = tempPtr->prev_node;
+            }
  
-             //Proper place has been located, move pointers to insert item
-             pcbPtr->next_node = tempPtr->next_node;
-             pcbPtr->prev_node = tempPtr;
+            //Proper place has been located, move pointers to insert item
+            pcbPtr->next_node = tempPtr->next_node;
+            pcbPtr->prev_node = tempPtr;
  
-             tempPtr->next_node->prev_node = pcbPtr;
-             tempPtr->next_node = pcbPtr;
+            if(tempPtr->next_node != NULL){
+               tempPtr->next_node->prev_node = pcbPtr;
+            }
+            tempPtr->next_node = pcbPtr;
+            BLOCKED.tail = pcbPtr;
  
-             tempPtr = NULL;
-             return;
-         }
+            tempPtr = NULL;
+            return;
+        }
  
 
         
@@ -299,6 +313,9 @@ void pcb_insert(pcb* pcbPtr){
 
     return;
 }
+
+
+
 
 
 int pcb_remove(pcb* removed_pcbPtr){
