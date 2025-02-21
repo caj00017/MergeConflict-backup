@@ -136,7 +136,7 @@ int comexec(char buf[]) {
             print(class_response);
 
             // check for valid format
-            if(isNumeric(class_response) == 1 && atoi(class_response) >= 0 && atoi(class_response) <= 1){
+            if(isNumeric(class_response) == 1 && atoi(class_response) >= 0 && strcmp(class_response, "") != 0){
                 // valid input
                 class = atoi(class_response);
                 break;

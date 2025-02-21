@@ -2,6 +2,7 @@
 #include <memory.h>
 #include <ctype.h>
 #include <sys_req.h>
+#include <stdlib.h>
 
 /* memcpy() and memset() are in core.c */
 
