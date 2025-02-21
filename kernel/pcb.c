@@ -168,10 +168,13 @@ void pcb_insert(pcb* pcbPtr){
 
             if(tempPtr->prev_node != NULL){
                 tempPtr->prev_node->next_node = pcbPtr;
+                tempPtr->prev_node = pcbPtr;
             }
-            tempPtr->prev_node = pcbPtr;
-            READY.head = pcbPtr;
-
+            else{
+                tempPtr->prev_node = pcbPtr;
+                READY.head = pcbPtr;
+            }
+            
             tempPtr = NULL;
             return;
         }
@@ -199,10 +202,13 @@ void pcb_insert(pcb* pcbPtr){
 
             if(tempPtr->next_node != NULL){
                 tempPtr->next_node->prev_node = pcbPtr;
+                tempPtr->next_node = pcbPtr;
             }
-            tempPtr->next_node = pcbPtr;
-            READY.tail = pcbPtr;
-
+            else{
+                tempPtr->next_node = pcbPtr;
+                READY.tail = pcbPtr;
+            }
+            
             tempPtr = NULL;
             return;
         }
@@ -264,9 +270,13 @@ void pcb_insert(pcb* pcbPtr){
  
             if(tempPtr->prev_node != NULL){
                tempPtr->prev_node->next_node = pcbPtr;
+               tempPtr->prev_node = pcbPtr;
             }
-            tempPtr->prev_node = pcbPtr;
-            BLOCKED.head = pcbPtr;
+            else{
+                tempPtr->prev_node = pcbPtr;
+                BLOCKED.head = pcbPtr;
+            }
+            
  
             tempPtr = NULL;
             return;
@@ -295,9 +305,13 @@ void pcb_insert(pcb* pcbPtr){
  
             if(tempPtr->next_node != NULL){
                tempPtr->next_node->prev_node = pcbPtr;
+               tempPtr->next_node = pcbPtr;
+            
             }
-            tempPtr->next_node = pcbPtr;
-            BLOCKED.tail = pcbPtr;
+            else{
+                tempPtr->next_node = pcbPtr;
+                BLOCKED.tail = pcbPtr;
+            }
  
             tempPtr = NULL;
             return;
