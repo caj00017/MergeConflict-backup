@@ -231,15 +231,14 @@ int set_PCB_priority(char* name, int priority){
         return 1; // pcb not found
     }
 
-    // 2/19 - pcb_remove is not working
-    // // remove pcb for reinsertion?
-    // pcb_remove(PCB);
+    // remove pcb for reinsertion
+    pcb_remove(PCB);
 
-    //Change Priority
+    // change Priority
     PCB->priority = priority;
 
-    // // reinsert at proper location in queue
-    // pcb_insert(PCB);
+    // reinsert at proper location in queue
+    pcb_insert(PCB);
 
     println();
     print("PCB Updated: ");
