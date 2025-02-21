@@ -39,7 +39,7 @@ int comexec(char buf[]) {
         return 0;
     }
     else if (strcmp(buf, "set_time") == 0) {
-        print("\nPlease enter the time to be set (set_time HH:MM): ");
+        print("\nPlease enter the time to be set (set_time HH:MM:SS) ");
         return 0;
     }
     else if (contains(buf, "set_time") == 1) {
@@ -74,7 +74,6 @@ int comexec(char buf[]) {
             //For first time, write instructions
             if(first == 1){
                 first = 0;
-                print_color("@ ", "blue");
                 print("Please enter the name of the process to create (or write 'cancel' to cancel): ");
             }
 
@@ -91,7 +90,6 @@ int comexec(char buf[]) {
             // check for invalid format
             if(isNumeric(name_response)){
                 println();
-                print_color("@ ", "blue");
                 print("Please retype your response: ");
                 continue;
             }
@@ -121,7 +119,6 @@ int comexec(char buf[]) {
             if(first == 1){
                 first = 0;
                 println();
-                print_color("@ ", "blue");
                 print("Please enter the class [0,1] of the process to create (or write 'cancel' to cancel): ");
             }
 
@@ -150,7 +147,6 @@ int comexec(char buf[]) {
             else{
                 // invalid input
                 println();
-                print_color("@ ", "blue");
                 print("Please retype your response [0,1]: ");
                 continue;
             }
@@ -170,7 +166,6 @@ int comexec(char buf[]) {
             if(first == 1){
                 first = 0;
                 println();
-                print_color("@ ", "blue");
                 print("Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): ");
             }
 
@@ -199,7 +194,6 @@ int comexec(char buf[]) {
             else{
                 // invalid input
                 println();
-                print_color("@ ", "blue");
                 print("Please retype your response [0-9]: ");
                 continue;
             }
@@ -427,7 +421,6 @@ int comexec(char buf[]) {
             if(first == 1){
                 first = 0;
                 println();
-                print_color("@ ", "blue");
                 print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
             }
 
@@ -456,7 +449,6 @@ int comexec(char buf[]) {
             else{
                 // invalid input
                 println();
-                print_color("@ ", "blue");
                 print("Please retype your response [0-9]: ");
                 continue;
             }
@@ -559,7 +551,6 @@ int shutdown(void) {
         //For first time, write instructions
         if(first== 1){
             first++;
-            print_color("@ ", "blue");
             print("Are you sure you want to shutdown? (y or n)");
         }
 
@@ -574,14 +565,12 @@ int shutdown(void) {
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
             println();
-            print_color("@ ", "blue");
             print("Returning to Usual Operations...");
             return 1; //exit and continue running program
         }
         else{
             //If they don't response with the proper entry, give repeated instructions and loop again.
             println();
-            print_color("@ ", "blue");
             print("Please retype your response: (y or n)");
             continue;
         }
