@@ -522,10 +522,11 @@ int comexec(char buf[]) {
         return show_all_PCB();
     }
 
-    else if (strcmp(buf, "test_color") == 0)
+    else if (strcmp(buf, "test_trim") == 0)
     {
         println();
-        print_error("This is an error");
+        print( trim("      We         ") );
+        print("hello");
         return 0;
     }
 

@@ -316,8 +316,6 @@ void pcb_insert(pcb* pcbPtr){
             tempPtr = NULL;
             return;
         }
- 
-
         
     }
     else {

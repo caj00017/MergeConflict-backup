@@ -237,3 +237,27 @@ void print_color(const char* sentence, const char* color_code){
 	//Print Color Reset
 	sys_req(WRITE, COM1, "\x1b[0m", strlen("\x1b[0m"));
 }
+
+
+
+char* trim(char * sentence){
+	if(sentence == NULL){
+		return NULL;
+	}
+
+	//Remove whitespace from the front
+	while(isspace(*sentence))
+	{
+		sentence++;
+	}
+
+	
+	char* end = sentence + strlen(sentence) -1;
+	while(end > sentence && isspace(*end)){
+		*end = '\0';
+		end--;
+	}
+
+	return sentence;
+}
+
