@@ -4,7 +4,8 @@
 #include <string.h>
 #include <mpx/interrupts.h>
 
-
+//global variable to check if the user has set the time yet
+int set_time_run = 0;
 
 int get_time(void){
     //disabling the NMI bit
@@ -18,8 +19,14 @@ int get_time(void){
         //accessing the hour bit
         outb(0x70, 0x04);
 
+            //checking if the user has set the time
+            if(set_time_run == 0){
+                time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10)); // -5 offset
+            }
+            else{
             //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10)); // -5 offset
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10)); //regular offset
+            }
 
             // write the hour to the terminal (size checking)
             if (atoi(time_ptr) <= 9) {
@@ -71,6 +78,9 @@ int get_time(void){
 
 int set_time(char buf[]){
     
+        //setting the global variable to 1 because the user ran set_time
+        set_time_run = 1;
+
        // disable interrupts
         cli();
 
@@ -97,9 +107,11 @@ int set_time(char buf[]){
             }
 
             // retrieve int values for hour, minute, and second
-            unsigned int hour = (unsigned int)atoi(hr_chars) + 5; // +5 for EST
+            unsigned int hour = (unsigned int)atoi(hr_chars); // +5 for EST
             unsigned int minute = (unsigned int)atoi(min_chars);
             unsigned int second = (unsigned int)atoi(sec_chars);
+
+
 
             // convert each time value to BCD
             unsigned int hour_BCD = intToBCD(hour);

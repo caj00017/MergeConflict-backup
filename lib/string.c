@@ -251,7 +251,7 @@ char* trim(char * sentence){
 		sentence++;
 	}
 
-	
+	//Remove whitespace from end of sentence
 	char* end = sentence + strlen(sentence) -1;
 	while(end > sentence && isspace(*end)){
 		*end = '\0';

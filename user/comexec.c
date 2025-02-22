@@ -27,6 +27,7 @@ int comexec(void) {
     // --------------------------------------------------------------------- // 
     // --------------------------- COMMAND LOGIC --------------------------- //
     // --------------------------------------------------------------------- // 
+    buf = trim(buf);
 
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
         int status = shutdown();
@@ -53,7 +54,7 @@ int comexec(void) {
         return 0;
     }
     else if (strcmp(buf, "set_time") == 0) {
-        print("\nPlease enter the time to be set (set_time HH:MM): ");
+        print("\nPlease enter the time to be set (set_time HH:MM:SS) ");
         return 0;
     }
     else if (contains(buf, "set_time") == 1) {
