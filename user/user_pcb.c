@@ -2,7 +2,6 @@
 #include <mpx/user_pcb.h>
 #include <sys_req.h>
 #include <stdlib.h>
-#include <stddef.h>
 #include <string.h>
 
 /**

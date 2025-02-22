@@ -14,7 +14,7 @@
 * @return Status code indicating shutdown (1), successful command execution (0), or an invalid command (-1).
 * @authors Tanner Forbes, Chris Jones, Izaak Whetsell, Evan Humphrey
 */
-int comexec(char buf[]);
+int comexec();
 
 /**
  * @brief Terminates the command handling sequence.
@@ -43,5 +43,12 @@ int version(void);
  * @author Evan Humphrey
  */
 int clear_screen(void);
+
+/**
+ * @brief Returns the code for the currently set color.
+ * @return The code for the color of the text (for serial.c)
+ * @author Chris Jones
+ */
+char* return_color(void);
 
 #endif

@@ -11,9 +11,23 @@
 #include <memory.h>
 #include <mpx/time.h>
 #include <mpx/user_pcb.h>
+#include <string.h>
 
-int comexec(char buf[]) {
+char* color = "blue"; // color to be set by the user, blue by default
+
+int comexec(void) {
+
+    // Add the @ before each command
+    print_color("@ ", color);
+
+    // initialize buffer and read from user
+    char buf[100] = { 0 };
+    sys_req(READ, COM1, buf, sizeof(buf));
     
+    // --------------------------------------------------------------------- // 
+    // --------------------------- COMMAND LOGIC --------------------------- //
+    // --------------------------------------------------------------------- // 
+
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
         int status = shutdown();
         return status;
@@ -50,6 +64,67 @@ int comexec(char buf[]) {
         help();
         return 0;
     } 
+    else if (contains(buf, "color") == 1) {
+
+        println();
+        int first = 1;
+
+        // color entry loop
+        while (1)
+        {
+            // reset reponse on each loop
+            char color_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                print_color("@ ", color);
+                print("Color options: ");
+                print_color("green, ", "green");
+                print_color("yellow, ", "yellow");
+                print_color("blue, ", "blue");
+                print_color("magenta, ", "magenta");
+                print_color("cyan\n", "cyan");
+
+                print("Please enter the color to change to (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, color_response, sizeof(color_response));
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(color_response);
+
+            // ensure valid input
+            if(strcmp(color_response, "green") == 0 || strcmp(color_response, "yellow") == 0 || strcmp(color_response, "blue") == 0 || strcmp(color_response, "magenta") == 0 || strcmp(color_response, "cyan") == 0){
+                color = color_response;
+                print("\nColor changed to: ");
+                print_color(color, color);
+                break;
+            }
+            else if (strcmp(color_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Process creation cancelled.");
+                color = "blue";
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response: ");
+                continue;
+            }
+        }
+
+        first = 1;
+        return 0;
+    }
 
     /*  PCB Functions  */
 
@@ -74,13 +149,13 @@ int comexec(char buf[]) {
             //For first time, write instructions
             if(first == 1){
                 first = 0;
-                print_color("@ ", "blue");
+                print_color("@ ", color);
                 print("Please enter the name of the process to create (or write 'cancel' to cancel): ");
             }
 
             //Write formatting for entry and read from the command line
             println();
-            print_color("@ ", "blue");
+            print_color("@ ", color);
             sys_req(READ, COM1, name_response, sizeof(name_response));
 
             // write reponse for testing purposes
@@ -91,7 +166,7 @@ int comexec(char buf[]) {
             // check for invalid format
             if(isNumeric(name_response)){
                 println();
-                print_color("@ ", "blue");
+                print_color("@ ", color);
                 print("Please retype your response: ");
                 continue;
             }
@@ -121,13 +196,13 @@ int comexec(char buf[]) {
             if(first == 1){
                 first = 0;
                 println();
-                print_color("@ ", "blue");
+                print_color("@ ", color);
                 print("Please enter the class [0,1] of the process to create (or write 'cancel' to cancel): ");
             }
 
             //Write formatting for entry and read from the command line
             println();
-            print_color("@ ", "blue");
+            print_color("@ ", color);
             sys_req(READ, COM1, class_response, sizeof(class_response));
 
             // write reponse for testing purposes
@@ -150,7 +225,7 @@ int comexec(char buf[]) {
             else{
                 // invalid input
                 println();
-                print_color("@ ", "blue");
+                print_color("@ ", color);
                 print("Please retype your response [0,1]: ");
                 continue;
             }
@@ -170,13 +245,13 @@ int comexec(char buf[]) {
             if(first == 1){
                 first = 0;
                 println();
-                print_color("@ ", "blue");
+                print_color("@ ", color);
                 print("Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): ");
             }
 
             //Write formatting for entry and read from the command line
             println();
-            print_color("@ ", "blue");
+            print_color("@ ", color);
             sys_req(READ, COM1, priority_response, sizeof(priority_response));
 
             // write reponse for testing purposes
@@ -199,7 +274,7 @@ int comexec(char buf[]) {
             else{
                 // invalid input
                 println();
-                print_color("@ ", "blue");
+                print_color("@ ", color);
                 print("Please retype your response [0-9]: ");
                 continue;
             }
@@ -226,7 +301,7 @@ int comexec(char buf[]) {
 
         //Write formatting for entry and read from the command line
         println();
-        print_color("@ ", "blue");
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
@@ -247,7 +322,6 @@ int comexec(char buf[]) {
         }
     }
 
-    // CJ - Note: As of Feb. 19, pcb_remove is not working, so pcb_block is unable to remove blocked PCBs from the ready queue
     else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
     {
         char* name;
@@ -257,7 +331,7 @@ int comexec(char buf[]) {
 
         //Write formatting for entry and read from the command line
         println();
-        print_color("@ ", "blue");
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
@@ -284,8 +358,6 @@ int comexec(char buf[]) {
         }
     }
 
-    // CJ - Note: As of Feb. 19, pcb_remove is not working, so pcb_unblock is unable to remove ready PCBs from the blocked queue
-    // Side note: Executing 'psa' or any similar command after unblocking results in an infinite loop. No idea why.
     else if (strcmp(buf, "process_unblock") == 0 || strcmp(buf, "pub") == 0)
     {
         char* name;
@@ -295,7 +367,7 @@ int comexec(char buf[]) {
 
         //Write formatting for entry and read from the command line
         println();
-        print_color("@ ", "blue");
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
@@ -331,7 +403,7 @@ int comexec(char buf[]) {
 
         //Write formatting for entry and read from the command line
         println();
-        print_color("@ ", "blue");
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
@@ -366,7 +438,7 @@ int comexec(char buf[]) {
 
         //Write formatting for entry and read from the command line
         println();
-        print_color("@ ", "blue");
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
@@ -400,7 +472,7 @@ int comexec(char buf[]) {
 
         //Write formatting for entry and read from the command line
         println();
-        print_color("@ ", "blue");
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
@@ -427,13 +499,13 @@ int comexec(char buf[]) {
             if(first == 1){
                 first = 0;
                 println();
-                print_color("@ ", "blue");
+                print_color("@ ", color);
                 print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
             }
 
             //Write formatting for entry and read from the command line
             println();
-            print_color("@ ", "blue");
+            print_color("@ ", color);
             sys_req(READ, COM1, priority_response, sizeof(priority_response));
 
             // write reponse for testing purposes
@@ -456,7 +528,7 @@ int comexec(char buf[]) {
             else{
                 // invalid input
                 println();
-                print_color("@ ", "blue");
+                print_color("@ ", color);
                 print("Please retype your response [0-9]: ");
                 continue;
             }
@@ -485,7 +557,7 @@ int comexec(char buf[]) {
 
         //Write formatting for entry and read from the command line
         println();
-        print_color("@ ", "blue");
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
 
         name = response;
@@ -521,6 +593,10 @@ int comexec(char buf[]) {
     {
         return show_all_PCB();
     }
+    
+    // --------------------------------------------------------------------- // 
+    // ------------------------- END COMMAND LOGIC ------------------------- //
+    // --------------------------------------------------------------------- // 
 
     else if (strcmp(buf, "test_trim") == 0)
     {
@@ -559,13 +635,13 @@ int shutdown(void) {
         //For first time, write instructions
         if(first== 1){
             first++;
-            print_color("@ ", "blue");
+            print_color("@ ", color);
             print("Are you sure you want to shutdown? (y or n)");
         }
 
         //Write formatting for entry and read from the command line
         println();
-        print_color("@ ", "blue");
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
 
         //Check to see if the person want to shutdown (y) or continue running program(n)
@@ -574,14 +650,14 @@ int shutdown(void) {
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
             println();
-            print_color("@ ", "blue");
+            print_color("@ ", color);
             print("Returning to Usual Operations...");
             return 1; //exit and continue running program
         }
         else{
             //If they don't response with the proper entry, give repeated instructions and loop again.
             println();
-            print_color("@ ", "blue");
+            print_color("@ ", color);
             print("Please retype your response: (y or n)");
             continue;
         }
@@ -595,71 +671,71 @@ int help(void) {
 
     // R1 commands
     println();
-    print_color("=====","blue"); // 5 equal signs
+    print_color("=====",color); // 5 equal signs
     println();
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("help\t\tPrints a complete list of each available command.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("version\tPrints the current version of the program.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("get_date\tPrints the current date set by the user.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("set_date\tMM/DD/YY\tSets the current date.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("get_time\tPrints the current time set by the user.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("set_time\tHH:MM:SS\tSets the current time.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("shutdown\tExits the program.");
 
     // R2 commands
     println();
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_create\tpc\tCreates a new process.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_delete\tpd\tDeletes a process.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_block\t\tpb\tBlocks a process.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_unblock\tpub\tUnblocks a process.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_suspend\tpsus\tSuspends a process.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_resume\tpres\tResumes a process.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_priority\tpp\tChanges the priority of a process.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_show\t\tps\tShows information about a process.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_show_ready\tpsr\tShows all processes in the ready state.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_show_blocked\tpsb\tShows all processes in the blocked state.");
     println(); 
-    print_color("@ ", "blue");
+    print_color("@ ", color);
     print("process_show_all\tpsa\tShows all processes.");
     println();
-    print_color("=====", "blue");//5 equal signs
+    print_color("=====", color);//5 equal signs
     return 0;
 }
 
 int version(void) {
     println();
-    print("Version 1.0\nCompilation Date: 2/7/2025");
+    print("Version 2.0\nCompilation Date: 2/28/2025");
     return 0;
 }
 
@@ -668,3 +744,28 @@ int clear_screen(void) {
     print("\033[H");
     return 0;
 }
+
+char* return_color(void) {
+
+    // return code for each color (for serial.c)
+    if (strcmp(color, "green") == 0) {
+        return "\x1b[32m";
+    }
+    else if (strcmp(color, "yellow") == 0) {
+        return "\x1b[33m";
+    }
+    else if (strcmp(color, "blue") == 0) {
+        return "\x1b[34m";
+    }
+    else if (strcmp(color, "magenta") == 0) {
+        return "\x1b[35m";
+    }
+    else if (strcmp(color, "cyan") == 0) {
+        return "\x1b[36m";
+    }
+    else {
+        return "\x1b[34m"; // return blue
+    }
+}
+
+

@@ -10,16 +10,9 @@ void comhand(void) {
     print_color("@ ","blue");
     print("Type 'help' to see list of commands\n");
     while(1) {
-
-        // Add the @ before each command
-        print_color("@ ", "blue");
-
-        // initialize buffer and read from user
-        char buf[100] = { 0 };
-        sys_req(READ, COM1, buf, sizeof(buf));
         
         // process the command
-        int status = comexec(buf);
+        int status = comexec();
         
         // if the command is a shutdown, exit command loop
         if (status == -1) {

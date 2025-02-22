@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpx/serial.h>
+#include <mpx/comexec.h>
 
 //Function protos
 void buffer_refresh(char *buffer, int buf_length, int pos);
@@ -216,8 +217,10 @@ int serial_poll(device dev, char *buffer, size_t len)
 }
 
 void buffer_refresh(char *buffer, int buf_length, int pos) {
+
+	char* color = return_color(); // get the color that the user sets in comexec
 	serial_out(COM1, "\033[2K\r", sizeof("\033[2K\r")); //"\033" starts in escape sequence, "2K" clears the terminal line, "\r" prints a carraige return to get back to the beginning of the line
-	serial_out(COM1, "\x1b[34m", sizeof("\x1b[34m")); //changes the color of the @ symbol to blue
+	serial_out(COM1, color, sizeof("\x1b[34m")); //changes the color of the @ symbol to set color (using size for blue, all color codes are the same size)
 	serial_out(COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
 	serial_out(COM1, " ", sizeof(" ")); //^^^
 	serial_out(COM1, "\x1b[0m", sizeof("\x1b[0m")); //resets the color of the terminal line to the default color
