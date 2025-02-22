@@ -21,13 +21,13 @@ int comexec(void) {
     print_color("@ ", color);
 
     // initialize buffer and read from user
-    char buf[100] = { 0 };
-    sys_req(READ, COM1, buf, sizeof(buf));
+    char buffer[100] = { 0 };
+    sys_req(READ, COM1, buffer, sizeof(buffer));
+    char* buf = trim(buffer);
     
     // --------------------------------------------------------------------- // 
     // --------------------------- COMMAND LOGIC --------------------------- //
-    // --------------------------------------------------------------------- // 
-    buf = trim(buf);
+    // --------------------------------------------------------------------- //
 
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
         int status = shutdown();
@@ -111,7 +111,6 @@ int comexec(void) {
                 // cancel
                 println();
                 print("Process creation cancelled.");
-                color = "blue";
                 return 0;
             }
             else{
@@ -692,6 +691,9 @@ int help(void) {
     print_color("@ ", color);
     print("set_time\tHH:MM:SS\tSets the current time.");
     println(); 
+    print_color("@ ", color);
+    print("color\t\tChanges the text color.");
+    println();
     print_color("@ ", color);
     print("shutdown\tExits the program.");
 
