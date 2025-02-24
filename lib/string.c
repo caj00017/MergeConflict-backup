@@ -240,24 +240,29 @@ void print_color(const char* sentence, const char* color_code){
 
 
 
-char* trim(char * sentence){
-	if(sentence == NULL){
-		return NULL;
-	}
+void trim(char sentence[]){
+	int first_nonspace = 0;
 
 	//Remove whitespace from the front
-	while(isspace(*sentence))
+	while(isspace(sentence[first_nonspace]))
 	{
-		sentence++;
+		first_nonspace++;
 	}
 
-	//Remove whitespace from end of sentence
-	char* end = sentence + strlen(sentence) -1;
-	while(end > sentence && isspace(*end)){
-		*end = '\0';
-		end--;
+	size_t old_length = strlen(sentence);
+	size_t chars_to_move = strlen(sentence) - first_nonspace;
+	memcpy(sentence, &sentence[first_nonspace], chars_to_move);
+
+	for(size_t i = chars_to_move; i<old_length; i++){
+		sentence[i] = '\0';
 	}
 
-	return sentence;
+	int pose = strlen(sentence) -1;
+	while(pose>=0 && isspace(sentence[pose]) ) {
+		sentence[pose] = '\0';
+		pose--;
+	}
+
+	return;
 }
 

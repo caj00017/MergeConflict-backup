@@ -21,9 +21,9 @@ int comexec(void) {
     print_color("@ ", color);
 
     // initialize buffer and read from user
-    char buffer[100] = { 0 };
-    sys_req(READ, COM1, buffer, sizeof(buffer));
-    char* buf = trim(buffer);
+    char buf[100] = { 0 };
+    sys_req(READ, COM1, buf, sizeof(buf));
+    trim(buf);
     
     // --------------------------------------------------------------------- // 
     // --------------------------- COMMAND LOGIC --------------------------- //
@@ -601,8 +601,12 @@ int comexec(void) {
 
     else if (strcmp(buf, "test_trim") == 0)
     {
+        char words[100] = "    shutit    ";
         println();
-        print( trim("      We         ") );
+        print(words);
+        trim(words);
+        println();
+        print(words);
         print("hello");
         return 0;
     }

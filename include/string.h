@@ -132,8 +132,9 @@ void print_color(const char* sentence, const char* color_code);
 /**
  @brief Removes whitespace from the front and back of a passed string
  @param sentence The String to be trimmed
- @return A pointer to the trimmed string
  @author Izaak Whetsell
  */
-char* trim( char* sentence);
+void trim(char sentence[]);
+
 #endif
+
