@@ -94,6 +94,7 @@ int comexec(void) {
             println();
             print_color("@ ", color);
             sys_req(READ, COM1, color_response, sizeof(color_response));
+            trim(color_response);
 
             // write reponse for testing purposes
             println();
@@ -157,6 +158,7 @@ int comexec(void) {
             println();
             print_color("@ ", color);
             sys_req(READ, COM1, name_response, sizeof(name_response));
+            trim(name_response);
 
             // write reponse for testing purposes
             println();
@@ -204,6 +206,7 @@ int comexec(void) {
             println();
             print_color("@ ", color);
             sys_req(READ, COM1, class_response, sizeof(class_response));
+            trim(class_response);
 
             // write reponse for testing purposes
             println();
@@ -253,6 +256,7 @@ int comexec(void) {
             println();
             print_color("@ ", color);
             sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
 
             // write reponse for testing purposes
             println();
@@ -303,6 +307,7 @@ int comexec(void) {
         println();
         print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         name = response;
 
@@ -333,6 +338,7 @@ int comexec(void) {
         println();
         print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         name = response;
 
@@ -369,6 +375,7 @@ int comexec(void) {
         println();
         print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         name = response;
 
@@ -405,6 +412,7 @@ int comexec(void) {
         println();
         print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         name = response;
 
@@ -440,6 +448,7 @@ int comexec(void) {
         println();
         print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         name = response;
 
@@ -474,6 +483,7 @@ int comexec(void) {
         println();
         print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         name = response;
 
@@ -507,6 +517,7 @@ int comexec(void) {
             println();
             print_color("@ ", color);
             sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
 
             // write reponse for testing purposes
             println();
@@ -559,6 +570,7 @@ int comexec(void) {
         println();
         print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         name = response;
 
@@ -648,6 +660,7 @@ int shutdown(void) {
         println();
         print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         //Check to see if the person want to shutdown (y) or continue running program(n)
         if(strcmp(response, "y") == 0 || strcmp(response, "yes") == 0 ){
