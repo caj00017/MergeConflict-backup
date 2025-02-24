@@ -197,7 +197,7 @@ int comexec(void) {
                 first = 0;
                 println();
                 print_color("@ ", color);
-                print("Please enter the class [0,1] of the process to create (or write 'cancel' to cancel): ");
+                print("Please enter the class of the process to create (or write 'cancel' to cancel): [0 - User or 1 - Kernel]");
             }
 
             //Write formatting for entry and read from the command line
@@ -211,7 +211,7 @@ int comexec(void) {
             print(class_response);
 
             // check for valid format
-            if(isNumeric(class_response) == 1 && atoi(class_response) >= 0 && strcmp(class_response, "") != 0){
+            if(isNumeric(class_response) == 1 && (atoi(class_response) == 0 || atoi(class_response)==1) && strcmp(class_response, "") != 0){
                 // valid input
                 class = atoi(class_response);
                 break;
@@ -566,7 +566,8 @@ int comexec(void) {
         print("Locating PCB: ");
         print(name);
         print("...");
-        
+        println();
+
         pcb* PCB = pcb_find(name);
         if (PCB == NULL) {
             print("Process not found: ");
