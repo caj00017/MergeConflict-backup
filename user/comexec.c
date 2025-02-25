@@ -710,10 +710,14 @@ int help(void) {
     print("set_time\tHH:MM:SS\tSets the current time.");
     println(); 
     print_color("@ ", color);
-    print("color\t\tChanges the text color.");
+    print("color\t\tChanges the text color.");    
+    println();
+    print_color("@ ", color);
+    print("clear\t\tClears the console.");
     println();
     print_color("@ ", color);
     print("shutdown\tExits the program.");
+
 
     // R2 commands
     println();
