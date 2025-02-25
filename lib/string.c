@@ -1,6 +1,7 @@
 #include <string.h>
 #include <memory.h>
 #include <ctype.h>
+#include <sys_req.h>
 
 /* memcpy() and memset() are in core.c */
 
@@ -77,6 +78,24 @@ char *strtok(char * restrict s1, const char * restrict s2)
 	tok_tmp = NULL;
 	return s1;
 }
+
+int strcpy(char* copy, const char* str) {
+
+    // check for invalid pointers
+    if (copy == NULL || str == NULL) {
+        return 1; // return error for bad pointers
+    }
+
+    while (*str != '\0') {
+		*copy = *str;  // copy char from str to copy
+		copy++;        // move temp to next char
+		str++;         // move str to next char
+    }
+
+    *copy = '\0';  // add null terminator for copy
+    return 0;
+}
+
 
 int contains(const char *str1, const char *str2) {
 
@@ -169,3 +188,81 @@ int indexOf(char* str, char searched_char){
 	}
 	return -1;
 }
+
+void print(const char* sentence){
+	//Print Sentance
+	sys_req(WRITE, COM1, sentence, strlen(sentence));
+}
+
+void println(void){
+	//Print newline
+	sys_req(WRITE, COM1, "\n", strlen("\n"));
+}
+
+
+void print_error(const char* sentence){
+	//Print Red Color Code
+	sys_req(WRITE, COM1, "\x1b[31m", strlen("\x1b[31m"));
+	//Print Error
+	sys_req(WRITE, COM1, sentence, strlen(sentence));
+	//Print Color Reset
+	sys_req(WRITE, COM1, "\x1b[0m", strlen("\x1b[0m"));
+}
+
+void print_color(const char* sentence, const char* color_code){
+	// Set color code from given parameter
+	if(strcmp(color_code, "green") == 0) {
+		color_code = "\x1b[32m";
+	}
+	else if(strcmp(color_code, "yellow") == 0) {
+		color_code = "\x1b[33m";
+	}
+	else if(strcmp(color_code, "blue") == 0) {
+		color_code = "\x1b[34m";
+	}
+	else if(strcmp(color_code, "magenta") == 0) {
+		color_code = "\x1b[35m";
+	}
+	else if(strcmp(color_code, "cyan") == 0) {
+		color_code = "\x1b[36m";
+	}
+	else {
+		color_code = "";
+	}
+	
+	//Print Color Code
+	sys_req(WRITE, COM1, color_code, strlen(color_code));
+	//Print Sentence
+	sys_req(WRITE, COM1, sentence, strlen(sentence));
+	//Print Color Reset
+	sys_req(WRITE, COM1, "\x1b[0m", strlen("\x1b[0m"));
+}
+
+
+
+void trim(char sentence[]){
+	int first_nonspace = 0;
+
+	//Remove whitespace from the front
+	while(isspace(sentence[first_nonspace]))
+	{
+		first_nonspace++;
+	}
+
+	size_t old_length = strlen(sentence);
+	size_t chars_to_move = strlen(sentence) - first_nonspace;
+	memcpy(sentence, &sentence[first_nonspace], chars_to_move);
+
+	for(size_t i = chars_to_move; i<old_length; i++){
+		sentence[i] = '\0';
+	}
+
+	int pose = strlen(sentence) -1;
+	while(pose>=0 && isspace(sentence[pose]) ) {
+		sentence[pose] = '\0';
+		pose--;
+	}
+
+	return;
+}
+

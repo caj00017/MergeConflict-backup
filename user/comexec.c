@@ -9,14 +9,31 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <memory.h>
+#include <mpx/time.h>
+#include <mpx/user_pcb.h>
+#include <string.h>
 
-int comexec(char buf[]) {
+char* color = "blue"; // color to be set by the user, blue by default
+
+int comexec(void) {
+
+    // Add the @ before each command
+    print_color("@ ", color);
+
+    // initialize buffer and read from user
+    char buf[100] = { 0 };
+    sys_req(READ, COM1, buf, sizeof(buf));
+    trim(buf);
     
+    // --------------------------------------------------------------------- // 
+    // --------------------------- COMMAND LOGIC --------------------------- //
+    // --------------------------------------------------------------------- //
+
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
         int status = shutdown();
         return status;
     }
-    if (strcmp(buf, "version") == 0 || strcmp(buf, "v") == 0) {
+    else if (strcmp(buf, "version") == 0 || strcmp(buf, "v") == 0) {
         version();
         return 0;
     }
@@ -25,7 +42,7 @@ int comexec(char buf[]) {
         return 0;
     }
     else if (strcmp(buf, "set_date") == 0) {
-        sys_req(WRITE, COM1, "\nPlease enter the date to be set (set_date MM/DD/YY): ", sizeof("\nPlease enter the date to be set (set_date MM/DD/YY): "));
+        print("\nPlease enter the date to be set (set_date MM/DD/YY): ");
         return 0;
     }
     else if (contains(buf, "set_date") == 1) {
@@ -37,26 +54,591 @@ int comexec(char buf[]) {
         return 0;
     }
     else if (strcmp(buf, "set_time") == 0) {
-        sys_req(WRITE, COM1, "\nPlease enter the time to be set (set_time HH:MM): ", sizeof("\nPlease enter the time to be set (set_time HH:MM): "));
+        print("\nPlease enter the time to be set (set_time HH:MM:SS) ");
         return 0;
     }
     else if (contains(buf, "set_time") == 1) {
         set_time(buf);
         return 0;
     }
-    if (strcmp(buf, "help") == 0) {
+    else if (strcmp(buf, "help") == 0) {
         help();
         return 0;
     } 
+    else if (contains(buf, "color") == 1) {
+
+        println();
+        int first = 1;
+
+        // color entry loop
+        while (1)
+        {
+            // reset reponse on each loop
+            char color_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                print_color("@ ", color);
+                print("Color options: ");
+                print_color("green, ", "green");
+                print_color("yellow, ", "yellow");
+                print_color("blue, ", "blue");
+                print_color("magenta, ", "magenta");
+                print_color("cyan\n", "cyan");
+
+                print("Please enter the color to change to (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, color_response, sizeof(color_response));
+            trim(color_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(color_response);
+
+            // ensure valid input
+            if(strcmp(color_response, "green") == 0 || strcmp(color_response, "yellow") == 0 || strcmp(color_response, "blue") == 0 || strcmp(color_response, "magenta") == 0 || strcmp(color_response, "cyan") == 0){
+                color = color_response;
+                print("\nColor changed to: ");
+                print_color(color, color);
+                break;
+            }
+            else if (strcmp(color_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Process creation cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response: ");
+                continue;
+            }
+        }
+
+        first = 1;
+        return 0;
+    }
+
+    /*  PCB Functions  */
+
+    else if (strcmp(buf, "process_create") == 0 || strcmp(buf, "pc") == 0)
+    {
+        //Write a newline to command line.
+        println();
+
+        //Create variable for a one time only command per shutdown call
+        int first = 1;
+
+        char* name;
+        int class;
+        int priority;
+
+        // Name entry loop
+        while (1)
+        {
+            // reset reponse on each loop
+            char name_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                print_color("@ ", color);
+                print("Please enter the name of the process to create (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, name_response, sizeof(name_response));
+            trim(name_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(name_response);
+
+            // check for invalid format
+            if(isNumeric(name_response)){
+                println();
+                print_color("@ ", color);
+                print("Please retype your response: ");
+                continue;
+            }
+            else if (strcmp(name_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Process creation cancelled.");
+                return 0;
+            }
+            else{
+                // valid input
+                name = name_response;
+                break;
+            }
+        }
+
+        // reset first
+        first = 1;
+
+        // Class entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char class_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                println();
+                print_color("@ ", color);
+                print("Please enter the class of the process to create (or write 'cancel' to cancel): [0 - User or 1 - Kernel]");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, class_response, sizeof(class_response));
+            trim(class_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(class_response);
+
+            // check for valid format
+            if(isNumeric(class_response) == 1 && (atoi(class_response) == 0 || atoi(class_response)==1) && strcmp(class_response, "") != 0){
+                // valid input
+                class = atoi(class_response);
+                break;
+            }
+            else if (strcmp(class_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Process creation cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response [0,1]: ");
+                continue;
+            }
+                
+        }
+
+        // reset first
+        first = 1;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                println();
+                print_color("@ ", color);
+                print("Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
+
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Process creation cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response [0-9]: ");
+                continue;
+            }
+
+        }
+
+        int status = create_PCB(name, class, priority);
+        if (status == 1) {
+            return 0; // continue running comexec
+        }
+
+        println();
+        print("PCB created successfully.");
+        show_PCB(name);
+        return 0;
+    }
+
+    else if (strcmp(buf, "process_delete") == 0 || strcmp(buf, "pd") == 0)
+    {
+        char* name;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the name of the process to delete: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            println();
+            print("Process not found: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else {
+            println();
+            print("Deleting PCB: ");
+            print(name);
+            delete_PCB(name);
+            return 0;
+        }
+    }
+
+    else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
+    {
+        char* name;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the name of the process to block: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            println();
+            print("Process not found: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else if (PCB->state != READY_SUS && PCB->state != READY_NOT_SUS) {
+            println();
+            print("Process is not in a ready state: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else {
+            println();
+            print("Blocking PCB: ");
+            print(name);
+            block_PCB(name);
+            return 0;
+        }
+    }
+
+    else if (strcmp(buf, "process_unblock") == 0 || strcmp(buf, "pub") == 0)
+    {
+        char* name;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the name of the process to unblock: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            println();
+            print("Process not found: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else if (PCB->state != BLOCKED_SUS && PCB->state != BLOCKED_NOT_SUS) {
+            println();
+            print("Process is not in a blocked state: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else {
+            println();
+            print("Unblocking PCB: ");
+            print(name);
+            unblock_PCB(name);
+            return 0;
+        }
+    }
+
+    else if (strcmp(buf, "process_suspend") == 0 || strcmp(buf, "psus") == 0)
+    {
+        char* name;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the name of the process to suspend: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        println();
+
+        if (PCB == NULL) {
+            print("Process not found: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else if (PCB->state != READY_NOT_SUS && PCB->state != BLOCKED_NOT_SUS) {
+            print("Process is already suspended: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else {
+            print("Suspending PCB: ");
+            print(name);
+            suspend_PCB(name);
+            return 0;
+        }
+    }
+
+    else if (strcmp(buf, "process_resume") == 0 || strcmp(buf, "pres") == 0)
+    {
+        char* name;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the name of the suspended process to resume: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        println();
+        if (PCB == NULL) {
+            print("Process not found: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else if (PCB->state != READY_SUS && PCB->state != BLOCKED_SUS) {
+            print("Process cannot be resumed: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else {
+            print("Resuming PCB: ");
+            print(name);
+            resume_PCB(name);
+            return 0;
+        }
+    }
+
+    else if (strcmp(buf, "process_priority") == 0 || strcmp(buf, "pp") == 0)
+    {
+        char* name;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the name of the process to update: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        name = response;
+
+        pcb* PCB = pcb_find(name);
+        println();
+
+        if (PCB == NULL) {
+            print("Process not found: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+
+        int first = 1;
+        int priority;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                println();
+                print_color("@ ", color);
+                print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
+
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Priority reassignment cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response [0-9]: ");
+                continue;
+            }
+
+        }
+
+        char str[100];
+
+        println();
+        print("Setting priority for PCB: ");
+        print(name);
+        print(" to ");
+        print(itoa(priority, str, 10));
+
+        set_PCB_priority(name, priority);
+
+        return 0;
+    }
+
+    else if (strcmp(buf, "process_show") == 0 || strcmp(buf, "ps") == 0)
+    {
+        char* name;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the name of the process to show: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        name = response;
+
+        println();
+        print("Locating PCB: ");
+        print(name);
+        print("...");
+        println();
+
+        pcb* PCB = pcb_find(name);
+        if (PCB == NULL) {
+            print("Process not found: ");
+            print(name);
+            return 0; // continue running comexec
+        }
+        else {
+            show_PCB(name);
+            return 0;
+        }
+    }
+
+    else if (strcmp(buf, "process_show_ready") == 0 || strcmp(buf, "psr") == 0)
+    {
+        return show_ready_PCB();
+    }
+
+    else if (strcmp(buf, "process_show_blocked") == 0 || strcmp(buf, "psb") == 0)
+    {
+        return show_blocked_PCB();
+    }
+
+    else if (strcmp(buf, "process_show_all") == 0 || strcmp(buf, "psa") == 0)
+    {
+        return show_all_PCB();
+    }
+    
+    // --------------------------------------------------------------------- // 
+    // ------------------------- END COMMAND LOGIC ------------------------- //
+    // --------------------------------------------------------------------- // 
+
+    else if (strcmp(buf, "test_trim") == 0)
+    {
+        char words[100] = "    shutit    ";
+        println();
+        print(words);
+        trim(words);
+        println();
+        print(words);
+        print("hello");
+        return 0;
+    }
+
+    //Bonus Commands
+    else if (strcmp(buf, "clear") == 0) {
+        clear_screen();
+        return 5;
+    }
+
     else {
-        sys_req(WRITE, COM1, "\nError: Invalid command.", sizeof("\nError: Invalid command."));
-        return -1;
+        println();
+        print_error("Error: Invalid command. Please Re-type.");
+        return 1;
     }
 }
 
 int shutdown(void) {
- //Write a newline to command line.
-    sys_req(WRITE, COM1, "\n", sizeof("\n"));
+    //Write a newline to command line.
+    println();
 
     //Create variable for a one time only command per shutdown call
     int first = 1;
@@ -70,25 +652,31 @@ int shutdown(void) {
         //For first time, write instructions
         if(first== 1){
             first++;
-            sys_req(WRITE, COM1, "@ Are you sure you want to shutdown? (y or n)", sizeof("@ Are you sure you want to shutdown? (y or n)"));
+            print_color("@ ", color);
+            print("Are you sure you want to shutdown? (y or n)");
         }
 
         //Write formatting for entry and read from the command line
-        sys_req(WRITE, COM1, "\n@ ", sizeof("@ "));
+        println();
+        print_color("@ ", color);
         sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
 
         //Check to see if the person want to shutdown (y) or continue running program(n)
         if(strcmp(response, "y") == 0 || strcmp(response, "yes") == 0 ){
-            return 1; //exit and end the program
+            return -1; //exit and end the program
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
-            sys_req(WRITE, COM1, "\n@ Returning to Usual Operations...", sizeof("\n@ Returning to Usual Operations..."));
-            return 0; //exit and continue running program
+            println();
+            print_color("@ ", color);
+            print("Returning to Usual Operations...");
+            return 1; //exit and continue running program
         }
         else{
             //If they don't response with the proper entry, give repeated instructions and loop again.
-            sys_req(WRITE, COM1, "\n", sizeof("\n"));
-            sys_req(WRITE, COM1, "@ Please retype your response: (y or n)", sizeof("@ Please retype your response: (y or n)"));
+            println();
+            print_color("@ ", color);
+            print("Please retype your response: (y or n)");
             continue;
         }
     
@@ -98,276 +686,111 @@ int shutdown(void) {
 
 int help(void) {
     // Print list of commands
-    sys_req(WRITE, COM1, "\n@ help\t\tPrints a complete list of each available command.", sizeof("@ help\tPrints a complete list of each available command."));
-    sys_req(WRITE, COM1, "\n@ version\tPrints the current version of the program.", sizeof("@ version\tPrints the current version of the program."));
-    sys_req(WRITE, COM1, "\n@ get_date\tPrints the current date set by the user.", sizeof("@ get_date\tPrints the current date set by the user."));
-    sys_req(WRITE, COM1, "\n@ set_date\tMM/DD/YY\tSets the current date.", sizeof("@ set_date\tMM/DD/YY\tSets the current date."));
-    sys_req(WRITE, COM1, "\n@ get_time\tPrints the current time set by the user.", sizeof("@ get_time\tPrints the current time set by the user."));
-    sys_req(WRITE, COM1, "\n@ set_time\tHH:MM:SS\tSets the current time.", sizeof("@ set_time\tHH:MM:SS\tSets the current time."));
-    sys_req(WRITE, COM1, "\n@ shutdown\tExits the program.", sizeof("\n@ shutdown\tExits the program."));
+
+    // R1 commands
+    println();
+    print_color("=====",color); // 5 equal signs
+    println();
+    print_color("@ ", color);
+    print("help\t\tPrints a complete list of each available command.");
+    println(); 
+    print_color("@ ", color);
+    print("version\tPrints the current version of the program.");
+    println(); 
+    print_color("@ ", color);
+    print("get_date\tPrints the current date set by the user.");
+    println(); 
+    print_color("@ ", color);
+    print("set_date\tMM/DD/YY\tSets the current date.");
+    println(); 
+    print_color("@ ", color);
+    print("get_time\tPrints the current time set by the user.");
+    println(); 
+    print_color("@ ", color);
+    print("set_time\tHH:MM:SS\tSets the current time.");
+    println(); 
+    print_color("@ ", color);
+    print("color\t\tChanges the text color.");    
+    println();
+    print_color("@ ", color);
+    print("clear\t\tClears the console.");
+    println();
+    print_color("@ ", color);
+    print("shutdown\tExits the program.");
+
+
+    // R2 commands
+    println();
+    print_color("@ ", color);
+    print("process_create\tpc\tCreates a new process.");
+    println(); 
+    print_color("@ ", color);
+    print("process_delete\tpd\tDeletes a process.");
+    println(); 
+    print_color("@ ", color);
+    print("process_block\t\tpb\tBlocks a process.");
+    println(); 
+    print_color("@ ", color);
+    print("process_unblock\tpub\tUnblocks a process.");
+    println(); 
+    print_color("@ ", color);
+    print("process_suspend\tpsus\tSuspends a process.");
+    println(); 
+    print_color("@ ", color);
+    print("process_resume\tpres\tResumes a process.");
+    println(); 
+    print_color("@ ", color);
+    print("process_priority\tpp\tChanges the priority of a process.");
+    println(); 
+    print_color("@ ", color);
+    print("process_show\t\tps\tShows information about a process.");
+    println(); 
+    print_color("@ ", color);
+    print("process_show_ready\tpsr\tShows all processes in the ready state.");
+    println(); 
+    print_color("@ ", color);
+    print("process_show_blocked\tpsb\tShows all processes in the blocked state.");
+    println(); 
+    print_color("@ ", color);
+    print("process_show_all\tpsa\tShows all processes.");
+    println();
+    print_color("=====", color);//5 equal signs
     return 0;
 }
 
 int version(void) {
-    char msg[100] = "\nVersion 1.0\nCompilation Date: 2/7/2025";
-    sys_req(WRITE,COM1, msg, sizeof(msg));
+    println();
+    print("Version 2.0\nCompilation Date: 2/28/2025");
     return 0;
 }
 
-int get_time(void) {
-    //disabling the NMI bit
-        outb(0x70, inb(0x70) | 0x80);
-        char str[100];
-        char *time_ptr;
-        char colon[1];
-        colon[0] = ':';
-        sys_req(WRITE, COM1, "\n", sizeof("\n"));
-
-        //accessing the hour bit
-        outb(0x70, 0x04);
-
-            //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10)); // -5 offset
-
-            // write the hour to the terminal (size checking)
-            if (atoi(time_ptr) <= 9) {
-                sys_req(WRITE, COM1, "0", sizeof("0"));
-                sys_req(WRITE, COM1, time_ptr, 1);
-            }
-            else {
-                sys_req(WRITE, COM1, time_ptr, 2);
-            }
-
-            //writing a colon to the terminal
-            sys_req(WRITE, COM1, colon, sizeof(colon));
-
-        // accessing the minute bit
-        outb(0x70, 0x02);
-
-            //changing the minute bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-
-            // write the minute to the terminal (size checking)
-            if (atoi(time_ptr) <= 9) {
-                sys_req(WRITE, COM1, "0", sizeof("0"));
-                sys_req(WRITE, COM1, time_ptr, 1);
-            }
-            else {
-                sys_req(WRITE, COM1, time_ptr, 2);
-            }
-
-            sys_req(WRITE, COM1, colon, sizeof(colon));
-
-        // accessing the second bit 
-        outb(0x70, 0x00);
-
-            //changing the second bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-
-            // write the second to the terminal (size checking)
-            if (atoi(time_ptr) <= 9) {
-                sys_req(WRITE, COM1, "0", sizeof("0"));
-                sys_req(WRITE, COM1, time_ptr, 1);
-            }
-            else {
-                sys_req(WRITE, COM1, time_ptr, 2);
-            }
-
-        // return 0 indicating success
-        return 0;
-}
-
-int set_time(char buf[]) {
-    
-       // disable interrupts
-        cli();
-
-        // derive time string from the buffer
-        char* time = substr(buf, 9);
-
-        // check for invalid format (invalid time check pending)
-        if (charCount(time, ':') != 2 || strlen(time) != 8 || isNumeric(strtok(time, ":")) == 0) {
-            sys_req(WRITE, COM1, "\nInvalid set_time format. (set_time HH:MM:SS)", sizeof("\nInvalid set_time format. (set_time HH:MM:SS)"));
-            return -1;
-        }
-        else {
-            char hr_chars[3] = {time[0], time[1], '\0'}; // first 2 chars = hour value
-            char min_chars[3] = {time[3], time[4], '\0'}; // next 2 chars (skipping ':') = minute value
-            char sec_chars[3] = {time[6], time[7], '\0'}; // last 2 chars = second value
-
-            // check for invalid times / characters 
-            if (strcmp(hr_chars, "23") > 0 || strcmp(hr_chars, "0") < 0   
-            || strcmp(min_chars, "59") > 0 || strcmp(min_chars, "0") < 0  
-            || strcmp(sec_chars, "59") > 0 || strcmp(sec_chars, "0") < 0) 
-            {
-                sys_req(WRITE, COM1, "\nInvalid time. (set_time [00-23]:[00-59]:[00-59])", sizeof("\nInvalid time. (set_time [00-23]:[00-59]:[00-59])"));
-                return -1;
-            }
-
-            // retrieve int values for hour, minute, and second
-            unsigned int hour = (unsigned int)atoi(hr_chars) + 5; // +5 for EST
-            unsigned int minute = (unsigned int)atoi(min_chars);
-            unsigned int second = (unsigned int)atoi(sec_chars);
-
-            // convert each time value to BCD
-            unsigned int hour_BCD = intToBCD(hour);
-            unsigned int minute_BCD = intToBCD(minute);
-            unsigned int second_BCD = intToBCD(second);
-
-            // write each BCD value to the corresponding register
-            outb(0x70, 0x04);
-            outb(0x71, hour_BCD); // hour
-
-            outb(0x70, 0x02);
-            outb(0x71, minute_BCD); // minute
-
-            outb(0x70, 0x00);
-            outb(0x71, second_BCD); // second
-
-            sys_req(WRITE, COM1, "\nTime set to: ", sizeof("\nTime set to: "));
-            get_time();
-        }
-
-        // re-enable interrupts
-        sti();
-
-        return 0;
-}
-
-int get_date(void){
-
-        //disabling the NMI bit
-        outb(0x70, inb(0x70) | 0x80);  
-        char str[100];
-        char *date_ptr;
-
-        //creating a slash char to put between the months/days/years
-        char slash[1];
-        slash[0] = '/';
-        sys_req(WRITE, COM1, "\n", sizeof("\n"));
-
-        //accessing the month bit
-        outb(0x70, 0x08);      
-
-            //changing the bit from bcd to a char ptr                      
-            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));  
-
-            // write the month to the terminal (size checking)
-            if (atoi(date_ptr) <= 9) {
-                sys_req(WRITE, COM1, date_ptr, 1);
-            }
-            else {
-                sys_req(WRITE, COM1, date_ptr, 2);   
-            }
-
-             //writing the month and a slash to the terminal      
-            sys_req(WRITE, COM1, slash, sizeof(slash));     
-
-        //accessing the day bit
-        outb(0x70, 0x07);
-
-            //changing the bit from bcd to a char ptr                             
-            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-
-            // write the day to the terminal (size checking)
-            if (atoi(date_ptr) <= 9) {
-                sys_req(WRITE, COM1, date_ptr, 1);
-            }
-            else {
-                sys_req(WRITE, COM1, date_ptr, 2);   
-            }
-            
-            // write a slash to the terminal
-            sys_req(WRITE, COM1, slash, sizeof(slash));
-
-        //accessing the year bit
-        outb(0x70, 0x09);  
-
-            //changing the bit from bcd to a char ptr                             
-            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
-
-            //writing the year to the terminal
-            sys_req(WRITE, COM1, date_ptr, 2);
-
-    //returning 0 indicates success   
+int clear_screen(void) {
+    print("\033[2J");
+    print("\033[H");
     return 0;
 }
 
-int set_date(char buf[]) {
-    
-        // disable interrupts
-        cli();
+char* return_color(void) {
 
-        //getting the inputted date from the buffer
-        char* date = substr(buf, 9);
-
-        //checking to make sure the date is in a valid format
-        if (contains(date, "/") == 0 || strlen(date) != 8 || isNumeric(strtok(date, "/")) == 0) {
-            sys_req(WRITE, COM1, "\nInvalid set_date format. (set_date MM/DD/YY)", sizeof("\nInvalid set_date format. (set_date MM/DD/YY)"));
-        }
-        else {
-            char mth_chars[3] = {date[0], date[1], '\0'}; // first 2 chars = month value
-            char day_chars[3] = {date[3], date[4], '\0'}; // next 2 chars = day value
-            char year_chars[5] = {date[6], date[7],'\0'}; // last 2 chars = year value
-
-            unsigned int month = (unsigned int)atoi(mth_chars); //converting the month char to a unsigned int
-            unsigned int day = (unsigned int)atoi(day_chars); //converting the day char to a unsigned int
-            unsigned int year = (unsigned int)atoi(year_chars); //converting the year char to a unsigned int
-
-            //checking for valid month input
-            if(month > 12){
-                sys_req(WRITE, COM1, "\nInvalid Month. Please input a month between 01-12.", sizeof("\nInvalid Month. Please input a month between 01-12."));
-                return -1;
-            }
-            //checking for valid day input for months with 31 days in them
-            else if(month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12){
-                if(day > 31 || day < 1){
-                    sys_req(WRITE, COM1, "\nInvalid Day. Please input a day between 01-31.", sizeof("\nInvalid Day. Please input a day between 01-31."));
-                    return -1;
-                }
-            }
-            //checking for valid day input for months with 30 days in them
-            else if(month == 4 || month == 6 || month == 9 || month == 11){
-                if(day > 30 || day < 1){
-                    sys_req(WRITE, COM1, "\nInvalid Day. Please input a day between 01-30.", sizeof("\nInvalid Day. Please input a day between 01-30."));
-                    return -1;
-                }
-            }
-            //checking for valid day input for february during a leap year
-            else if(month == 2 && (year % 4) == 0 ){
-                if(day > 29 || day < 1){
-                    sys_req(WRITE, COM1, "\nInvalid Day. Please input a day between 01-29.", sizeof("\nInvalid Day. Please input a day between 01-29."));
-                    return -1;
-                }
-            }
-            //checking for valid day input for february not during a leap year
-            else if(month == 2){
-                  if(day > 28 || day < 1){
-                    sys_req(WRITE, COM1, "\nInvalid Day. Please input a day between 01-28.", sizeof("\nInvalid Day. Please input a day between 01-28."));
-                    return -1;
-                }
-            }
-
-            unsigned int month_BCD = intToBCD(month); //converting month int to BCD
-            unsigned int day_BCD = intToBCD(day); //converting day int to BCD
-            unsigned int year_BCD = intToBCD(year); //converting year int to BCD
-
-            //write each BCD value to the corresponding register
-            
-            outb(0x70, 0x09); //accessing the year register
-            outb(0x71, year_BCD); //writing the year BCD to the month register
-
-            outb(0x70, 0x08); //accessing the month register
-            outb(0x71, month_BCD); //writing the month BCD to the day register
-
-            outb(0x70, 0x07); //accessing the day register
-            outb(0x71, day_BCD); //writing the day BCD to the year register
-
-            sys_req(WRITE, COM1, "\nDate set to: ", sizeof("\nDate set to: "));
-            get_date();
-
-        // re-enable interrupts
-        sti();
-        }
-    return 0;
+    // return code for each color (for serial.c)
+    if (strcmp(color, "green") == 0) {
+        return "\x1b[32m";
+    }
+    else if (strcmp(color, "yellow") == 0) {
+        return "\x1b[33m";
+    }
+    else if (strcmp(color, "blue") == 0) {
+        return "\x1b[34m";
+    }
+    else if (strcmp(color, "magenta") == 0) {
+        return "\x1b[35m";
+    }
+    else if (strcmp(color, "cyan") == 0) {
+        return "\x1b[36m";
+    }
+    else {
+        return "\x1b[34m"; // return blue
+    }
 }
+
+

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpx/serial.h>
+#include <mpx/comexec.h>
 
 //Function protos
 void buffer_refresh(char *buffer, int buf_length, int pos);
@@ -74,7 +75,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 	//Size of the buffer
 	int entry_length = 0;
 
-	while (sizeof(buffer) < len && exit_return == 0) /* looping while the buffer size is less than the total length */ {
+	while (sizeof(buffer) < len && exit_return == 0 && pos < (int)len) /* looping while the buffer size is less than the total length */ {
 		if(inb(dev + LSR) & 1) /* checks to see if there is a byte to read */ {
 
 			char c = inb(dev); //reads the byte using inb
@@ -127,17 +128,15 @@ int serial_poll(device dev, char *buffer, size_t len)
 				//Assemble Special String Combination
 				char special_key[4] = {c, d, e,'\0'};
 
-				// sys_req(WRITE,COM1, special_key , 3);
-
 				//Up Arrow key
 				if(strcmp(special_key, UP_ARROW) == 0){
 
-					//make these remember the last few (3) commands that we typed
+					//make these remember the last few (5) commands that we typed
 				}
 				//Down Arrow key
 				else if(strcmp(special_key, DOWN_ARROW) == 0){
 
-					//make these remember the last few (3) commands that we typed
+					//make these remember the last few (5) commands that we typed
 				}
 				//Right Arrow key
 				else if(strcmp(special_key, RIGHT_ARROW) == 0){
@@ -146,7 +145,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 						//If we can go further right, increment the position counter
 						pos++;
 						//escape sequence to move cursor right (which prints a character to the terminal to move the cursor right)
-						sys_req(WRITE, COM1, "\033[1C", sizeof("\033[1D"));
+						serial_out(COM1, "\033[1C", sizeof("\033[1D"));
 					}
 				}
 				//Left Arrow key
@@ -156,7 +155,7 @@ int serial_poll(device dev, char *buffer, size_t len)
 						//If we can go further left, decrement the position counter to keep track of cursor position
 						pos--;
 						//escape sequence to move cursor left (which prints a character to the terminal to move the cursor left)
-						sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D"));
+						serial_out(COM1, "\033[1D", sizeof("\033[1D"));
 					}
 				}
 				//Delete key
@@ -218,13 +217,17 @@ int serial_poll(device dev, char *buffer, size_t len)
 }
 
 void buffer_refresh(char *buffer, int buf_length, int pos) {
-	sys_req(WRITE, COM1, "\033[2K\r", sizeof("\033[2K\r")); //"\033" starts in escape sequence, "2K" clears the terminal line, "\r" prints a carraige return to get back to the beginning of the line
-	sys_req(WRITE, COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
-	sys_req(WRITE, COM1, " ", sizeof(" ")); //^^^
-	sys_req(WRITE, COM1, buffer, buf_length); //this reprints the buffer
+
+	char* color = return_color(); // get the color that the user sets in comexec
+	serial_out(COM1, "\033[2K\r", sizeof("\033[2K\r")); //"\033" starts in escape sequence, "2K" clears the terminal line, "\r" prints a carraige return to get back to the beginning of the line
+	serial_out(COM1, color, sizeof("\x1b[34m")); //changes the color of the @ symbol to set color (using size for blue, all color codes are the same size)
+	serial_out(COM1, "@", sizeof("@")); //the next two statements reprint the beginning two symbols of the terminal line that appear before every command
+	serial_out(COM1, " ", sizeof(" ")); //^^^
+	serial_out(COM1, "\x1b[0m", sizeof("\x1b[0m")); //resets the color of the terminal line to the default color
+	serial_out(COM1, buffer, buf_length); //this reprints the buffer
 	
 	//This loop moves the cursor back to the position it was at before the buffer was refreshed, since every time that the buffer is reprinted, the cursor is moved back to the front of the line
 	for(int i = buf_length; i > pos; i--) {
-		sys_req(WRITE, COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
+		serial_out(COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
 	}
 }

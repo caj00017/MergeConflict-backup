@@ -3,6 +3,7 @@
     "files.associations": {
         "*.embeddedhtml": "html",
         "comhand.h": "c",
-        "mtpext.h": "c"
+        "mtpext.h": "c",
+        "iosfwd": "c"
     }
 }

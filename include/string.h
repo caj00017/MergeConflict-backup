@@ -48,6 +48,15 @@ size_t strlen(const char *s);
 char* strtok(char * restrict s1, const char * restrict s2);
 
 /**
+ * @brief Function which copies a string from src to dest
+ * @param copy The string to copy to
+ * @param str The string to copy from
+ * @return 0 success, 1 failure (null pointers)
+ * @author Chris Jones
+ */
+int strcpy(char* copy, const char* str);
+
+/**
 * @brief Indicates whether str1 contains str2
 * @param str1 The outer string to search
 * @param str2 The inner string to find
@@ -90,4 +99,42 @@ int charCount(char* str, char c);
  */
 int indexOf(char* str, char searched_char);
 
+/**
+ @brief Prints passed parameter to terminal
+ @param sentence The String to be printed
+ @author Izaak Whetsell
+ */
+void print(const char* sentence);
+
+/**
+ @brief Prints newline to terminal
+ @author Izaak Whetsell
+ */
+void println(void);
+
+/**
+ @brief Alters the color of the string output and prints to terminal
+ @param sentence The String to be printed red
+ @author Izaak Whetsell
+ */
+void print_error(const char* sentence);
+
+/**
+ @brief Alters the color of the string output and prints to terminal
+ @param sentence The String to be printed
+ @param color_code The color to be used
+ @author Evan Humphrey
+ */
+void print_color(const char* sentence, const char* color_code);
+
+
+
+/**
+ @brief Removes whitespace from the front and back of a passed string
+ @param sentence The String to be trimmed
+ @author Izaak Whetsell
+ */
+void trim(char sentence[]);
+
 #endif
+

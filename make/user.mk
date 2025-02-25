@@ -6,4 +6,5 @@ user/core.o: user/core.c include/string.h include/mpx/serial.h \
 USER_OBJECTS=\
 	user/core.o \
 	user/comhand.o \
-	user/comexec.o
+	user/comexec.o \
+	user/user_pcb.o
