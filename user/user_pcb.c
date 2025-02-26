@@ -48,6 +48,12 @@ int delete_PCB(char* name){
         return 1; // pcb not found
     }
 
+    // ensure not a kernel process
+    if (PCB->class == 1) {
+        sys_req(WRITE, COM1, "\nError: Cannot alter a kernel process.", sizeof("\nError: Cannot alter a kernel process."));
+        return 1;
+    }
+
     //Remove from queue with pcb_remove
     pcb_remove(PCB);
 
@@ -82,6 +88,12 @@ int block_PCB(char* name){
     pcb* PCB = pcb_find(name);
     if (PCB == NULL) {
         return 1; // pcb not found
+    }
+
+    // ensure not a kernel process
+    if (PCB->class == 1) {
+        sys_req(WRITE, COM1, "\nError: Cannot alter a kernel process.", sizeof("\nError: Cannot alter a kernel process."));
+        return 1;
     }
 
 
@@ -122,6 +134,12 @@ int unblock_PCB(char* name){
     if (PCB == NULL) {
         return 1; // pcb not found
     }
+
+    // ensure not a kernel process
+    if (PCB->class == 1) {
+        sys_req(WRITE, COM1, "\nError: Cannot alter a kernel process.", sizeof("\nError: Cannot alter a kernel process."));
+        return 1;
+    }
     
     // Remove from blocked queue
     pcb_remove(PCB); //pcb_remove is currently not working
@@ -161,6 +179,12 @@ int suspend_PCB(char* name){
     if (PCB == NULL) {
         return 1; // pcb not found
     }
+
+    // ensure not a kernel process
+    if (PCB->class == 1) {
+        sys_req(WRITE, COM1, "\nError: Cannot alter a kernel process.", sizeof("\nError: Cannot alter a kernel process."));
+        return 1;
+    }
     
     //Alter to suspended state
     if (PCB->state == 1) {
@@ -198,6 +222,12 @@ int resume_PCB(char* name){
         return 1; // pcb not found
     }
 
+    // ensure not a kernel process
+    if (PCB->class == 1) {
+        sys_req(WRITE, COM1, "\nError: Cannot alter a kernel process.", sizeof("\nError: Cannot alter a kernel process."));
+        return 1;
+    }
+
     //Alter to not be suspended state
     if (PCB->state == 0) {
         PCB->state = 1;
@@ -228,6 +258,12 @@ int set_PCB_priority(char* name, int priority){
     pcb* PCB = pcb_find(name);
     if (PCB == NULL) {
         return 1; // pcb not found
+    }
+
+    // ensure not a kernel process
+    if (PCB->class == 1) {
+        sys_req(WRITE, COM1, "\nError: Cannot alter a kernel process.", sizeof("\nError: Cannot alter a kernel process."));
+        return 1;
     }
 
     // remove pcb for reinsertion
