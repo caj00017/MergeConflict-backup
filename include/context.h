@@ -8,13 +8,13 @@
 
 typedef struct {
     // segment registers
-    uint16_t CS, DS, ES, FS, GS, SS;
+    int CS, DS, ES, FS, GS, SS;
 
     // status control registers
-    uint32_t EIP, EFLAGS;
+    int EIP, EFLAGS;
 
     // general purpose registers
-    uint32_t EAX, EBX, ECX, EDX, ESI, EDI, EBP, ESP;
+    int EAX, EBX, ECX, EDX, ESI, EDI, EBP, ESP;
 
 } context;
 
