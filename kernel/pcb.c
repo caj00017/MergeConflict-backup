@@ -1,6 +1,7 @@
 #include <mpx/pcb.h>
 #include <memory.h>
 #include <string.h>
+#include <context.h>
 
 /**
  * @file pcb.c 
@@ -15,13 +16,45 @@ pcb* pcb_setup(char* name, int class, int priority) {
     new_pcb->name = (char*)sys_alloc_mem(strlen(name) + 1);
     strcpy(new_pcb->name, name);
 
+    // allocate memory for stack
+    unsigned char* stack_ptr = (unsigned char*)sys_alloc_mem(1024); // allocate 1024 bytes for pcb stack
+
     new_pcb->class = class;
     new_pcb->priority = priority;
     new_pcb->state = 0;               //Change?
-    new_pcb->stack = NULL;             // Should we allocate here?
-    new_pcb->stack_location = NULL;
+    new_pcb->stack = stack_ptr;
+    new_pcb->stack_location = stack_ptr + 1024;
     new_pcb->next_node = NULL;
     new_pcb->prev_node = NULL;
+
+    // create room for context at the top of the stack
+    new_pcb->stack_location = new_pcb->stack_location - sizeof(context);
+
+    // create context
+    context* ctx = (context*)stack_ptr;
+
+    // initialize code and data registers
+    ctx->CS = 0;
+    ctx->DS = 0;
+    ctx->ES = 0;
+    ctx->FS = 0;
+    ctx->GS = 0;
+    ctx->SS = 0;
+
+    // initialize status control registers
+    ctx->EIP = 0;
+    ctx->EFLAGS = 0;
+
+    // initialize general purpose registers
+    ctx->EAX = 0;
+    ctx->EBX = 0;
+    ctx->ECX = 0;
+    ctx->EDX = 0;
+    ctx->ESI = 0;
+    ctx->EDI = 0;
+    ctx->EBP = 0;
+    ctx->ESP = 0;
+
     return new_pcb;
 }
 
