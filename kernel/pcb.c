@@ -17,33 +17,34 @@ pcb* pcb_setup(char* name, int class, int priority) {
     strcpy(new_pcb->name, name);
 
     // allocate memory for stack
-    unsigned char* stack_ptr = (unsigned char*)sys_alloc_mem(1024); // allocate 1024 bytes for pcb stack
+    unsigned char* stack_location = (unsigned char*)sys_alloc_mem(1024); // allocate 1024 bytes for pcb stack
 
     new_pcb->class = class;
     new_pcb->priority = priority;
     new_pcb->state = 0;               //Change?
-    new_pcb->stack = stack_ptr;
-    new_pcb->stack_location = stack_ptr + 1024;
+    new_pcb->stack = stack_location - 1024; // beginning of stack
+    new_pcb->stack_ptr = stack_location; // end of stack
     new_pcb->next_node = NULL;
     new_pcb->prev_node = NULL;
 
     // create room for context at the top of the stack
-    new_pcb->stack_location = new_pcb->stack_location - sizeof(context);
+    new_pcb->stack_ptr = new_pcb->stack_ptr - sizeof(context);
 
     // create context
-    context* ctx = (context*)stack_ptr;
+    context* ctx = (context*)new_pcb->stack_ptr;
+    new_pcb->ctx_ptr = ctx;
 
     // initialize code and data registers
-    ctx->CS = 0;
-    ctx->DS = 0;
-    ctx->ES = 0;
-    ctx->FS = 0;
-    ctx->GS = 0;
-    ctx->SS = 0;
+    ctx->CS = 0x08;
+    ctx->DS = 0x10;
+    ctx->ES = 0x10;
+    ctx->FS = 0x10;
+    ctx->GS = 0x10;
+    ctx->SS = 0x10;
 
     // initialize status control registers
-    ctx->EIP = 0;
-    ctx->EFLAGS = 0;
+    ctx->EIP = 0; // pointer to what function?
+    ctx->EFLAGS = 0x0202;
 
     // initialize general purpose registers
     ctx->EAX = 0;
@@ -55,6 +56,7 @@ pcb* pcb_setup(char* name, int class, int priority) {
     ctx->EBP = 0;
     ctx->ESP = 0;
 
+    ctx->pcb = new_pcb;
     return new_pcb;
 }
 

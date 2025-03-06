@@ -12,6 +12,7 @@
 #include <mpx/time.h>
 #include <mpx/user_pcb.h>
 #include <string.h>
+#include <mpx/sys_call.h>
 
 char* color = "blue"; // color to be set by the user, blue by default
 

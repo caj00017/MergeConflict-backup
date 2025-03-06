@@ -1,6 +1,8 @@
 #ifndef PCB_H
 #define PCB_H
 
+#include <context.h>
+
 /**
  * @file pcb.h 
  * @brief Header file for pcb struct, getters/setters for fields
@@ -22,9 +24,10 @@ typedef struct pcb {
     char* name;
     int class; /* 0 - user process, 1 - kernel process */
     int priority; /* 0-9 */
-    int state; /* 0-4 */                                               //possible change to enum.
-    unsigned char* stack;
-    unsigned char* stack_location; // points to the final byte in the stack
+    int state; /* 0-4 */  //possible change to enum.
+    unsigned char* stack; // points to the first byte in the stack
+    unsigned char* stack_ptr; // points to the final byte in the stack
+    struct context* ctx_ptr; // points to the location of this process's context
     struct pcb* next_node;
     struct pcb* prev_node;
 } pcb;
