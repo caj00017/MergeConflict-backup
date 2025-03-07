@@ -93,5 +93,11 @@ int show_blocked_PCB(void);
  */
 int show_all_PCB(void);
 
+/**
+ * @brief Creates Processes for R3 
+ * @returns Status code (0 success, -1 invalid state)
+ * @author Izaak Whetsell
+ */
+int Load_R3(void);
 
 #endif

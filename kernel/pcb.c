@@ -9,7 +9,7 @@
  * @authors Chris Jones
  */
 
-pcb* pcb_setup(char* name, int class, int priority) {
+pcb* pcb_setup(char* name, int class, int priority, void (*function_ptr)(void)) {
     pcb* new_pcb = pcb_allocate();
     
     // Allocate memory and copy the name
@@ -20,19 +20,24 @@ pcb* pcb_setup(char* name, int class, int priority) {
     unsigned char* stack_location = (unsigned char*)sys_alloc_mem(1024); // allocate 1024 bytes for pcb stack
 
     new_pcb->class = class;
-    new_pcb->priority = priority;
-    new_pcb->state = 0;               //Change?
-    new_pcb->stack = stack_location - 1024; // beginning of stack
-    new_pcb->stack_ptr = stack_location; // end of stack
+    new_pcb->priority = priority; 
+    new_pcb->state = 1;                      // Ready, Not Suspended         
+    new_pcb->stack = stack_location;  // beginning of stack, should this jsut be zero?
+    new_pcb->stack_ptr = stack_location+1024;     // end of stack
     new_pcb->next_node = NULL;
     new_pcb->prev_node = NULL;
 
+
+    /* <<<< Creating the Context >>>>  */
+    //Allocate memory for the context
+    context* ctx = (context*)sys_alloc_mem(sizeof(context));
+
     // create room for context at the top of the stack
-    new_pcb->stack_ptr = new_pcb->stack_ptr - sizeof(context);
+    new_pcb->stack_ptr = new_pcb->stack_ptr - sizeof(ctx); //problem ??
 
     // create context
-    context* ctx = (context*)new_pcb->stack_ptr;
-    new_pcb->ctx_ptr = (unsigned char*)ctx;
+    ctx = (context*)new_pcb->stack_ptr;
+    
 
     // initialize code and data registers
     ctx->CS = 0x08;
@@ -43,7 +48,7 @@ pcb* pcb_setup(char* name, int class, int priority) {
     ctx->SS = 0x10;
 
     // initialize status control registers
-    ctx->EIP = 0; // pointer to what function?
+    ctx->EIP = (int) function_ptr; // pointer to what function?
     ctx->EFLAGS = 0x0202;
 
     // initialize general purpose registers
@@ -56,7 +61,9 @@ pcb* pcb_setup(char* name, int class, int priority) {
     ctx->EBP = 0;
     ctx->ESP = 0;
 
-    ctx->pcb = new_pcb;
+    //Store context into PCB
+    new_pcb->ctx_ptr = (unsigned char*)ctx;
+
     return new_pcb;
 }
 
