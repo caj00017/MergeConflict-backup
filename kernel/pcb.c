@@ -32,7 +32,7 @@ pcb* pcb_setup(char* name, int class, int priority) {
 
     // create context
     context* ctx = (context*)new_pcb->stack_ptr;
-    new_pcb->ctx_ptr = ctx;
+    new_pcb->ctx_ptr = (unsigned char*)ctx;
 
     // initialize code and data registers
     ctx->CS = 0x08;

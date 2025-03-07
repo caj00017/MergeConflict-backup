@@ -6,5 +6,6 @@ extern pcb* GLOBAL_PCB;
 
 /**
  * 
+ * @authors Chris Jones, Evan Humphrey
  */
-struct context* sys_call(context* ctx);
+context* sys_call(context* ctx);

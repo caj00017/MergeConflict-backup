@@ -8,7 +8,7 @@
  * @authors Chris Jones,
  */
 
-typedef struct {
+ typedef struct {
     // segment registers
     int CS, DS, ES, FS, GS, SS;
 
