@@ -54,7 +54,7 @@ queue* return_queue(int class);
  * @returns pcb* pointer to the new pcb
  * @author Chris Jones
  */
-pcb* pcb_setup(char* name, int class, int priority);
+pcb* pcb_setup(char* name, int class, int priority, void (*function_ptr)(void));
 
 /**
  * @brief Allocate memory for a pcb
