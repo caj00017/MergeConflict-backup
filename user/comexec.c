@@ -731,7 +731,7 @@ int help(void) {
     // R2 commands
     println();
     print_color("@ ", color);
-    print("process_create\tpc\tCreates a new process.");
+    print("load_r3\tlr3\tLoads test processes for R3.");
     println(); 
     print_color("@ ", color);
     print("process_delete\tpd\tDeletes a process.");

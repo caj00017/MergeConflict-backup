@@ -18,6 +18,9 @@
     // general purpose registers
     int EAX, EBX, ECX, EDX, ESI, EDI, EBP, ESP;
 
+    // name of the PCB this context belongs to
+    char* pcb_name;
+
 } context;
 
 #endif
