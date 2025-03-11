@@ -3,6 +3,7 @@
 #include <sys_req.h>
 #include <stdlib.h>
 #include <string.h>
+#include <processes.h>
 
 /**
  * Create PCB
@@ -22,7 +23,7 @@ int create_PCB(char* name, int class, int priority){
     }
 
     //Call PCB Setup
-    pcb* PCB = pcb_setup(name, class, priority);
+    pcb* PCB = pcb_setup(name, class, priority, proc1);
 
 
     //Check that PCB was created
@@ -422,6 +423,39 @@ int show_all_PCB(void){
 
     // Blocked
     show_blocked_PCB();
+
+    return 0;
+}
+
+
+
+int Load_R3(void){
+    //Might need error echecking to see if processes already exist
+    if(  (pcb_find("Process 1") != NULL) || 
+         (pcb_find("Process 2") != NULL) ||
+         (pcb_find("Process 3") != NULL) || 
+         (pcb_find("Process 4") != NULL) || 
+         (pcb_find("Process 5") != NULL)    )
+    {
+        println();
+        print_error("Processes 1-5 have already been created.");
+        return 1;
+    }
+
+    //Manually make 5 processes with pcb_setup
+    pcb* PCB1 = pcb_setup("Process 1", 0, 1, proc1);
+    pcb* PCB2 = pcb_setup("Process 2", 0, 2, proc2);
+    pcb* PCB3 = pcb_setup("Process 3", 0, 3, proc3);
+    pcb* PCB4 = pcb_setup("Process 4", 0, 4, proc4);
+    pcb* PCB5 = pcb_setup("Process 5", 0, 5, proc5);
+
+    
+    //Insert into Queues
+    pcb_insert(PCB1);
+    pcb_insert(PCB2);
+    pcb_insert(PCB3);
+    pcb_insert(PCB4);
+    pcb_insert(PCB5);
 
     return 0;
 }
