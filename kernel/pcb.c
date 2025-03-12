@@ -65,7 +65,7 @@ pcb* pcb_setup(char* name, int class, int priority, void (*function_ptr)(void)) 
     ctx->pcb_name = new_pcb->name;
 
     //Store context into PCB
-    new_pcb->ctx_ptr = (unsigned char*)ctx;
+    new_pcb->ctx_ptr = ctx;
 
     return new_pcb;
 }

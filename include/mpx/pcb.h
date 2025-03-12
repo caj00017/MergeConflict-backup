@@ -1,6 +1,8 @@
 #ifndef PCB_H
 #define PCB_H
 
+#include <context.h>
+
 /**
  * @file pcb.h 
  * @brief Header file for pcb struct, getters/setters for fields
@@ -11,12 +13,12 @@
  * @brief PCB states
  */
 enum pcb_state {
-                READY_SUS, // =0
-                READY_NOT_SUS, // =1
-                RUNNING, // =2
-                BLOCKED_SUS, // =3
-                BLOCKED_NOT_SUS, // =4
-                };
+    READY_SUS, // =0
+    READY_NOT_SUS, // =1
+    RUNNING, // =2
+    BLOCKED_SUS, // =3
+    BLOCKED_NOT_SUS, // =4
+};
 
 typedef struct pcb {
     char* name;
@@ -25,7 +27,7 @@ typedef struct pcb {
     int state; /* 0-4 */  //possible change to enum.
     unsigned char* stack; // points to the first byte in the stack
     unsigned char* stack_ptr; // points to the final byte in the stack
-    unsigned char* ctx_ptr; // points to the location of this process's context
+    context* ctx_ptr; // points to the location of this process's context
     struct pcb* next_node;
     struct pcb* prev_node;
 } pcb;
