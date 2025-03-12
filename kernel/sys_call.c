@@ -7,6 +7,8 @@ context* sys_call(context* ctx) {
 
     // handle sys_req(IDLE) and (EXIT)
     int op = ctx->EAX;
+    context* return_ctx;
+    
     if (op == 0) { // EXIT
         // delete the currently running PCB
         pcb* thisPCB = pcb_find(ctx->pcb_name);
@@ -15,12 +17,23 @@ context* sys_call(context* ctx) {
         // if there are any ready, non-suspended PCBs in the queue,
         // remove the first from the queue and store it in a temporary
         // variable as the next process
-
+        pcb* nextPCB = find_first_ready();
+        if (nextPCB != NULL) {
+            GLOBAL_PCB = nextPCB;
+            return_ctx = nextPCB->ctx_ptr;
+            return return_ctx;
+        }
 
         // if the PCB queue is empty, or only consists of blocked or
         // suspended PCBs, load the original context
+        else {
+            GLOBAL_PCB = thisPCB;
+            return_ctx = thisPCB->ctx_ptr;
+            return return_ctx;
+        }
 
         // ensure that the return value seen by sys_req is 0.
+        return_ctx->EAX = 0;
     }
     else if (op == 1) { // IDLE
         // if there are any ready, non-suspended PCBs in the queue,
