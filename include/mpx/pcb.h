@@ -25,7 +25,7 @@ typedef struct pcb {
     int state; /* 0-4 */  //possible change to enum.
     unsigned char* stack; // points to the first byte in the stack
     unsigned char* stack_ptr; // points to the final byte in the stack
-    unsigned char* ctx_ptr; // points to the location of this process's context
+ //   unsigned char* ctx_ptr; // points to the location of this process's context
     struct pcb* next_node;
     struct pcb* prev_node;
 } pcb;
