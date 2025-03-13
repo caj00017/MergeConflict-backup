@@ -100,4 +100,13 @@ int show_all_PCB(void);
  */
 int Load_R3(void);
 
+/**
+ * @brief Creates Suspended Processes for R3 Extra Credit 
+ * @param pcb_num The number of the test process to load in the suspended state
+ * @param priority The priortiy of the test process given by user
+ * @returns Status code (0 success, -1 invalid state)
+ * @author Izaak Whetsell
+ */
+int Load_R3_Sus(int pcb_num, int priority);
+
 #endif

@@ -23,7 +23,7 @@ int create_PCB(char* name, int class, int priority){
     }
 
     //Call PCB Setup
-    pcb* PCB = pcb_setup(name, class, priority, proc1);
+    pcb* PCB = pcb_setup(name, class, priority, 1, proc1);
 
 
     //Check that PCB was created
@@ -51,7 +51,7 @@ int delete_PCB(char* name){
 
     // ensure not a kernel process
     if (PCB->class == 1) {
-        sys_req(WRITE, COM1, "\nError: Cannot alter a kernel process.", sizeof("\nError: Cannot alter a kernel process."));
+        print_error("\nError: Cannot alter a kernel process.");
         return 1;
     }
 
@@ -430,32 +430,115 @@ int show_all_PCB(void){
 
 
 int Load_R3(void){
-    //Might need error echecking to see if processes already exist
-    if(  (pcb_find("Process 1") != NULL) || 
-         (pcb_find("Process 2") != NULL) ||
-         (pcb_find("Process 3") != NULL) || 
-         (pcb_find("Process 4") != NULL) || 
-         (pcb_find("Process 5") != NULL)    )
-    {
-        println();
-        print_error("Processes 1-5 have already been created.");
-        return 1;
+    println();
+
+    // Check for Process 1
+    if( pcb_find("Process 1") == NULL){
+        pcb* PCB1 = pcb_setup("Process 1", 1, 1, 1, proc1); //Name, Class, Priority, State, Function
+        print("Finished Loading: Process 1\n");
+        pcb_insert(PCB1);
+    }
+    else{
+        print_error("Processes 1 has already been created.\n");
     }
 
-    //Manually make 5 processes with pcb_setup
-    pcb* PCB1 = pcb_setup("Process 1", 0, 1, proc1);
-    pcb* PCB2 = pcb_setup("Process 2", 0, 2, proc2);
-    pcb* PCB3 = pcb_setup("Process 3", 0, 3, proc3);
-    pcb* PCB4 = pcb_setup("Process 4", 0, 4, proc4);
-    pcb* PCB5 = pcb_setup("Process 5", 0, 5, proc5);
+    // Check for Process 2
+    if( pcb_find("Process 2") == NULL){
+        pcb* PCB2 = pcb_setup("Process 2", 1, 2, 1, proc1); //Name, Class, Priority, State, Function
+        print("Finished Loading: Process 2\n");
+        pcb_insert(PCB2);
+    }
+    else{
+        print_error("Processes 2 has already been created.\n");
+    }
 
-    
-    //Insert into Queues
-    pcb_insert(PCB1);
-    pcb_insert(PCB2);
-    pcb_insert(PCB3);
-    pcb_insert(PCB4);
-    pcb_insert(PCB5);
+    // Check for Process 3
+    if( pcb_find("Process 3") == NULL){
+        pcb* PCB3 = pcb_setup("Process 3", 1, 3, 1, proc1); //Name, Class, Priority, State, Function
+        print("Finished Loading: Process 3\n");
+        pcb_insert(PCB3);
+    }
+    else{
+        print_error("Processes 3 has already been created.\n");
+    }
+
+    // Check for Process 4
+    if( pcb_find("Process 4") == NULL){
+        pcb* PCB4 = pcb_setup("Process 4", 1, 4, 1, proc1); //Name, Class, Priority, State, Function
+        print("Finished Loading: Process 4\n");
+        pcb_insert(PCB4);
+    }
+    else{
+        print_error("Processes 4 has already been created.\n");
+    }
+
+    // Check for Process 5
+    if( pcb_find("Process 5") == NULL){
+        pcb* PCB5 = pcb_setup("Process 5", 1, 5, 1, proc1); //Name, Class, Priority, State, Function
+        print("Finished Loading: Process 5\n");
+        pcb_insert(PCB5);
+    }
+    else{
+        print_error("Processes 5 has already been created.\n");
+    }
 
     return 0;
 }
+
+
+int Load_R3_Sus(int pcb_num, int priority){
+
+    void (*funct)(void) = NULL;
+    char * pcb_name = NULL;
+
+    //Check the users input for process and priority
+    if(pcb_num > 5 || pcb_num <1){
+        print_error("Process Number can not be used.");
+        return 1;
+    }
+    else if(pcb_num == 1){
+        pcb_name = "Process 1";
+        funct = proc1;
+    }
+    else if(pcb_num == 2){
+        pcb_name = "Process 2";
+        funct= proc2;
+    }
+    else if(pcb_num == 3){
+        pcb_name = "Process 3";
+        funct = proc3;
+    }
+    else if(pcb_num == 4){
+        pcb_name = "Process 4";
+        funct = proc4;
+    }
+    else if(pcb_num == 5){
+        pcb_name = "Process 5";
+        funct = proc5;
+    }
+
+    
+    //Might need error echecking to see if processes already exist
+    if(pcb_find(pcb_name) != NULL)
+    {
+        println();
+        print_error("This process has already been created.");
+        return 1;
+    }
+
+    //Manually make process with pcb_setup
+    pcb* PCB = pcb_setup(pcb_name, 0, priority, 0, funct);
+
+    //Print status
+    print("\nFinished Loading as Suspended: ");
+    print(pcb_name);
+   
+
+    //Insert into Queues
+    pcb_insert(PCB);
+
+    show_PCB(pcb_name);
+
+    return 0;
+}
+
