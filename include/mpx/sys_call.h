@@ -6,6 +6,9 @@
 // global PCB pointer
 extern pcb* GLOBAL_PCB;
 
+//global context pointer
+extern context* GLOBAL_CTX;
+
 /**
  * 
  * @authors Chris Jones, Evan Humphrey

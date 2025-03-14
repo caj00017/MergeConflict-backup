@@ -7,9 +7,14 @@ pcb* find_first_ready(void);
 
 // global PCB pointer
 pcb* GLOBAL_PCB = NULL;
+context* GLOBAL_CTX = NULL;
 
 context* sys_call(context* ctx) {
     int op = ctx->EAX;
+    if(GLOBAL_CTX == NULL) {
+        GLOBAL_CTX = ctx;
+    }
+
     if(op == 0) /* EXIT */{
         //delete the currently running pcb
         pcb* curPCB = GLOBAL_PCB;
@@ -27,7 +32,7 @@ context* sys_call(context* ctx) {
         else {
             GLOBAL_PCB = curPCB;
             ctx-> EAX = 0;
-            return (context*)curPCB->stack_ptr;
+            return GLOBAL_CTX;
         }
 
         // In all cases, ensure that the return value seen by sys req() is 0
@@ -36,13 +41,14 @@ context* sys_call(context* ctx) {
         // If there are any ready, non-suspended PCBs in the queue, 
         // remove the first from the queue and store it in a temporary variable as the next process
         pcb* curPCB = GLOBAL_PCB;
-        if(find_first_ready()) {
+        if(find_first_ready() && curPCB != NULL) {
             pcb* nextPCB = find_first_ready();
             pcb_remove(nextPCB);
 
             // Save the context of the current PCB by updating its stack pointer
-            ctx->EBP = (int)curPCB->stack_ptr; //MAYBE?
             curPCB->stack_ptr = curPCB->stack + 1024 - sizeof(ctx) - 2;
+            ctx->EBP = (int)curPCB->stack_ptr; //MAYBE?
+            //curPCB->stack_ptr = curPCB->stack + 1024 - sizeof(ctx) - 2;
 
             // Add the current PCB back to the queue
             pcb_insert(curPCB);
@@ -70,9 +76,13 @@ context* sys_call(context* ctx) {
 pcb* find_first_ready(void) {
     queue* ready = return_queue(0);
     pcb* current_pcb = ready->head;
+    int count = 0;
     while (current_pcb != NULL) {
         if (current_pcb->state == READY_NOT_SUS) {
-            return current_pcb;
+            count++;
+            if(count == 2) {
+                return current_pcb;
+            }
         }
         current_pcb = current_pcb->next_node;
     }
