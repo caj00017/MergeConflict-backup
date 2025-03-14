@@ -1,5 +1,7 @@
 #include <context.h>
 #include <mpx/pcb.h>
+#include <stddef.h>
+#include <sys_req.h>
 
 // global PCB pointer
 extern pcb* GLOBAL_PCB;

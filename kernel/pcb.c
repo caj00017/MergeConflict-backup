@@ -9,7 +9,7 @@
  * @authors Chris Jones
  */
 
-pcb* pcb_setup(char* name, int class, int priority, void (*function_ptr)(void)) {
+pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_ptr)(void)) {
     pcb* new_pcb = pcb_allocate();
     
     // Allocate memory and copy the name
@@ -21,7 +21,7 @@ pcb* pcb_setup(char* name, int class, int priority, void (*function_ptr)(void)) 
 
     new_pcb->class = class;
     new_pcb->priority = priority; 
-    new_pcb->state = 1;                      // Ready, Not Suspended         
+    new_pcb->state = state;                      // Ready, Not Suspended         
     new_pcb->stack = stack_location;  // beginning of stack, should this jsut be zero?
     new_pcb->stack_ptr = stack_location+1024;     // end of stack
     new_pcb->next_node = NULL;
