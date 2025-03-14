@@ -36,7 +36,7 @@ pcb* pcb_setup(char* name, int class, int priority, void (*function_ptr)(void)) 
     new_pcb->stack_ptr = new_pcb->stack + 1024 - sizeof(ctx) - 2; //problem ??
 
     // create context
-    ctx = (context*)new_pcb->stack_ptr;
+    ctx = (context*)new_pcb->stack_ptr; //does this need to 
     
 
     // initialize code and data registers
@@ -58,7 +58,7 @@ pcb* pcb_setup(char* name, int class, int priority, void (*function_ptr)(void)) 
     ctx->EDX = 0;
     ctx->ESI = 0;
     ctx->EDI = 0;
-    ctx->EBP = new_pcb->stack;
+    ctx->EBP = (int)new_pcb->stack;
 
     // store pcb's name in context
     ctx->pcb_name = new_pcb->name;
