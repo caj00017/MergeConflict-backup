@@ -75,6 +75,9 @@ context* sys_call(context* ctx) {
         // }
         // if there is a runnning process
         if(GLOBAL_PCB != NULL) {
+
+            pcb_remove(GLOBAL_PCB);
+
             if(curPCB == NULL) {
                 curPCB = GLOBAL_PCB;
                 return (context*)curPCB->stack_ptr;
