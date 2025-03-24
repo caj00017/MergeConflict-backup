@@ -30,6 +30,7 @@ typedef struct pcb {
  //   unsigned char* ctx_ptr; // points to the location of this process's context
     struct pcb* next_node;
     struct pcb* prev_node;
+    void* params; // parameters for the process's function
 } pcb;
 
 typedef struct queue {
@@ -56,7 +57,7 @@ queue* return_queue(int class);
  * @returns pcb* pointer to the new pcb
  * @author Chris Jones
  */
-pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_ptr)(void));
+pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_ptr)(void*));
 
 /**
  * @brief Allocate memory for a pcb

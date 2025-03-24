@@ -13,6 +13,7 @@
 #include <mpx/user_pcb.h>
 #include <string.h>
 #include <mpx/sys_call.h>
+#include <mpx/alarm.h>
 
 char* color = "blue"; // color to be set by the user, blue by default
 
@@ -717,6 +718,35 @@ int comexec(void) {
         return Load_R3_Sus(5, priority);
     }
     
+    // --------------------------------------------------------------------- // 
+    // ------------------------- R4 COMMAND LOGIC -------------------------- //
+    // --------------------------------------------------------------------- // 
+    else if (strcmp(buf, "alarm") == 0 || strcmp(buf, "a") == 0) {
+        char message[100] = { 0 };
+        char time[9] = { 0 };
+
+        sys_req(WRITE, COM1, "\nPlease enter the message for the alarm: ", sizeof("\nPlease enter the message for the alarm: "));
+        sys_req(READ, COM1, message, sizeof(message));
+        trim(message);
+
+        sys_req(WRITE, COM1, "\nPlease enter the time for the alarm (HH:MM:SS): ", sizeof("\nPlease enter the time for the alarm (HH:MM:SS): "));
+        sys_req(READ, COM1, time, sizeof(time));
+        trim(time);
+
+        print("Creating alarm...");
+        println();
+
+        print("Message: ");
+        print(message);
+        println();
+        print("Time: ");
+        print(time);
+        println();
+
+        create_alarm(message, time);
+        return 0;
+    }
+
     // --------------------------------------------------------------------- // 
     // ---------------------- BONUS + TEST COMMAND LOGIC ------------------- //
     // --------------------------------------------------------------------- // 

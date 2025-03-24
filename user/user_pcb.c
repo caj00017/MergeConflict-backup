@@ -488,7 +488,7 @@ int Load_R3(void){
 
 int Load_R3_Sus(int pcb_num, int priority){
 
-    void (*funct)(void) = NULL;
+    void (*funct)(void*) = NULL;
     char * pcb_name = NULL;
 
     //Check the users input for process and priority

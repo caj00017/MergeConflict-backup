@@ -2,6 +2,8 @@
 #include <mpx/pcb.h>
 #include <sys_req.h>
 #include <string.h>
+#include <stdlib.h>
+#include <memory.h>
 
 /**
  * @file alarm.h
@@ -18,7 +20,7 @@ typedef struct {
  * @brief Function which handles alarm process logic.
  * @authors Chris Jones
  */
-int alarm_process(void* params);
+void alarm_process(void* params);
 
 /**
  * @brief Function which creates a new alarm process.

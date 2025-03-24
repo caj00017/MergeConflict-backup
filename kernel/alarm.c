@@ -1,6 +1,6 @@
 #include <mpx/alarm.h>
 
-int alarm_process(void* params) {
+void alarm_process(void* params) {
 
     alarm_params* args = (alarm_params*)params;
 
@@ -19,7 +19,6 @@ int alarm_process(void* params) {
                 if (get_second() == param_second) {
                     print(args->message);
                     sys_req(EXIT);
-                    return 0;
                 }
             }
         }
@@ -29,9 +28,18 @@ int alarm_process(void* params) {
 
 int create_alarm(char* message, char* time) {
     // create alarm process
+    alarm_params* params = (alarm_params*)sys_alloc_mem(sizeof(alarm_params));
+    strcpy(params->message, message);
+    strcpy(params->time, time);
 
-    // process should be idle before the specified time
+    pcb* alarm = pcb_setup("alarm", 1, 1, 1, alarm_process);
 
-    // if the current time matches the requested time or later, display the message and exit the process
+    // store the params as the PCB's params
+    alarm->params = params;
+
+    // add to ready queue
+    pcb_insert(alarm);
+    
+    return 0;
 
 }

@@ -13,27 +13,27 @@
 /**
  A test process that prints a message then yields, exiting after 1 iteration.
 */
-void proc1(void);
+void proc1(void* args);
 
 /**
  A test process that prints a message then yields, exiting after 2 iterations.
 */
-void proc2(void);
+void proc2(void* args);
 
 /**
  A test process that prints a message then yields, exiting after 3 iterations.
 */
-void proc3(void);
+void proc3(void* args);
 
 /**
  A test process that prints a message then yields, exiting after 4 iterations.
 */
-void proc4(void);
+void proc4(void* args);
 
 /**
  A test process that prints a message then yields, exiting after 5 iterations.
 */
-void proc5(void);
+void proc5(void* args);
 
 /* **********************************************************************
  The following function is needed for Module R4.

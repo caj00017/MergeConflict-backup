@@ -9,7 +9,7 @@
  * @authors Chris Jones
  */
 
-pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_ptr)(void)) {
+pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_ptr)(void*)) {
     pcb* new_pcb = pcb_allocate();
     
     // Allocate memory and copy the name
