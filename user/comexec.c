@@ -27,7 +27,7 @@ int comexec(void) {
     trim(buf);
     
     // --------------------------------------------------------------------- // 
-    // --------------------------- COMMAND LOGIC --------------------------- //
+    // --------------------------- R1 COMMAND LOGIC ------------------------ //
     // --------------------------------------------------------------------- //
 
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
@@ -128,174 +128,9 @@ int comexec(void) {
         return 0;
     }
 
-    /*  PCB Functions  */
-
-    // else if (strcmp(buf, "process_create") == 0 || strcmp(buf, "pc") == 0)
-    // {
-    //     //Write a newline to command line.
-    //     println();
-
-    //     //Create variable for a one time only command per shutdown call
-    //     int first = 1;
-
-    //     char* name;
-    //     int class;
-    //     int priority;
-
-    //     // Name entry loop
-    //     while (1)
-    //     {
-    //         // reset reponse on each loop
-    //         char name_response[100] = { 0 };
-
-    //         //For first time, write instructions
-    //         if(first == 1){
-    //             first = 0;
-    //             print_color("@ ", color);
-    //             print("Please enter the name of the process to create (or write 'cancel' to cancel): ");
-    //         }
-
-    //         //Write formatting for entry and read from the command line
-    //         println();
-    //         print_color("@ ", color);
-    //         sys_req(READ, COM1, name_response, sizeof(name_response));
-    //         trim(name_response);
-
-    //         // write reponse for testing purposes
-    //         println();
-    //         print("Reponse entered: ");
-    //         print(name_response);
-
-    //         // check for invalid format
-    //         if(isNumeric(name_response)){
-    //             println();
-    //             print_color("@ ", color);
-    //             print("Please retype your response: ");
-    //             continue;
-    //         }
-    //         else if (strcmp(name_response, "cancel") == 0){
-    //             // cancel
-    //             println();
-    //             print("Process creation cancelled.");
-    //             return 0;
-    //         }
-    //         else{
-    //             // valid input
-    //             name = name_response;
-    //             break;
-    //         }
-    //     }
-
-    //     // reset first
-    //     first = 1;
-
-    //     // Class entry loop
-    //     while(1) {
-
-    //         // reset reponse on each loop
-    //         char class_response[100] = { 0 };
-
-    //         //For first time, write instructions
-    //         if(first == 1){
-    //             first = 0;
-    //             println();
-    //             print_color("@ ", color);
-    //             print("Please enter the class of the process to create (or write 'cancel' to cancel): [0 - User or 1 - Kernel]");
-    //         }
-
-    //         //Write formatting for entry and read from the command line
-    //         println();
-    //         print_color("@ ", color);
-    //         sys_req(READ, COM1, class_response, sizeof(class_response));
-    //         trim(class_response);
-
-    //         // write reponse for testing purposes
-    //         println();
-    //         print("Reponse entered: ");
-    //         print(class_response);
-
-    //         // check for valid format
-    //         if(isNumeric(class_response) == 1 && (atoi(class_response) == 0 || atoi(class_response)==1) && strcmp(class_response, "") != 0){
-    //             // valid input
-    //             class = atoi(class_response);
-    //             break;
-    //         }
-    //         else if (strcmp(class_response, "cancel") == 0){
-    //             // cancel
-    //             println();
-    //             print("Process creation cancelled.");
-    //             return 0;
-    //         }
-    //         else{
-    //             // invalid input
-    //             println();
-    //             print_color("@ ", color);
-    //             print("Please retype your response [0,1]: ");
-    //             continue;
-    //         }
-                
-    //     }
-
-    //     // reset first
-    //     first = 1;
-
-    //     // Priority entry loop
-    //     while(1) {
-
-    //         // reset reponse on each loop
-    //         char priority_response[100] = { 0 };
-
-    //         //For first time, write instructions
-    //         if(first == 1){
-    //             first = 0;
-    //             println();
-    //             print_color("@ ", color);
-    //             print("Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): ");
-    //         }
-
-    //         //Write formatting for entry and read from the command line
-    //         println();
-    //         print_color("@ ", color);
-    //         sys_req(READ, COM1, priority_response, sizeof(priority_response));
-    //         trim(priority_response);
-
-    //         // write reponse for testing purposes
-    //         println();
-    //         print("Reponse entered: ");
-    //         print(priority_response);
-
-    //         // check for valid format
-    //         if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
-    //             // valid input
-    //             priority = atoi(priority_response);
-    //             break;
-    //         }
-    //         else if (strcmp(priority_response, "cancel") == 0){
-    //             // cancel
-    //             println();
-    //             print("Process creation cancelled.");
-    //             return 0;
-    //         }
-    //         else{
-    //             // invalid input
-    //             println();
-    //             print_color("@ ", color);
-    //             print("Please retype your response [0-9]: ");
-    //             continue;
-    //         }
-
-    //     }
-
-    //     int status = create_PCB(name, class, priority);
-    //     if (status == 1) {
-    //         return 0; // continue running comexec
-    //     }
-
-    //     println();
-    //     print("PCB created successfully.");
-    //     show_PCB(name);
-    //     return 0;
-    // }
+    // --------------------------------------------------------------------- // 
+    // --------------------------- R2 COMMAND LOGIC ------------------------ //
+    // --------------------------------------------------------------------- //
 
     else if (strcmp(buf, "process_delete") == 0 || strcmp(buf, "pd") == 0)
     {
@@ -327,7 +162,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
     {
         char* name;
@@ -364,7 +198,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_unblock") == 0 || strcmp(buf, "pub") == 0)
     {
         char* name;
@@ -401,7 +234,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_suspend") == 0 || strcmp(buf, "psus") == 0)
     {
         char* name;
@@ -437,7 +269,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_resume") == 0 || strcmp(buf, "pres") == 0)
     {
         char* name;
@@ -472,7 +303,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_priority") == 0 || strcmp(buf, "pp") == 0)
     {
         char* name;
@@ -559,7 +389,6 @@ int comexec(void) {
 
         return 0;
     }
-
     else if (strcmp(buf, "process_show") == 0 || strcmp(buf, "ps") == 0)
     {
         char* name;
@@ -592,30 +421,27 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_show_ready") == 0 || strcmp(buf, "psr") == 0)
     {
         return show_ready_PCB();
     }
-
     else if (strcmp(buf, "process_show_blocked") == 0 || strcmp(buf, "psb") == 0)
     {
         return show_blocked_PCB();
     }
-
     else if (strcmp(buf, "process_show_all") == 0 || strcmp(buf, "psa") == 0)
     {
         return show_all_PCB();
     }
 
     // --------------------------------------------------------------------- // 
-    // ------------------------- R3 COMMAND LOGIC ------------------------- //
+    // ------------------------- R3 COMMAND LOGIC -------------------------- //
     // --------------------------------------------------------------------- // 
+
     else if (strcmp(buf, "load_r3") == 0 || strcmp(buf, "lr3") == 0)
     {
         return Load_R3();
     }
-
     else if(strcmp(buf, "yield") == 0 || strcmp(buf, "y") == 0) {
         sys_req(IDLE);
         return 0;
@@ -836,8 +662,6 @@ int comexec(void) {
 
         return Load_R3_Sus(4, priority);
     }
-
-
     else if (strcmp(buf, "load_p5") == 0 || strcmp(buf, "lp5") == 0)
     {
         int first = 1;
@@ -894,7 +718,7 @@ int comexec(void) {
     }
     
     // --------------------------------------------------------------------- // 
-    // ------------------------- END COMMAND LOGIC ------------------------- //
+    // ---------------------- BONUS + TEST COMMAND LOGIC ------------------- //
     // --------------------------------------------------------------------- // 
 
     else if (strcmp(buf, "test_trim") == 0)
@@ -1102,5 +926,3 @@ char* return_color(void) {
         return "\x1b[34m"; // return blue
     }
 }
-
-

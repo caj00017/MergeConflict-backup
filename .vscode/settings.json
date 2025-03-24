@@ -6,6 +6,7 @@
         "mtpext.h": "c",
         "iosfwd": "c",
         "context.h": "c",
-        "sys_call.h": "c"
+        "sys_call.h": "c",
+        "alarm.h": "c"
     }
 }
