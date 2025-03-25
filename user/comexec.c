@@ -807,7 +807,9 @@ int help(void) {
 
     // R1 commands
     println();
-    print_color("=====",color); // 5 equal signs
+    println();
+    print_color("===================================================================================================", color); //100 equal signs
+    println();
     println();
     print_color("@ ", color);
     print("help\t\tPrints a complete list of each available command.");
@@ -839,11 +841,9 @@ int help(void) {
 
     // R2 commands
     println();
-    print_color("@ ", color);
-    print("load_r3\t\tlr3\tLoads test processes for R3.");
     println();
-    print_color("@ ", color);
-    print("yield\t\ty\tYield a process's control of the CPU.");
+    print_color("===================================================================================================", color);
+    println();
     println(); 
     print_color("@ ", color);
     print("process_delete\tpd\tDeletes a process.");
@@ -877,6 +877,13 @@ int help(void) {
 
     //Load R3 Commands
     println();
+    println();
+    print_color("===================================================================================================", color);
+    println();
+    println();
+    print_color("@ ", color);
+    print("yield\t\ty\tYield a process's control of the CPU.");
+    println();
     print_color("@ ", color);
     print("load_r3\tlr3\tLoads test processes for R3.");
     println();
@@ -896,7 +903,9 @@ int help(void) {
     print("load_p5\tlp5\tLoads suspended test processes 5.");
     println();
 
-    print_color("=====", color);//5 equal signs
+    println();
+    print_color("===================================================================================================", color); //100 equal signs
+    println();
     return 0;
 }
 
