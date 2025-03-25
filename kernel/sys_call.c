@@ -41,23 +41,16 @@ context* sys_call(context* ctx) {
             
             CURRENT_PCB = nextPCB;
             CURRENT_PCB->state = RUNNING;
-            ctx->EAX = 0;
-            return (context*) CURRENT_PCB->stack_ptr;; 
+            context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
+            next_ctx->EAX = 0;
+            return next_ctx;
         
         }
         else{
-            ctx->EAX = 0;
+            context* next_ctx = GLOBAL_CTX;
+            next_ctx->EAX = 0;
             return GLOBAL_CTX;
         }
-
-      
-
-        //If there are any ready non suspended PCBs in queue, load the first as in idle,
-    
-
-
-
-        // if PCB queue empty or only block/sus, load originial context
 
        
     }
@@ -68,6 +61,20 @@ context* sys_call(context* ctx) {
             GLOBAL_CTX = ctx;
         }
 
+        if(CURRENT_PCB != NULL){
+            CURRENT_PCB->stack_ptr = (unsigned char*)ctx;
+
+            CURRENT_PCB->state = READY_NOT_SUS;
+
+            pcb_insert(CURRENT_PCB);
+
+            CURRENT_PCB = NULL;
+        }
+
+        if(return_queue(0) != NULL) {
+            nextPCB = find_first_ready();
+        }
+
          //if any nonsuspended PCBs in queue, remove first from queue, store in temp variable as next process
         if(nextPCB != NULL){
             pcb_remove(nextPCB);
@@ -75,27 +82,31 @@ context* sys_call(context* ctx) {
             if(CURRENT_PCB == NULL){
                 CURRENT_PCB = nextPCB;
                 CURRENT_PCB->state = RUNNING;
-                ctx->EAX = 0;
-                return (context*) CURRENT_PCB->stack_ptr;; 
+                context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
+                next_ctx->EAX = 0;
+                return next_ctx;
             }
             else{
-                CURRENT_PCB->stack_ptr = (unsigned char*)ctx;
+                // CURRENT_PCB->stack_ptr = (unsigned char*)ctx;
 
-                CURRENT_PCB->state = READY_NOT_SUS;
+                // CURRENT_PCB->state = READY_NOT_SUS;
 
-                pcb_insert(CURRENT_PCB);
+                // pcb_insert(CURRENT_PCB);
 
                 CURRENT_PCB = nextPCB;
 
                 CURRENT_PCB->state = RUNNING;
-                ctx->EAX = 0;
-                return (context*)CURRENT_PCB->stack_ptr;
+                context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
+                next_ctx->EAX = 0;
+                return next_ctx;
             }
 
         }
         else{
-            ctx->EAX = 0;
-            return GLOBAL_CTX;
+
+            context* next_ctx = GLOBAL_CTX;
+            next_ctx->EAX = 0;
+            return next_ctx;
         }
 
     }

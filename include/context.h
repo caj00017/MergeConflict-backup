@@ -17,9 +17,6 @@
     //status control registers
     int EIP, CS, EFLAGS;
 
-    // name of the PCB this context belongs to
-    char* pcb_name;
-
 } context;
 
 #endif
