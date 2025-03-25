@@ -6,6 +6,8 @@
         "mtpext.h": "c",
         "iosfwd": "c",
         "context.h": "c",
-        "sys_call.h": "c"
+        "sys_call.h": "c",
+        "stddef.h": "c",
+        "pcb.h": "c"
     }
 }
