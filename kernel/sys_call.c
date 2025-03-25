@@ -7,100 +7,173 @@ pcb* find_first_ready(void);
 
 //global PCB pointer
 pcb* GLOBAL_PCB = NULL;
+pcb* CURRENT_PCB = NULL;
 
 //global context pointer
 context* GLOBAL_CTX = NULL;
 
 // current process tracker
-pcb* curPCB = NULL;
+// pcb* curPCB = NULL;
+pcb* nextPCB = NULL;
 
 context* sys_call(context* ctx) {
     int op = ctx->EAX;
+
     if(return_queue(0) != NULL) {
-        GLOBAL_PCB = find_first_ready();
+        nextPCB = find_first_ready();
     }
 
+
     if(op == 0) /* EXIT */{
-        //delete the currently running pcb
-        pcb* curPCB = GLOBAL_PCB;
-        pcb_remove(curPCB);
+        //Delete Currently Running PCB
 
-        //If there are any ready, non-suspended PCBs in the queue, load the first as in IDLE
-        if(find_first_ready()) {
-            //Load the first ready, non-suspended PCB
-            GLOBAL_PCB = find_first_ready();
+        //See if it exists in queue
+        // if(pcb_find(CURRENT_PCB->name) != NULL){ 
+        //     //Remove from queue
+        //     pcb_remove(CURRENT_PCB);
+        // }
+
+        CURRENT_PCB = NULL;
+        //Do we need to free the memory aswell??
+
+        if(nextPCB != NULL){
+            pcb_remove(nextPCB);
+            
+            CURRENT_PCB = nextPCB;
+            CURRENT_PCB->state = RUNNING;
             ctx->EAX = 0;
-            return (context*)GLOBAL_PCB->stack_ptr;
+            return (context*) CURRENT_PCB->stack_ptr;; 
+        
         }
-
-        //If the PCB queue is empty, or only consists of blocked or suspended PCBs, load the original context
-        else {
-            GLOBAL_PCB = curPCB;
-            ctx-> EAX = 0;
+        else{
+            ctx->EAX = 0;
             return GLOBAL_CTX;
         }
 
-        // In all cases, ensure that the return value seen by sys req() is 0
+      
+
+        //If there are any ready non suspended PCBs in queue, load the first as in idle,
+    
+
+
+
+        // if PCB queue empty or only block/sus, load originial context
+
+       
     }
+
     else if(op == 1) /* IDLE */ {
+        //Save Global Context
         if(GLOBAL_CTX == NULL) {
             GLOBAL_CTX = ctx;
         }
-        // If there are any ready, non-suspended PCBs in the queue, 
-        // remove the first from the queue and store it in a temporary variable as the next process
-        // pcb* curPCB = GLOBAL_PCB;
-        // if(find_first_ready() != NULL && curPCB != NULL) {
-        //     pcb* nextPCB = find_first_ready();
-        //     pcb_remove(nextPCB);
 
-        //     // Save the context of the current PCB by updating its stack pointer
-        //     curPCB->stack_ptr = curPCB->stack + 1024 - sizeof(ctx) - 2;
-        //     ctx->EBP = (int)curPCB->stack_ptr; //MAYBE?
-        //     //curPCB->stack_ptr = curPCB->stack + 1024 - sizeof(ctx) - 2;
-
-        //     // Add the current PCB back to the queue
-        //     pcb_insert(curPCB);
-
-        //     // Return the context of the next process
-        //     ctx->EAX = 0;
-        //     return (context*)nextPCB->stack_ptr;
-
-        // }
-        // else {
-        //     // If the PCB queue is empty, or only consists of blocked or suspended PCBs, continue with the current process
-        //     // In all cases, ensure that the return value seen by sys req() is 0
-        //     ctx->EAX = 0;
-        //     return ctx;
-
-        // }
-        // if there is a runnning process
-        if(GLOBAL_PCB != NULL) {
-
-            pcb_remove(GLOBAL_PCB);
-
-            if(curPCB == NULL) {
-                curPCB = GLOBAL_PCB;
-                return (context*)curPCB->stack_ptr;
+         //if any nonsuspended PCBs in queue, remove first from queue, store in temp variable as next process
+        if(nextPCB != NULL){
+            pcb_remove(nextPCB);
+           
+            if(CURRENT_PCB == NULL){
+                CURRENT_PCB = nextPCB;
+                CURRENT_PCB->state = RUNNING;
+                ctx->EAX = 0;
+                return (context*) CURRENT_PCB->stack_ptr;; 
             }
-            else {
-                curPCB->stack_ptr = (unsigned char*)ctx;
-                //set state to ready
-                pcb_insert(curPCB);
-                curPCB = GLOBAL_PCB;
-                //set state to running
-                return (context*)curPCB->stack_ptr;
+            else{
+                CURRENT_PCB->stack_ptr = (unsigned char*)ctx;
+
+                CURRENT_PCB->state = READY_NOT_SUS;
+
+                pcb_insert(CURRENT_PCB);
+
+                CURRENT_PCB = nextPCB;
+
+                CURRENT_PCB->state = RUNNING;
+                ctx->EAX = 0;
+                return (context*)CURRENT_PCB->stack_ptr;
             }
+
         }
-        else {
+        else{
             ctx->EAX = 0;
             return GLOBAL_CTX;
         }
+
     }
+
     else {
         ctx->EAX = -1;
         context *return_ctx = ctx;
         return return_ctx;
     }
+
+
+
+
+    /*OLD CODE*/
+    // int op = ctx->EAX;
+    // if(return_queue(0) != NULL) {
+    //     GLOBAL_PCB = find_first_ready();
+    // }
+
+    // if(op == 0) /* EXIT */{
+    //     //delete the currently running pcb
+    //     pcb* curPCB = GLOBAL_PCB;
+    //     pcb_remove(curPCB);
+
+    //     //If there are any ready, non-suspended PCBs in the queue, load the first as in IDLE
+    //     if(find_first_ready()) {
+    //         //Load the first ready, non-suspended PCB
+    //         GLOBAL_PCB = find_first_ready();
+    //         ctx->EAX = 0;
+    //         return (context*)GLOBAL_PCB->stack_ptr;
+    //     }
+
+    //     //If the PCB queue is empty, or only consists of blocked or suspended PCBs, load the original context
+    //     else {
+    //         GLOBAL_PCB = curPCB;
+    //         ctx-> EAX = 0;
+    //         return GLOBAL_CTX;
+    //     }
+
+    //     // In all cases, ensure that the return value seen by sys req() is 0
+    // }
+    // else if(op == 1) /* IDLE */ {
+    //     if(GLOBAL_CTX == NULL) {
+    //         GLOBAL_CTX = ctx;
+    //     }
+        
+    //     // if there is a runnning process
+    //     if(GLOBAL_PCB != NULL) {
+
+    //         pcb_remove(GLOBAL_PCB);
+
+    //         if(curPCB == NULL) {
+    //             curPCB = GLOBAL_PCB;
+    //             return (context*)curPCB->stack_ptr;
+    //         }
+    //         else {
+    //             curPCB->stack_ptr = (unsigned char*)ctx;
+    //             //set state to ready
+    //             pcb_insert(curPCB);
+    //             curPCB = GLOBAL_PCB;
+    //             //set state to running
+    //             return (context*)curPCB->stack_ptr;
+    //         }
+    //     }
+    //     else {
+    //         ctx->EAX = 0;
+    //         return GLOBAL_CTX;
+    //     }
+    // }
+    // else {
+    //     ctx->EAX = -1;
+    //     context *return_ctx = ctx;
+    //     return return_ctx;
+    // }
+
+
+
+
 }
 
 pcb* find_first_ready(void) {
