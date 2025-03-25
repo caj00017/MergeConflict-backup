@@ -911,7 +911,7 @@ int help(void) {
 
 int version(void) {
     println();
-    print("Version 2.0\nCompilation Date: 2/28/2025");
+    print("Version 3.0\nCompilation Date: 3/28/2025");
     return 0;
 }
 
