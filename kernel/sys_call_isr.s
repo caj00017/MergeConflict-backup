@@ -2,10 +2,11 @@ bits 32
 global sys_call_isr
 extern sys_call			; The C function that sys_call_isr will call
 
-;;; System call interrupt handler. To be implemented in Module R3.
+;;; System call interrupt handler.
 
  sys_call_isr:
-	; mov EAX, -1
+	
+	;pushing registers onto the stack into reverse order
 	push SS
 	push GS
 	push FS
@@ -20,9 +21,11 @@ extern sys_call			; The C function that sys_call_isr will call
 	push EAX
 	push ESP
 
+	;calling sys_call and then setting ESP to the return value
 	call sys_call
 	mov ESP, EAX
 
+	;popping all registers in order and returning
 	pop EAX
 	pop EBX
 	pop ECX
