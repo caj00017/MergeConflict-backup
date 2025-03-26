@@ -32,7 +32,9 @@ int create_alarm(char* message, char* time) {
     strcpy(params->message, message);
     strcpy(params->time, time);
 
-    pcb* alarm = pcb_setup("alarm", 1, 1, 1, alarm_process);
+    char* alarm_name = strcat("alarm_", time);
+
+    pcb* alarm = pcb_setup(alarm_name, 1, 1, 1, alarm_process);
 
     // store the params as the PCB's params
     alarm->params = params;

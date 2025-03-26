@@ -127,14 +127,21 @@ void print_error(const char* sentence);
  */
 void print_color(const char* sentence, const char* color_code);
 
-
-
 /**
  @brief Removes whitespace from the front and back of a passed string
  @param sentence The String to be trimmed
  @author Izaak Whetsell
  */
 void trim(char sentence[]);
+
+/**
+ * @brief Function which concatenates two strings
+ * @param des The string to be concatenated to
+ * @param src The string to be concatenated from
+ * @return The concatenated string
+ * @author Tanner Forbes
+ */
+char* strcat(char* des, const char* src);
 
 #endif
 
