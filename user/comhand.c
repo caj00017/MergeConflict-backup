@@ -14,7 +14,6 @@ void comhand(void) {
     print("Type 'help' to see list of commands\n");
 
     while(1) {
-        
         // process the command
         int status = comexec();
         
