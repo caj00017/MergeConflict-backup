@@ -12,6 +12,7 @@
 #include <mpx/time.h>
 #include <mpx/user_pcb.h>
 #include <string.h>
+#include <mpx/sys_call.h>
 
 char* color = "blue"; // color to be set by the user, blue by default
 
@@ -124,175 +125,6 @@ int comexec(void) {
         }
 
         first = 1;
-        return 0;
-    }
-
-    /*  PCB Functions  */
-
-    else if (strcmp(buf, "process_create") == 0 || strcmp(buf, "pc") == 0)
-    {
-        //Write a newline to command line.
-        println();
-
-        //Create variable for a one time only command per shutdown call
-        int first = 1;
-
-        char* name;
-        int class;
-        int priority;
-
-        // Name entry loop
-        while (1)
-        {
-            // reset reponse on each loop
-            char name_response[100] = { 0 };
-
-            //For first time, write instructions
-            if(first == 1){
-                first = 0;
-                print_color("@ ", color);
-                print("Please enter the name of the process to create (or write 'cancel' to cancel): ");
-            }
-
-            //Write formatting for entry and read from the command line
-            println();
-            print_color("@ ", color);
-            sys_req(READ, COM1, name_response, sizeof(name_response));
-            trim(name_response);
-
-            // write reponse for testing purposes
-            println();
-            print("Reponse entered: ");
-            print(name_response);
-
-            // check for invalid format
-            if(isNumeric(name_response)){
-                println();
-                print_color("@ ", color);
-                print("Please retype your response: ");
-                continue;
-            }
-            else if (strcmp(name_response, "cancel") == 0){
-                // cancel
-                println();
-                print("Process creation cancelled.");
-                return 0;
-            }
-            else{
-                // valid input
-                name = name_response;
-                break;
-            }
-        }
-
-        // reset first
-        first = 1;
-
-        // Class entry loop
-        while(1) {
-
-            // reset reponse on each loop
-            char class_response[100] = { 0 };
-
-            //For first time, write instructions
-            if(first == 1){
-                first = 0;
-                println();
-                print_color("@ ", color);
-                print("Please enter the class of the process to create (or write 'cancel' to cancel): [0 - User or 1 - Kernel]");
-            }
-
-            //Write formatting for entry and read from the command line
-            println();
-            print_color("@ ", color);
-            sys_req(READ, COM1, class_response, sizeof(class_response));
-            trim(class_response);
-
-            // write reponse for testing purposes
-            println();
-            print("Reponse entered: ");
-            print(class_response);
-
-            // check for valid format
-            if(isNumeric(class_response) == 1 && (atoi(class_response) == 0 || atoi(class_response)==1) && strcmp(class_response, "") != 0){
-                // valid input
-                class = atoi(class_response);
-                break;
-            }
-            else if (strcmp(class_response, "cancel") == 0){
-                // cancel
-                println();
-                print("Process creation cancelled.");
-                return 0;
-            }
-            else{
-                // invalid input
-                println();
-                print_color("@ ", color);
-                print("Please retype your response [0,1]: ");
-                continue;
-            }
-                
-        }
-
-        // reset first
-        first = 1;
-
-        // Priority entry loop
-        while(1) {
-
-            // reset reponse on each loop
-            char priority_response[100] = { 0 };
-
-            //For first time, write instructions
-            if(first == 1){
-                first = 0;
-                println();
-                print_color("@ ", color);
-                print("Please enter the priority [0-9] of the process to create (or write 'cancel' to cancel): ");
-            }
-
-            //Write formatting for entry and read from the command line
-            println();
-            print_color("@ ", color);
-            sys_req(READ, COM1, priority_response, sizeof(priority_response));
-            trim(priority_response);
-
-            // write reponse for testing purposes
-            println();
-            print("Reponse entered: ");
-            print(priority_response);
-
-            // check for valid format
-            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
-                // valid input
-                priority = atoi(priority_response);
-                break;
-            }
-            else if (strcmp(priority_response, "cancel") == 0){
-                // cancel
-                println();
-                print("Process creation cancelled.");
-                return 0;
-            }
-            else{
-                // invalid input
-                println();
-                print_color("@ ", color);
-                print("Please retype your response [0-9]: ");
-                continue;
-            }
-
-        }
-
-        int status = create_PCB(name, class, priority);
-        if (status == 1) {
-            return 0; // continue running comexec
-        }
-
-        println();
-        print("PCB created successfully.");
-        show_PCB(name);
         return 0;
     }
 
@@ -606,6 +438,292 @@ int comexec(void) {
     {
         return show_all_PCB();
     }
+
+    // --------------------------------------------------------------------- // 
+    // ------------------------- R3 COMMAND LOGIC ------------------------- //
+    // --------------------------------------------------------------------- // 
+    else if (strcmp(buf, "load_r3") == 0 || strcmp(buf, "lr3") == 0)
+    {
+        return Load_R3();
+    }
+
+    else if(strcmp(buf, "yield") == 0 || strcmp(buf, "y") == 0) {
+        println();
+        sys_req(IDLE);
+        return 0;
+    }
+    else if (strcmp(buf, "load_p1") == 0 || strcmp(buf, "lp1") == 0)
+    {
+        int first = 1;
+        int priority;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                println();
+                print_color("@ ", color);
+                print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
+
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Test Process Creation Cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response [0-9]: ");
+                continue;
+            }
+
+        }
+
+        return Load_R3_Sus(1, priority);
+    }
+    else if (strcmp(buf, "load_p2") == 0 || strcmp(buf, "lp2") == 0)
+    {
+        int first = 1;
+        int priority;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                println();
+                print_color("@ ", color);
+                print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
+
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Test Process Creation Cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response [0-9]: ");
+                continue;
+            }
+
+        }
+
+        return Load_R3_Sus(2, priority);
+    }
+    else if (strcmp(buf, "load_p3") == 0 || strcmp(buf, "lp3") == 0)
+    {
+        int first = 1;
+        int priority;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                println();
+                print_color("@ ", color);
+                print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
+
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Test Process Creation Cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response [0-9]: ");
+                continue;
+            }
+
+        }
+
+        return Load_R3_Sus(3, priority);
+    }
+    else if (strcmp(buf, "load_p4") == 0 || strcmp(buf, "lp4") == 0)
+    {
+        int first = 1;
+        int priority;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                println();
+                print_color("@ ", color);
+                print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
+
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Test Process Creation Cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response [0-9]: ");
+                continue;
+            }
+
+        }
+
+        return Load_R3_Sus(4, priority);
+    }
+
+
+    else if (strcmp(buf, "load_p5") == 0 || strcmp(buf, "lp5") == 0)
+    {
+        int first = 1;
+        int priority;
+
+        // Priority entry loop
+        while(1) {
+
+            // reset reponse on each loop
+            char priority_response[100] = { 0 };
+
+            //For first time, write instructions
+            if(first == 1){
+                first = 0;
+                println();
+                print_color("@ ", color);
+                print("Please enter the new priority [0-9] of the process (or write 'cancel' to cancel): ");
+            }
+
+            //Write formatting for entry and read from the command line
+            println();
+            print_color("@ ", color);
+            sys_req(READ, COM1, priority_response, sizeof(priority_response));
+            trim(priority_response);
+
+            // write reponse for testing purposes
+            println();
+            print("Reponse entered: ");
+            print(priority_response);
+
+            // check for valid format
+            if(isNumeric(priority_response) == 1 && atoi(priority_response) >= 0 && atoi(priority_response) <= 9){
+                // valid input
+                priority = atoi(priority_response);
+                break;
+            }
+            else if (strcmp(priority_response, "cancel") == 0){
+                // cancel
+                println();
+                print("Test Process Creation Cancelled.");
+                return 0;
+            }
+            else{
+                // invalid input
+                println();
+                print_color("@ ", color);
+                print("Please retype your response [0-9]: ");
+                continue;
+            }
+
+        }
+
+        return Load_R3_Sus(5, priority);
+    }
     
     // --------------------------------------------------------------------- // 
     // ------------------------- END COMMAND LOGIC ------------------------- //
@@ -689,7 +807,9 @@ int help(void) {
 
     // R1 commands
     println();
-    print_color("=====",color); // 5 equal signs
+    println();
+    print_color("===================================================================================================", color); //100 equal signs
+    println();
     println();
     print_color("@ ", color);
     print("help\t\tPrints a complete list of each available command.");
@@ -721,8 +841,9 @@ int help(void) {
 
     // R2 commands
     println();
-    print_color("@ ", color);
-    print("process_create\tpc\tCreates a new process.");
+    println();
+    print_color("===================================================================================================", color);
+    println();
     println(); 
     print_color("@ ", color);
     print("process_delete\tpd\tDeletes a process.");
@@ -753,14 +874,44 @@ int help(void) {
     println(); 
     print_color("@ ", color);
     print("process_show_all\tpsa\tShows all processes.");
+
+    //Load R3 Commands
     println();
-    print_color("=====", color);//5 equal signs
+    println();
+    print_color("===================================================================================================", color);
+    println();
+    println();
+    print_color("@ ", color);
+    print("yield\t\ty\tYield a process's control of the CPU.");
+    println();
+    print_color("@ ", color);
+    print("load_r3\tlr3\tLoads test processes for R3.");
+    println();
+    print_color("@ ", color);
+    print("load_p1\tlp1\tLoads suspended test processes 1.");
+    println();
+    print_color("@ ", color);
+    print("load_p2\tlp2\tLoads suspended test processes 2.");
+    println();
+    print_color("@ ", color);
+    print("load_p3\tlp3\tLoads suspended test processes 3.");
+    println();
+    print_color("@ ", color);
+    print("load_p4\tlp4\tLoads suspended test processes 4.");
+    println();
+    print_color("@ ", color);
+    print("load_p5\tlp5\tLoads suspended test processes 5.");
+    println();
+
+    println();
+    print_color("===================================================================================================", color); //100 equal signs
+    println();
     return 0;
 }
 
 int version(void) {
     println();
-    print("Version 2.0\nCompilation Date: 2/28/2025");
+    print("Version 3.0\nCompilation Date: 3/28/2025");
     return 0;
 }
 

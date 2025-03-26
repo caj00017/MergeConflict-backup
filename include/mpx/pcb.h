@@ -1,6 +1,8 @@
 #ifndef PCB_H
 #define PCB_H
 
+#include <context.h>
+
 /**
  * @file pcb.h 
  * @brief Header file for pcb struct, getters/setters for fields
@@ -11,20 +13,21 @@
  * @brief PCB states
  */
 enum pcb_state {
-                READY_SUS, // =0
-                READY_NOT_SUS, // =1
-                RUNNING, // =2
-                BLOCKED_SUS, // =3
-                BLOCKED_NOT_SUS, // =4
-                };
+    READY_SUS, // =0
+    READY_NOT_SUS, // =1
+    RUNNING, // =2
+    BLOCKED_SUS, // =3
+    BLOCKED_NOT_SUS, // =4
+};
 
 typedef struct pcb {
     char* name;
     int class; /* 0 - user process, 1 - kernel process */
     int priority; /* 0-9 */
-    int state; /* 0-4 */                                               //possible change to enum.
-    unsigned char* stack;
-    unsigned char* stack_location; // points to the final byte in the stack
+    int state; /* 0-4 */  //possible change to enum.
+    unsigned char* stack; // points to the first byte in the stack
+    unsigned char* stack_ptr; // points to the final byte in the stack
+ //   unsigned char* ctx_ptr; // points to the location of this process's context
     struct pcb* next_node;
     struct pcb* prev_node;
 } pcb;
@@ -48,10 +51,12 @@ queue* return_queue(int class);
  * @param name Name of the pcb
  * @param class Class of the pcb
  * @param priority Priority of the pcb
+ * @param state State of the pcb
+ * @param function_ptr Pointer to the pcb function to execute
  * @returns pcb* pointer to the new pcb
  * @author Chris Jones
  */
-pcb* pcb_setup(char* name, int class, int priority);
+pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_ptr)(void));
 
 /**
  * @brief Allocate memory for a pcb

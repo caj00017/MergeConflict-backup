@@ -4,6 +4,10 @@
         "*.embeddedhtml": "html",
         "comhand.h": "c",
         "mtpext.h": "c",
-        "iosfwd": "c"
+        "iosfwd": "c",
+        "context.h": "c",
+        "sys_call.h": "c",
+        "stddef.h": "c",
+        "pcb.h": "c"
     }
 }

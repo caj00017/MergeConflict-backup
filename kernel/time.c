@@ -21,7 +21,34 @@ int get_time(void){
 
             //checking if the user has set the time
             if(set_time_run == 0){
-                time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10)); // -5 offset
+                
+                //if time hasn't been set converting all get time calls to EST
+                time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+
+                //checking if current hour is 01 and subtracting 5 to convert to EST
+                if(strcmp(time_ptr, "1") == 0){
+                    time_ptr = "20";
+                }
+
+                //checking if current hour is 02 and subtracting 5 to convert to EST
+                else if(strcmp(time_ptr, "2") == 0){
+                    time_ptr = "21";
+                }
+
+                //checking if current hour is 03 and subtracting 5 to convert to EST
+                else if(strcmp(time_ptr, "3") == 0){
+                    time_ptr = "22";
+                }
+
+                //checking if current hour is 04 and subtracting 5 to convert to EST
+                else if(strcmp(time_ptr, "4") == 0){
+                    time_ptr = "23";
+                }
+
+                //All other hours can have an included -5 offset and still avoid overflow
+                else{
+                    time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10));
+                }
             }
             else{
             //changing the hour bit from bcd to a char ptr
