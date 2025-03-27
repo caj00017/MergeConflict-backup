@@ -60,33 +60,20 @@ context* sys_call(context* ctx) {
             pcb_insert(CURRENT_PCB);
             CURRENT_PCB = NULL;
         }
-        // get the pcb of the next process
-        // if(return_queue(0) != NULL) {
-        //     nextPCB = find_first_ready();
-        // }
 
          //if any nonsuspended PCBs in queue, remove first from queue, store in temp variable as next process
         if(nextPCB != NULL){
             //remove the next process from the queue
             pcb_remove(nextPCB);
-            if (CURRENT_PCB == NULL) {
-                //set the current pcb to the next process if there is no process running
-                CURRENT_PCB = nextPCB;
-                //set its state to running in the system
-                CURRENT_PCB->state = RUNNING;
-                //return the context of the next process
-                context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
-                next_ctx->EAX = 0;
-                return next_ctx;
-            }
-            else {
-                //switch the currently running proces to the next process
-                CURRENT_PCB = nextPCB;
-                CURRENT_PCB->state = RUNNING;
-                context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
-                next_ctx->EAX = 0;
-                return next_ctx;
-            }
+            
+            //set the current pcb to the next process if there is no process running
+            CURRENT_PCB = nextPCB;
+            //set its state to running in the system
+            CURRENT_PCB->state = RUNNING;
+            //return the context of the next process
+            context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
+            next_ctx->EAX = 0;
+            return next_ctx;
         }
         else {
             //if there are no ready processes in the queue, return the global context of the first process run in the system
