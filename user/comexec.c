@@ -897,7 +897,10 @@ int help(void) {
     println(); 
     print_color("@ ", color);
     print("set_time\tHH:MM:SS\tSets the current time.");
-    println(); 
+    println();
+    print_color("@ ", color);
+    print("alarm \tHH:MM:SS\tCreates an alarm to go off at the specified time");
+    println();
     print_color("@ ", color);
     print("color\t\tChanges the text color.");    
     println();
