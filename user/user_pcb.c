@@ -23,7 +23,7 @@ int create_PCB(char* name, int class, int priority){
     }
 
     //Call PCB Setup
-    pcb* PCB = pcb_setup(name, class, priority, 1, proc1);
+    pcb* PCB = pcb_setup(name, class, priority, 1, proc1, NULL);
 
 
     //Check that PCB was created
@@ -434,7 +434,7 @@ int Load_R3(void){
 
     // Check for Process 1
     if( pcb_find("Process 1") == NULL){
-        pcb* PCB1 = pcb_setup("Process 1", 1, 1, 1, proc1); //Name, Class, Priority, State, Function
+        pcb* PCB1 = pcb_setup("Process 1", 1, 1, 1, proc1, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 1\n");
         pcb_insert(PCB1);
     }
@@ -444,7 +444,7 @@ int Load_R3(void){
 
     // Check for Process 2
     if( pcb_find("Process 2") == NULL){
-        pcb* PCB2 = pcb_setup("Process 2", 1, 2, 1, proc2); //Name, Class, Priority, State, Function
+        pcb* PCB2 = pcb_setup("Process 2", 1, 2, 1, proc2, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 2\n");
         pcb_insert(PCB2);
     }
@@ -454,7 +454,7 @@ int Load_R3(void){
 
     // Check for Process 3
     if( pcb_find("Process 3") == NULL){
-        pcb* PCB3 = pcb_setup("Process 3", 1, 3, 1, proc3); //Name, Class, Priority, State, Function
+        pcb* PCB3 = pcb_setup("Process 3", 1, 3, 1, proc3, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 3\n");
         pcb_insert(PCB3);
     }
@@ -464,7 +464,7 @@ int Load_R3(void){
 
     // Check for Process 4
     if( pcb_find("Process 4") == NULL){
-        pcb* PCB4 = pcb_setup("Process 4", 1, 4, 1, proc4); //Name, Class, Priority, State, Function
+        pcb* PCB4 = pcb_setup("Process 4", 1, 4, 1, proc4, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 4\n");
         pcb_insert(PCB4);
     }
@@ -474,7 +474,7 @@ int Load_R3(void){
 
     // Check for Process 5
     if( pcb_find("Process 5") == NULL){
-        pcb* PCB5 = pcb_setup("Process 5", 1, 5, 1, proc5); //Name, Class, Priority, State, Function
+        pcb* PCB5 = pcb_setup("Process 5", 1, 5, 1, proc5, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 5");
         pcb_insert(PCB5);
     }
@@ -488,7 +488,7 @@ int Load_R3(void){
 
 int Load_R3_Sus(int pcb_num, int priority){
 
-    void (*funct)(void*) = NULL;
+    void (*funct)(void) = NULL;
     char * pcb_name = NULL;
 
     //Check the users input for process and priority
@@ -527,7 +527,7 @@ int Load_R3_Sus(int pcb_num, int priority){
     }
 
     //Manually make process with pcb_setup
-    pcb* PCB = pcb_setup(pcb_name, 0, priority, 0, funct);
+    pcb* PCB = pcb_setup(pcb_name, 0, priority, 0, funct, NULL);
 
     //Print status
     print("\nFinished Loading as Suspended: ");

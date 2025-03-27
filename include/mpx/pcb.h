@@ -54,10 +54,11 @@ queue* return_queue(int class);
  * @param priority Priority of the pcb
  * @param state State of the pcb
  * @param function_ptr Pointer to the pcb function to execute
+ * @param params Parameters to pass to the function
  * @returns pcb* pointer to the new pcb
  * @author Chris Jones
  */
-pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_ptr)(void*));
+pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_ptr)(void), void* params);
 
 /**
  * @brief Allocate memory for a pcb

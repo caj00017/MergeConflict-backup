@@ -91,33 +91,28 @@ static void r3_proc(int iterations, const char *procname)
 /***********************************************************************/
 /* BEGIN R3 PROCESSES -- Create one process per function */
 /***********************************************************************/
-void proc1(void* args)
+void proc1(void)
 {
-	(void)args; // prevents unused parameter warning
 	r3_proc(RC_1, __func__);
 }
 
-void proc2(void* args)
+void proc2(void)
 {
-	(void)args;
 	r3_proc(RC_2, __func__);
 }
 
-void proc3(void* args)
+void proc3(void)
 {
-	(void)args;
 	r3_proc(RC_3, __func__);
 }
 
-void proc4(void* args)
+void proc4(void)
 {
-	(void)args;
 	r3_proc(RC_4, __func__);
 }
 
-void proc5(void* args)
+void proc5(void)
 {
-	(void)args;
 	r3_proc(RC_5, __func__);
 }
 

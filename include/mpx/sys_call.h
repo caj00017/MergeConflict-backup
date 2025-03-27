@@ -3,6 +3,15 @@
 #include <stddef.h>
 #include <sys_req.h>
 
+// global PCB pointer
+extern pcb* CURRENT_PCB;
+
+// global context pointer
+extern context* GLOBAL_CTX;
+
+// next process tracker
+extern pcb* nextPCB;
+
 /**
  * @brief system call function that handles all system calls from the user
  * @param ctx the context of the current process
