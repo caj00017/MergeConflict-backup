@@ -17,23 +17,23 @@ pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_p
     strcpy(new_pcb->name, name);
 
     // allocate memory for stack
-    unsigned char* stack_location = (unsigned char*)sys_alloc_mem(1024); // allocate 1024 bytes for pcb stack
+     new_pcb->stack = (unsigned char*)sys_alloc_mem(4096); // allocate 1024 bytes for pcb stack
 
     new_pcb->class = class;
     new_pcb->priority = priority; 
     new_pcb->state = state;                      // Ready, Not Suspended         
-    new_pcb->stack = stack_location;  // beginning of stack, should this jsut be zero?
-    new_pcb->stack_ptr = stack_location+1024;     // end of stack
+    //new_pcb->stack = stack_location;  // beginning of stack, should this jsut be zero?
+    //new_pcb->stack_ptr = stack_location+1024;     // end of stack
     new_pcb->next_node = NULL;
     new_pcb->prev_node = NULL;
 
 
     /* <<<< Creating the Context >>>>  */
     //Allocate memory for the context
-    context* ctx = (context*)sys_alloc_mem(sizeof(context));
+    context* ctx;
 
     // create room for context at the top of the stack
-    new_pcb->stack_ptr = new_pcb->stack + 1024 - sizeof(ctx) - 2; //problem ??
+    new_pcb->stack_ptr = new_pcb->stack + (4096 - sizeof(context) - 2); //problem ??
 
     // create context
     ctx = (context*)new_pcb->stack_ptr; //does this need to 

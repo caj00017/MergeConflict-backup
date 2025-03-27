@@ -776,6 +776,10 @@ int shutdown(void) {
 
         //Check to see if the person want to shutdown (y) or continue running program(n)
         if(strcmp(response, "y") == 0 || strcmp(response, "yes") == 0 ){
+            //delete the ready queue and the blocked queue
+
+            //then exit
+            sys_req(EXIT);
             return -1; //exit and end the program
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
