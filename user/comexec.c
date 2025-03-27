@@ -13,6 +13,7 @@
 #include <mpx/user_pcb.h>
 #include <string.h>
 #include <mpx/sys_call.h>
+#include <mpx/alarm.h>
 
 char* color = "blue"; // color to be set by the user, blue by default
 
@@ -27,7 +28,7 @@ int comexec(void) {
     trim(buf);
     
     // --------------------------------------------------------------------- // 
-    // --------------------------- COMMAND LOGIC --------------------------- //
+    // --------------------------- R1 COMMAND LOGIC ------------------------ //
     // --------------------------------------------------------------------- //
 
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
@@ -128,6 +129,10 @@ int comexec(void) {
         return 0;
     }
 
+    // --------------------------------------------------------------------- // 
+    // --------------------------- R2 COMMAND LOGIC ------------------------ //
+    // --------------------------------------------------------------------- //
+
     else if (strcmp(buf, "process_delete") == 0 || strcmp(buf, "pd") == 0)
     {
         char* name;
@@ -158,7 +163,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
     {
         char* name;
@@ -195,7 +199,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_unblock") == 0 || strcmp(buf, "pub") == 0)
     {
         char* name;
@@ -232,7 +235,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_suspend") == 0 || strcmp(buf, "psus") == 0)
     {
         char* name;
@@ -268,7 +270,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_resume") == 0 || strcmp(buf, "pres") == 0)
     {
         char* name;
@@ -303,7 +304,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_priority") == 0 || strcmp(buf, "pp") == 0)
     {
         char* name;
@@ -390,7 +390,6 @@ int comexec(void) {
 
         return 0;
     }
-
     else if (strcmp(buf, "process_show") == 0 || strcmp(buf, "ps") == 0)
     {
         char* name;
@@ -423,25 +422,23 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_show_ready") == 0 || strcmp(buf, "psr") == 0)
     {
         return show_ready_PCB();
     }
-
     else if (strcmp(buf, "process_show_blocked") == 0 || strcmp(buf, "psb") == 0)
     {
         return show_blocked_PCB();
     }
-
     else if (strcmp(buf, "process_show_all") == 0 || strcmp(buf, "psa") == 0)
     {
         return show_all_PCB();
     }
 
     // --------------------------------------------------------------------- // 
-    // ------------------------- R3 COMMAND LOGIC ------------------------- //
+    // ------------------------- R3 COMMAND LOGIC -------------------------- //
     // --------------------------------------------------------------------- // 
+
     else if (strcmp(buf, "load_r3") == 0 || strcmp(buf, "lr3") == 0)
     {
         return Load_R3();
@@ -662,8 +659,6 @@ int comexec(void) {
 
         return Load_R3_Sus(4, priority);
     }
-
-
     else if (strcmp(buf, "load_p5") == 0 || strcmp(buf, "lp5") == 0)
     {
         int first = 1;
@@ -720,7 +715,68 @@ int comexec(void) {
     }
     
     // --------------------------------------------------------------------- // 
-    // ------------------------- END COMMAND LOGIC ------------------------- //
+    // ------------------------- R4 COMMAND LOGIC -------------------------- //
+    // --------------------------------------------------------------------- // 
+    else if (strcmp(buf, "alarm") == 0 || strcmp(buf, "a") == 0) {
+        char message[100] = { 0 };
+        char time[9] = { 0 };
+
+        println();
+        print("Please enter the message for the alarm (100 chars. max): ");
+        
+        // Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, message, sizeof(message));
+        message[99] = '\0'; // Ensure null termination
+        trim(message);
+
+        sys_req(WRITE, COM1, "\nPlease enter the time for the alarm (HH:MM:SS): ", sizeof("\nPlease enter the time for the alarm (HH:MM:SS): "));
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, time, sizeof(time));
+        time[8] = '\0'; // Ensure null termination
+        trim(time);
+
+        // check for invalid format (invalid time check pending)
+        char washed_time[100];
+        strcpy(washed_time, time); // wash the time string to remove any leading/trailing spaces
+        if (charCount(time, ':') != 2 || strlen(time) != 8 || isNumeric(strtok(time, ":")) == 0) {
+            print("Invalid time format. (HH:MM:SS)");
+            return 0;
+        }
+        else {
+            char hr_chars[3] = {time[0], time[1], '\0'}; // first 2 chars = hour value
+            char min_chars[3] = {time[3], time[4], '\0'}; // next 2 chars (skipping ':') = minute value
+            char sec_chars[3] = {time[6], time[7], '\0'}; // last 2 chars = second value
+
+            // check for invalid times / characters 
+            if (strcmp(hr_chars, "23") > 0 || strcmp(hr_chars, "0") < 0   
+            || strcmp(min_chars, "59") > 0 || strcmp(min_chars, "0") < 0  
+            || strcmp(sec_chars, "59") > 0 || strcmp(sec_chars, "0") < 0) 
+            {
+                sys_req(WRITE, COM1, "\nInvalid time. ([00-23]:[00-59]:[00-59])", sizeof("\nInvalid time. ([00-23]:[00-59]:[00-59])"));
+                return 0;
+            }
+        }
+
+        println();
+        print("Creating alarm...");
+        println();
+
+        print("Message: ");
+        print(message);
+        println();
+        print("Time: ");
+        print(washed_time);
+        println();
+
+        create_alarm(message, washed_time);
+        return 0;
+    }
+
+    // --------------------------------------------------------------------- // 
+    // ---------------------- BONUS + TEST COMMAND LOGIC ------------------- //
     // --------------------------------------------------------------------- // 
 
     else if (strcmp(buf, "test_trim") == 0)
@@ -953,5 +1009,3 @@ char* return_color(void) {
         return "\x1b[34m"; // return blue
     }
 }
-
-

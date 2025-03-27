@@ -96,11 +96,11 @@ void kmain(void)
 	// pcb* comhand_pcb = pcb_setup("comhand", 1, 0, 1, comhand);
 	// pcb_insert(comhand_pcb);
 
-	pcb* sysidleprocess = pcb_setup("sysidleprocess", 1, 9, 1, sys_idle_process);
+	pcb* sysidleprocess = pcb_setup("sysidleprocess", 1, 9, 1, sys_idle_process, NULL);
 	pcb_insert(sysidleprocess);
 	// comhand();
 
-	pcb* comhand_pcb = pcb_setup("comhand", 1, 0, 1, comhand);
+	pcb* comhand_pcb = pcb_setup("comhand", 1, 0, 1, comhand, NULL);
 	pcb_insert(comhand_pcb);
 
 	__asm__ volatile ("int $0x60" :: "a"(IDLE));
