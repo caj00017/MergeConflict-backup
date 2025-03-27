@@ -726,14 +726,46 @@ int comexec(void) {
         char message[100] = { 0 };
         char time[9] = { 0 };
 
-        sys_req(WRITE, COM1, "\nPlease enter the message for the alarm: ", sizeof("\nPlease enter the message for the alarm: "));
+        println();
+        print("Please enter the message for the alarm (100 chars. max): ");
+        
+        // Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
         sys_req(READ, COM1, message, sizeof(message));
+        message[99] = '\0'; // Ensure null termination
         trim(message);
 
         sys_req(WRITE, COM1, "\nPlease enter the time for the alarm (HH:MM:SS): ", sizeof("\nPlease enter the time for the alarm (HH:MM:SS): "));
+        println();
+        print_color("@ ", color);
         sys_req(READ, COM1, time, sizeof(time));
+        time[8] = '\0'; // Ensure null termination
         trim(time);
 
+        // check for invalid format (invalid time check pending)
+        char washed_time[100];
+        strcpy(washed_time, time); // wash the time string to remove any leading/trailing spaces
+        if (charCount(time, ':') != 2 || strlen(time) != 8 || isNumeric(strtok(time, ":")) == 0) {
+            print("Invalid time format. (HH:MM:SS)");
+            return 0;
+        }
+        else {
+            char hr_chars[3] = {time[0], time[1], '\0'}; // first 2 chars = hour value
+            char min_chars[3] = {time[3], time[4], '\0'}; // next 2 chars (skipping ':') = minute value
+            char sec_chars[3] = {time[6], time[7], '\0'}; // last 2 chars = second value
+
+            // check for invalid times / characters 
+            if (strcmp(hr_chars, "23") > 0 || strcmp(hr_chars, "0") < 0   
+            || strcmp(min_chars, "59") > 0 || strcmp(min_chars, "0") < 0  
+            || strcmp(sec_chars, "59") > 0 || strcmp(sec_chars, "0") < 0) 
+            {
+                sys_req(WRITE, COM1, "\nInvalid time. ([00-23]:[00-59]:[00-59])", sizeof("\nInvalid time. ([00-23]:[00-59]:[00-59])"));
+                return 0;
+            }
+        }
+
+        println();
         print("Creating alarm...");
         println();
 
@@ -741,10 +773,10 @@ int comexec(void) {
         print(message);
         println();
         print("Time: ");
-        print(time);
+        print(washed_time);
         println();
 
-        create_alarm(message, time);
+        create_alarm(message, washed_time);
         return 0;
     }
 

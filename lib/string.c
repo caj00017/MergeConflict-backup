@@ -266,22 +266,3 @@ void trim(char sentence[]){
 	return;
 }
 
-char* strcat(char* des, const char* src){
-	int i = 0;
-	int j = 0;
-
-	while(des[i] != '\0'){
-		i++;
-	}
-
-	while(src[j] != '\0'){
-		des[i] = src[j];
-		i++;
-		j++;
-	}
-
-	des[i] = '\0';
-
-	return des;
-}
-
