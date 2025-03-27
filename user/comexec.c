@@ -880,34 +880,34 @@ int help(void) {
     println();
     println();
     print_color("@ ", color);
-    print("help\t\tPrints a complete list of each available command.");
+    print("help\t\t\tPrints a complete list of each available command.");
     println(); 
     print_color("@ ", color);
-    print("version\tPrints the current version of the program.");
+    print("version\tv\tPrints the current version of the program.");
     println(); 
     print_color("@ ", color);
-    print("get_date\tPrints the current date set by the user.");
+    print("get_date\tgd\tPrints the current date set by the user.");
     println(); 
     print_color("@ ", color);
-    print("set_date\tMM/DD/YY\tSets the current date.");
+    print("set_date\t\tMM/DD/YY\tSets the current date.");
     println(); 
     print_color("@ ", color);
-    print("get_time\tPrints the current time set by the user.");
+    print("get_time\tgt\tPrints the current time set by the user.");
     println(); 
     print_color("@ ", color);
-    print("set_time\tHH:MM:SS\tSets the current time.");
+    print("set_time\t\tHH:MM:SS\tSets the current time.");
     println();
     print_color("@ ", color);
-    print("alarm \tHH:MM:SS\tCreates an alarm to go off at the specified time");
+    print("alarm \ta\tCreates an alarm to go off at the specified time");
     println();
     print_color("@ ", color);
-    print("color\t\tChanges the text color.");    
+    print("color\t\t\tChanges the text color.");    
     println();
     print_color("@ ", color);
-    print("clear\t\tClears the console.");
+    print("clear\t\t\tClears the console.");
     println();
     print_color("@ ", color);
-    print("shutdown\tExits the program.");
+    print("shutdown\tsd\tExits the program.");
 
 
     // R2 commands
