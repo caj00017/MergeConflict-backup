@@ -23,7 +23,7 @@ int get_time(void){
             if(set_time_run == 0){
                 
                 //if time hasn't been set converting all get time calls to EST
-                time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+                time_ptr = (itoa(bcdToChar(inb(0x71)) - 47, str, 10));
 
                 //checking if current hour is 01 and subtracting 5 to convert to EST
                 if(strcmp(time_ptr, "1") == 0){
@@ -47,12 +47,12 @@ int get_time(void){
 
                 //All other hours can have an included -5 offset and still avoid overflow
                 else{
-                    time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10));
+                    time_ptr = (itoa(bcdToChar(inb(0x71)) - 52, str, 10));
                 }
             }
             else{
             //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10)); //regular offset
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 47, str, 10)); //regular offset
             }
 
             // write the hour to the terminal (size checking)
@@ -301,4 +301,74 @@ int set_date(char buf[]){
         sti();
         }
     return 0;
+}
+
+int get_hour(void){
+    //disabling the NMI bit
+    outb(0x70, inb(0x70) | 0x80);
+    int hour = 0;
+
+    //accessing the hour bit
+    outb(0x70, 0x04);
+
+        //checking if the user has set the time
+        if(set_time_run == 0){
+            
+            //if time hasn't been set converting all get time calls to EST
+            hour = ((int)bcdToChar(inb(0x71))) - 47;
+
+            //checking if current hour is 01 and subtracting 5 to convert to EST
+            if(hour == 1){
+                hour = 20;
+            }
+
+            //checking if current hour is 02 and subtracting 5 to convert to EST
+            else if(hour == 2){
+                hour = 21;
+            }
+
+            //checking if current hour is 03 and subtracting 5 to convert to EST
+            else if(hour == 3){
+                hour = 22;
+            }
+
+            //checking if current hour is 04 and subtracting 5 to convert to EST
+            else if(hour == 4){
+                hour = 23;
+            }
+
+            //All other hours can have an included -5 offset and still avoid overflow
+            else{
+                hour = ((int)bcdToChar(inb(0x71))) - 52;
+            }
+        }
+        else{
+        //changing the hour bit from bcd to a char ptr
+        hour = ((int)bcdToChar(inb(0x71))) - 47; //regular offset
+        }
+
+        return hour;
+}
+
+int get_minute(void){
+    outb(0x70, inb(0x70) | 0x80);
+    // accessing the minute bit
+    outb(0x70, 0x02);
+
+        //changing the minute bit from bcd to a char ptr
+        int minute = ((int)bcdToChar(inb(0x71))) - 48;
+
+    return minute;
+
+}
+
+int get_second(void){
+    outb(0x70, inb(0x70) | 0x80);
+    // accessing the second bit 
+    outb(0x70, 0x00);
+
+        //changing the second bit from bcd to a char ptr
+        int second = ((int)bcdToChar(inb(0x71))) - 48;
+
+    return second;
 }

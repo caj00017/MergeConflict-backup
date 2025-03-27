@@ -31,4 +31,25 @@ int get_date(void);
  */
 int set_date(char buf[]);
 
+/**
+ * @brief Function which utilizes the RTC registers to get the current hour.
+ * @return Current hour value
+ * @author Tanner Forbes
+ */
+int get_hour(void);
+
+/**
+ * @brief Function which utilizes the RTC registers to get the current minute.
+ * @return Current minute value
+ * @author Tanner Forbes
+ */
+int get_minute(void);
+
+/**
+ * @brief Function which utilizes the RTC registers to get the current second.
+ * @return Current second value
+ * @author Tanner Forbes
+ */
+int get_second(void);
+
 #endif

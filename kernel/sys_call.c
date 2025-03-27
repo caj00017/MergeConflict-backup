@@ -61,9 +61,9 @@ context* sys_call(context* ctx) {
             CURRENT_PCB = NULL;
         }
         // get the pcb of the next process
-        if(return_queue(0) != NULL) {
-            nextPCB = find_first_ready();
-        }
+        // if(return_queue(0) != NULL) {
+        //     nextPCB = find_first_ready();
+        // }
 
          //if any nonsuspended PCBs in queue, remove first from queue, store in temp variable as next process
         if(nextPCB != NULL){

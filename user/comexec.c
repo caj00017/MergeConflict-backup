@@ -11,8 +11,8 @@
 #include <memory.h>
 #include <mpx/time.h>
 #include <mpx/user_pcb.h>
-#include <string.h>
 #include <mpx/sys_call.h>
+#include <mpx/alarm.h>
 
 char* color = "blue"; // color to be set by the user, blue by default
 
@@ -27,7 +27,7 @@ int comexec(void) {
     trim(buf);
     
     // --------------------------------------------------------------------- // 
-    // --------------------------- COMMAND LOGIC --------------------------- //
+    // --------------------------- R1 COMMAND LOGIC ------------------------ //
     // --------------------------------------------------------------------- //
 
     if (strcmp(buf, "shutdown") == 0 || strcmp(buf, "sd") == 0) {
@@ -128,6 +128,10 @@ int comexec(void) {
         return 0;
     }
 
+    // --------------------------------------------------------------------- // 
+    // --------------------------- R2 COMMAND LOGIC ------------------------ //
+    // --------------------------------------------------------------------- //
+
     else if (strcmp(buf, "process_delete") == 0 || strcmp(buf, "pd") == 0)
     {
         char* name;
@@ -158,7 +162,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
     {
         char* name;
@@ -195,7 +198,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_unblock") == 0 || strcmp(buf, "pub") == 0)
     {
         char* name;
@@ -232,7 +234,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_suspend") == 0 || strcmp(buf, "psus") == 0)
     {
         char* name;
@@ -268,7 +269,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_resume") == 0 || strcmp(buf, "pres") == 0)
     {
         char* name;
@@ -303,7 +303,6 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_priority") == 0 || strcmp(buf, "pp") == 0)
     {
         char* name;
@@ -390,7 +389,6 @@ int comexec(void) {
 
         return 0;
     }
-
     else if (strcmp(buf, "process_show") == 0 || strcmp(buf, "ps") == 0)
     {
         char* name;
@@ -423,34 +421,26 @@ int comexec(void) {
             return 0;
         }
     }
-
     else if (strcmp(buf, "process_show_ready") == 0 || strcmp(buf, "psr") == 0)
     {
         return show_ready_PCB();
     }
-
     else if (strcmp(buf, "process_show_blocked") == 0 || strcmp(buf, "psb") == 0)
     {
         return show_blocked_PCB();
     }
-
     else if (strcmp(buf, "process_show_all") == 0 || strcmp(buf, "psa") == 0)
     {
         return show_all_PCB();
     }
 
     // --------------------------------------------------------------------- // 
-    // ------------------------- R3 COMMAND LOGIC ------------------------- //
+    // ------------------------- R3 COMMAND LOGIC -------------------------- //
     // --------------------------------------------------------------------- // 
+
     else if (strcmp(buf, "load_r3") == 0 || strcmp(buf, "lr3") == 0)
     {
         return Load_R3();
-    }
-
-    else if(strcmp(buf, "yield") == 0 || strcmp(buf, "y") == 0) {
-        println();
-        sys_req(IDLE);
-        return 0;
     }
     else if (strcmp(buf, "load_p1") == 0 || strcmp(buf, "lp1") == 0)
     {
@@ -668,8 +658,6 @@ int comexec(void) {
 
         return Load_R3_Sus(4, priority);
     }
-
-
     else if (strcmp(buf, "load_p5") == 0 || strcmp(buf, "lp5") == 0)
     {
         int first = 1;
@@ -726,7 +714,68 @@ int comexec(void) {
     }
     
     // --------------------------------------------------------------------- // 
-    // ------------------------- END COMMAND LOGIC ------------------------- //
+    // ------------------------- R4 COMMAND LOGIC -------------------------- //
+    // --------------------------------------------------------------------- // 
+    else if (strcmp(buf, "alarm") == 0 || strcmp(buf, "a") == 0) {
+        char message[100] = { 0 };
+        char time[9] = { 0 };
+
+        println();
+        print("Please enter the message for the alarm (100 chars. max): ");
+        
+        // Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, message, sizeof(message));
+        message[99] = '\0'; // Ensure null termination
+        trim(message);
+
+        sys_req(WRITE, COM1, "\nPlease enter the time for the alarm (HH:MM:SS): ", sizeof("\nPlease enter the time for the alarm (HH:MM:SS): "));
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, time, sizeof(time));
+        time[8] = '\0'; // Ensure null termination
+        trim(time);
+
+        // check for invalid format (invalid time check pending)
+        char washed_time[100];
+        strcpy(washed_time, time); // wash the time string to remove any leading/trailing spaces
+        if (charCount(time, ':') != 2 || strlen(time) != 8 || isNumeric(strtok(time, ":")) == 0) {
+            print("Invalid time format. (HH:MM:SS)");
+            return 0;
+        }
+        else {
+            char hr_chars[3] = {time[0], time[1], '\0'}; // first 2 chars = hour value
+            char min_chars[3] = {time[3], time[4], '\0'}; // next 2 chars (skipping ':') = minute value
+            char sec_chars[3] = {time[6], time[7], '\0'}; // last 2 chars = second value
+
+            // check for invalid times / characters 
+            if (strcmp(hr_chars, "23") > 0 || strcmp(hr_chars, "0") < 0   
+            || strcmp(min_chars, "59") > 0 || strcmp(min_chars, "0") < 0  
+            || strcmp(sec_chars, "59") > 0 || strcmp(sec_chars, "0") < 0) 
+            {
+                sys_req(WRITE, COM1, "\nInvalid time. ([00-23]:[00-59]:[00-59])", sizeof("\nInvalid time. ([00-23]:[00-59]:[00-59])"));
+                return 0;
+            }
+        }
+
+        println();
+        print("Creating alarm...");
+        println();
+
+        print("Message: ");
+        print(message);
+        println();
+        print("Time: ");
+        print(washed_time);
+        println();
+
+        create_alarm(message, washed_time);
+        return 0;
+    }
+
+    // --------------------------------------------------------------------- // 
+    // ---------------------- BONUS + TEST COMMAND LOGIC ------------------- //
     // --------------------------------------------------------------------- // 
 
     else if (strcmp(buf, "test_trim") == 0)
@@ -782,6 +831,25 @@ int shutdown(void) {
 
         //Check to see if the person want to shutdown (y) or continue running program(n)
         if(strcmp(response, "y") == 0 || strcmp(response, "yes") == 0 ){
+        //delete the ready queue and the blocked queue
+        //clear the ready queue
+        pcb* ready = return_queue(0)->tail;
+        while(ready != NULL) {
+            pcb* temp = ready->prev_node;
+            pcb_remove(ready);
+            pcb_free(ready);
+            ready = temp;
+        }
+        //clear the blocked queue
+        pcb* blocked = return_queue(1)->tail;
+        while(blocked != NULL) {
+            pcb* temp = blocked->prev_node;
+            pcb_remove(blocked);
+            pcb_free(blocked);
+            blocked = temp;
+        }
+            //then exit
+            sys_req(EXIT);
             return -1; //exit and end the program
         }
         else if(strcmp(response, "n") == 0 || strcmp(response, "no") == 0 ){
@@ -812,31 +880,34 @@ int help(void) {
     println();
     println();
     print_color("@ ", color);
-    print("help\t\tPrints a complete list of each available command.");
+    print("help\t\t\tPrints a complete list of each available command.");
     println(); 
     print_color("@ ", color);
-    print("version\tPrints the current version of the program.");
+    print("version\tv\tPrints the current version of the program.");
     println(); 
     print_color("@ ", color);
-    print("get_date\tPrints the current date set by the user.");
+    print("get_date\tgd\tPrints the current date set by the user.");
     println(); 
     print_color("@ ", color);
-    print("set_date\tMM/DD/YY\tSets the current date.");
+    print("set_date\t\tMM/DD/YY\tSets the current date.");
     println(); 
     print_color("@ ", color);
-    print("get_time\tPrints the current time set by the user.");
+    print("get_time\tgt\tPrints the current time set by the user.");
     println(); 
     print_color("@ ", color);
-    print("set_time\tHH:MM:SS\tSets the current time.");
-    println(); 
-    print_color("@ ", color);
-    print("color\t\tChanges the text color.");    
+    print("set_time\t\tHH:MM:SS\tSets the current time.");
     println();
     print_color("@ ", color);
-    print("clear\t\tClears the console.");
+    print("alarm \ta\tCreates an alarm to go off at the specified time");
     println();
     print_color("@ ", color);
-    print("shutdown\tExits the program.");
+    print("color\t\t\tChanges the text color.");    
+    println();
+    print_color("@ ", color);
+    print("clear\t\t\tClears the console.");
+    println();
+    print_color("@ ", color);
+    print("shutdown\tsd\tExits the program.");
 
 
     // R2 commands
@@ -882,9 +953,6 @@ int help(void) {
     println();
     println();
     print_color("@ ", color);
-    print("yield\t\ty\tYield a process's control of the CPU.");
-    println();
-    print_color("@ ", color);
     print("load_r3\tlr3\tLoads test processes for R3.");
     println();
     print_color("@ ", color);
@@ -911,7 +979,7 @@ int help(void) {
 
 int version(void) {
     println();
-    print("Version 3.0\nCompilation Date: 3/28/2025");
+    print("Version 4.0\nCompilation Date: 3/28/2025");
     return 0;
 }
 
@@ -943,5 +1011,3 @@ char* return_color(void) {
         return "\x1b[34m"; // return blue
     }
 }
-
-
