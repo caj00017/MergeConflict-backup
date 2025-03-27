@@ -315,7 +315,7 @@ int get_hour(void){
         if(set_time_run == 0){
             
             //if time hasn't been set converting all get time calls to EST
-            hour = ((int)bcdToChar(inb(0x71))) - 48;
+            hour = ((int)bcdToChar(inb(0x71))) - 47;
 
             //checking if current hour is 01 and subtracting 5 to convert to EST
             if(hour == 1){
@@ -339,12 +339,12 @@ int get_hour(void){
 
             //All other hours can have an included -5 offset and still avoid overflow
             else{
-                hour = ((int)bcdToChar(inb(0x71))) - 53;
+                hour = ((int)bcdToChar(inb(0x71))) - 52;
             }
         }
         else{
         //changing the hour bit from bcd to a char ptr
-        hour = ((int)bcdToChar(inb(0x71))) - 48; //regular offset
+        hour = ((int)bcdToChar(inb(0x71))) - 47; //regular offset
         }
 
         return hour;
