@@ -11,7 +11,6 @@
 #include <memory.h>
 #include <mpx/time.h>
 #include <mpx/user_pcb.h>
-#include <string.h>
 #include <mpx/sys_call.h>
 #include <mpx/alarm.h>
 
