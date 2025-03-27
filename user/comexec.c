@@ -446,12 +446,6 @@ int comexec(void) {
     {
         return Load_R3();
     }
-
-    else if(strcmp(buf, "yield") == 0 || strcmp(buf, "y") == 0) {
-        println();
-        sys_req(IDLE);
-        return 0;
-    }
     else if (strcmp(buf, "load_p1") == 0 || strcmp(buf, "lp1") == 0)
     {
         int first = 1;
@@ -880,9 +874,6 @@ int help(void) {
     println();
     print_color("===================================================================================================", color);
     println();
-    println();
-    print_color("@ ", color);
-    print("yield\t\ty\tYield a process's control of the CPU.");
     println();
     print_color("@ ", color);
     print("load_r3\tlr3\tLoads test processes for R3.");

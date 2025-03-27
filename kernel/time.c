@@ -23,7 +23,7 @@ int get_time(void){
             if(set_time_run == 0){
                 
                 //if time hasn't been set converting all get time calls to EST
-                time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+                time_ptr = (itoa(bcdToChar(inb(0x71)) - 47, str, 10));
 
                 //checking if current hour is 01 and subtracting 5 to convert to EST
                 if(strcmp(time_ptr, "1") == 0){
@@ -47,12 +47,12 @@ int get_time(void){
 
                 //All other hours can have an included -5 offset and still avoid overflow
                 else{
-                    time_ptr = (itoa(bcdToChar(inb(0x71)) - 53, str, 10));
+                    time_ptr = (itoa(bcdToChar(inb(0x71)) - 52, str, 10));
                 }
             }
             else{
             //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10)); //regular offset
+            time_ptr = (itoa(bcdToChar(inb(0x71)) - 47, str, 10)); //regular offset
             }
 
             // write the hour to the terminal (size checking)
