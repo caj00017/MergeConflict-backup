@@ -776,8 +776,23 @@ int shutdown(void) {
 
         //Check to see if the person want to shutdown (y) or continue running program(n)
         if(strcmp(response, "y") == 0 || strcmp(response, "yes") == 0 ){
-            //delete the ready queue and the blocked queue
-
+        //delete the ready queue and the blocked queue
+        //clear the ready queue
+        pcb* ready = return_queue(0)->tail;
+        while(ready != NULL) {
+            pcb* temp = ready->prev_node;
+            pcb_remove(ready);
+            pcb_free(ready);
+            ready = temp;
+        }
+        //clear the blocked queue
+        pcb* blocked = return_queue(1)->tail;
+        while(blocked != NULL) {
+            pcb* temp = blocked->prev_node;
+            pcb_remove(blocked);
+            pcb_free(blocked);
+            blocked = temp;
+        }
             //then exit
             sys_req(EXIT);
             return -1; //exit and end the program

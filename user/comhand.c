@@ -9,7 +9,7 @@
 
 void comhand(void) {
     //Print Startup Screen
-    //rOver_Startup();
+    rOver_Startup();
     print_color("@ ","blue");
     print("Type 'help' to see list of commands\n");
 
