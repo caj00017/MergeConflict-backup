@@ -783,7 +783,7 @@ int comexec(void) {
         
         // prompt for address
         unsigned int start_addr;
-        char addr_response[100] = { 0 };
+        char addr_response[100] = { '\0' };
         println();
         print("Please enter the address of the MCB to create: 0x");
 

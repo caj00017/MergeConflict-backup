@@ -3,6 +3,7 @@
 // allocated and free lists
 list ALLOCATED = {1, NULL, NULL};
 list FREE = {0, NULL, NULL};
+char str[100] = { 0 }; // string buffer for printing with itoa()
 
 mcb* mcb_setup(unsigned int start_addr, int size) {
     mcb* new_mcb = sys_alloc_mem(sizeof(mcb));
@@ -11,8 +12,16 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
     }
 
     // initialize members
+    clear(str);
     new_mcb->start_addr = start_addr;
+    print("\nStart address intialized: 0x");
+    print(itoa((int)new_mcb->start_addr, str, 10));
+
+    clear(str);
     new_mcb->size = size;
+    print("\nSize initialized: ");
+    print(itoa(new_mcb->size, str, 10));
+
     new_mcb->next_node = NULL;
     new_mcb->prev_node = NULL;
 
@@ -127,16 +136,20 @@ mcb* mcb_find(unsigned int start_addr) {
     }
 
     // MCB not found
+    clear(str);
     print("MCB not found: 0x");
-    print(itoa((int)start_addr, NULL, 10));
+    print(itoa((int)start_addr, str, 10));
     return NULL;
 }
 
 void show_mcb(mcb* mcb) {
+    clear(str);
     print("MCB: 0x");
-    print(itoa((int)mcb->start_addr, NULL, 10));
+    print(itoa((int)mcb->start_addr, str, 10));
+
+    clear(str);
     print("\nSize: ");
-    print(itoa(mcb->size, NULL, 10));
+    print(itoa(mcb->size, str, 10));
     println();
 }
 

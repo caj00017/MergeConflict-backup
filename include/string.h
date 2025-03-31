@@ -134,5 +134,12 @@ void print_color(const char* sentence, const char* color_code);
  */
 void trim(char sentence[]);
 
+/**
+ * @brief Clears a string by setting all characters to 0
+ * @param arr The string to be cleared
+ * @author Chris Jones
+ */
+void clear(char* arr);
+
 #endif
 
