@@ -1,4 +1,4 @@
-#include <mpx/mcb.h>
+#include <mcb.h>
 
 // allocated and free lists
 list ALLOCATED = {1, NULL, NULL};
@@ -128,17 +128,24 @@ mcb* mcb_find(unsigned int start_addr) {
 
     // MCB not found
     print("MCB not found: 0x");
-    print(atoi((int)start_addr));
+    print(itoa((int)start_addr, NULL, 16));
+    return NULL;
+}
+
+void show_mcb(mcb* mcb) {
+    print("MCB: 0x");
+    print(itoa((int)mcb->start_addr, NULL, 10));
+    print("\nSize: ");
+    print(itoa(mcb->size, NULL, 10));
+    println();
 }
 
 void show_alloc_mem(void) {
     list* allocated_list = return_list(1);
     mcb* current_mcb = allocated_list->head;
     while (current_mcb != NULL) {
-        print("\nAllocated MCB: 0x");
-        print(atoi((int)current_mcb->start_addr));
-        print("\nSize: ");
-        print(atoi(current_mcb->size));
+        print("[ALLOCATED] ");
+        show_mcb(current_mcb);
         current_mcb = current_mcb->next_node;
     }
 }
@@ -147,10 +154,8 @@ void show_free_mem(void) {
     list* free_list = return_list(0);
     mcb* current_mcb = free_list->head;
     while (current_mcb != NULL) {
-        print("\nFree MCB: 0x");
-        print(atoi((int)current_mcb->start_addr));
-        print("\nSize: ");
-        print(atoi(current_mcb->size));
+        print("[FREE] ");
+        show_mcb(current_mcb);
         current_mcb = current_mcb->next_node;
     }
 }

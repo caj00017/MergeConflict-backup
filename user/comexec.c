@@ -13,6 +13,7 @@
 #include <mpx/user_pcb.h>
 #include <mpx/sys_call.h>
 #include <mpx/alarm.h>
+#include <mcb.h>
 
 char* color = "blue"; // color to be set by the user, blue by default
 
@@ -775,6 +776,144 @@ int comexec(void) {
     }
 
     // --------------------------------------------------------------------- // 
+    // ---------------------- R5 TEST COMMAND LOGIC ------------------------ //
+    // --------------------------------------------------------------------- // 
+
+    else if (strcmp(buf, "create_mcb") == 0 || strcmp(buf, "cm") == 0) {
+        
+        // prompt for address
+        unsigned int start_addr;
+        char addr_response[100] = { 0 };
+        println();
+        print("Please enter the address of the MCB to create: 0x");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, addr_response, sizeof(addr_response));
+        trim(addr_response);
+
+        start_addr = (unsigned int)atoi(addr_response);
+
+        // prompt for size
+        int size;
+        char size_response[100] = { 0 };
+        println();
+        print("Please enter the size of the MCB to create: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, size_response, sizeof(size_response));
+        trim(size_response);
+
+        size = atoi(size_response);
+
+        println();
+        print("Creating MCB at: 0x");
+        print(itoa(start_addr, addr_response, 16));
+
+        mcb* new_mcb = mcb_setup(start_addr, size);
+        list* free_list = return_list(0);
+        mcb_insert(free_list, new_mcb);
+
+        print("Created new ");
+        show_mcb(new_mcb);
+        return 0;
+    }
+    else if (strcmp(buf, "delete_mcb") == 0 || strcmp(buf, "dm") == 0) {
+        unsigned int addr;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the address of the MCB to delete: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        addr = (unsigned int)atoi(response);
+
+        println();
+        print("Deleting MCB at 0x");
+        print(itoa(addr, response, 16));
+        print("...\n");
+
+        mcb* mcb = mcb_find(addr);
+        if (mcb == NULL) {
+            println();
+            print("MCB not found at 0x");
+            print(itoa(addr, response, 16));
+            return 0; // continue running comexec
+        }
+        else {
+
+            // this is bad practice, but who really cares anyway
+            list* free_list = return_list(0);
+            list* allocated_list = return_list(1);
+            mcb_remove(free_list, mcb);
+            mcb_remove(allocated_list, mcb);
+
+            println();
+            print("Deleted MCB at 0x");
+            print(itoa(addr, response, 16));
+        }
+        return 0;
+    }
+    else if (strcmp(buf, "show_mcb") == 0 || strcmp(buf, "sm") == 0) {
+        unsigned int addr;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the address of the MCB to show: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        addr = (unsigned int)atoi(response);
+
+        println();
+        print("Locating MCB: ");
+        print(itoa(addr, response, 16));
+        print("...");
+        println();
+
+        mcb* mcb = mcb_find(addr);
+        if (mcb == NULL) {
+            print("MCB not found at 0x");
+            print(itoa(addr, response, 16));
+            return 0; // continue running comexec
+        }
+
+        println();
+        show_mcb(mcb);
+
+        return 0;
+    }
+    else if (strcmp(buf, "show_mcb_free") == 0 || strcmp(buf, "smf") == 0) {
+        println();
+        print("Showing free MCBs...");
+        show_free_mem();
+        return 0;
+    }
+    else if (strcmp(buf, "show_mcb_alloc") == 0 || strcmp(buf, "sma") == 0) {
+        println();
+        print("Showing allocated MCBs...");
+        show_alloc_mem();
+        return 0;
+    }
+    else if (strcmp(buf, "show_mcb_all") == 0 || strcmp(buf, "small") == 0) {
+        println();
+        print("Showing all MCBs...");
+        show_alloc_mem();
+        show_free_mem();
+        return 0;
+    }
+
+    // --------------------------------------------------------------------- // 
     // ---------------------- BONUS + TEST COMMAND LOGIC ------------------- //
     // --------------------------------------------------------------------- // 
 
@@ -969,6 +1108,32 @@ int help(void) {
     println();
     print_color("@ ", color);
     print("load_p5\tlp5\tLoads suspended test processes 5.");
+    println();
+
+    // R5 commands
+    println();
+    println();
+    print_color("===================================================================================================", color);
+    println();
+    println();
+
+    print_color("@ ", color);
+    print("create_mcb\t\tcm\t\tCreates a new MCB.");
+    println();
+    print_color("@ ", color);
+    print("delete_mcb\t\tdm\t\tDeletes an MCB.");
+    println();
+    print_color("@ ", color);
+    print("show_mcb\t\tsm\t\tShows an MCB.");
+    println();
+    print_color("@ ", color);
+    print("show_mcb_free\t\tsmf\t\tShows all free MCBs.");
+    println();
+    print_color("@ ", color);
+    print("show_mcb_alloc\tsma\t\tShows all allocated MCBs.");
+    println();
+    print_color("@ ", color);
+    print("show_mcb_all\t\tsmall\t\tShows all MCBs.");
     println();
 
     println();
