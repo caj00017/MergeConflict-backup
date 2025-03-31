@@ -779,7 +779,7 @@ int comexec(void) {
     // ---------------------- R5 TEST COMMAND LOGIC ------------------------ //
     // --------------------------------------------------------------------- // 
 
-    else if (strcmp(buf, "create_mcb") == 0 || strcmp(buf, "cm") == 0) {
+    else if (strcmp(buf, "mcb_create") == 0 || strcmp(buf, "mc") == 0) {
         
         // prompt for address
         unsigned int start_addr;
@@ -822,7 +822,7 @@ int comexec(void) {
         show_mcb(new_mcb);
         return 0;
     }
-    else if (strcmp(buf, "delete_mcb") == 0 || strcmp(buf, "dm") == 0) {
+    else if (strcmp(buf, "mcb_delete") == 0 || strcmp(buf, "md") == 0) {
         unsigned int addr;
         char response[100] = { 0 };
         println();
@@ -862,7 +862,7 @@ int comexec(void) {
         }
         return 0;
     }
-    else if (strcmp(buf, "show_mcb") == 0 || strcmp(buf, "sm") == 0) {
+    else if (strcmp(buf, "mcb_show") == 0 || strcmp(buf, "ms") == 0) {
         unsigned int addr;
         char response[100] = { 0 };
         println();
@@ -894,21 +894,21 @@ int comexec(void) {
 
         return 0;
     }
-    else if (strcmp(buf, "show_mcb_free") == 0 || strcmp(buf, "smf") == 0) {
+    else if (strcmp(buf, "mcb_show_free") == 0 || strcmp(buf, "msf") == 0) {
         println();
-        print("Showing free MCBs...");
+        print("Showing free MCBs...\n");
         show_free_mem();
         return 0;
     }
-    else if (strcmp(buf, "show_mcb_alloc") == 0 || strcmp(buf, "sma") == 0) {
+    else if (strcmp(buf, "mcb_show_alloc") == 0 || strcmp(buf, "msl") == 0) {
         println();
-        print("Showing allocated MCBs...");
+        print("Showing allocated MCBs...\n");
         show_alloc_mem();
         return 0;
     }
-    else if (strcmp(buf, "show_mcb_all") == 0 || strcmp(buf, "small") == 0) {
+    else if (strcmp(buf, "mcb_show_all") == 0 || strcmp(buf, "msa") == 0) {
         println();
-        print("Showing all MCBs...");
+        print("Showing all MCBs...\n");
         show_alloc_mem();
         show_free_mem();
         return 0;

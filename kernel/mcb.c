@@ -64,6 +64,11 @@ void mcb_insert(list* list, mcb* new_mcb) {
 
 void mcb_remove(list* list, mcb* current_mcb) {
 
+    if (current_mcb == NULL) {
+        print("MCB is NULL\n");
+        return; // nothing to remove
+    }
+
     // if MCB is head
     if (current_mcb == list->head) {
 
@@ -101,6 +106,11 @@ void mcb_remove(list* list, mcb* current_mcb) {
     // MCB is in the middle of the list
     else { 
 
+        // ensure MCB is indeed not the head or tail
+        if (current_mcb->prev_node == NULL || current_mcb->next_node == NULL) {
+            return;
+        }        
+
         // link the previous node to the next node
         current_mcb->prev_node->next_node = current_mcb->next_node;
 
@@ -110,7 +120,7 @@ void mcb_remove(list* list, mcb* current_mcb) {
         }
     }
 
-    sys_free_mem(current_mcb); // free the MCB memory
+    // sys_free_mem(current_mcb); // free the MCB memory
 }
 
 mcb* mcb_find(unsigned int start_addr) {
