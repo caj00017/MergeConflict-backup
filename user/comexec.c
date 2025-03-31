@@ -1119,22 +1119,22 @@ int help(void) {
     println();
 
     print_color("@ ", color);
-    print("create_mcb\t\tcm\t\tCreates a new MCB.");
+    print("mcb_create\t\tmc\t\tCreates a new MCB.");
     println();
     print_color("@ ", color);
-    print("delete_mcb\t\tdm\t\tDeletes an MCB.");
+    print("mcb_delete\t\tmd\t\tDeletes an MCB.");
     println();
     print_color("@ ", color);
-    print("show_mcb\t\tsm\t\tShows an MCB.");
+    print("mcb_show\t\tms\t\tShows an MCB.");
     println();
     print_color("@ ", color);
-    print("show_mcb_free\t\tsmf\t\tShows all free MCBs.");
+    print("mcb_show_free\t\tmsf\t\tShows all free MCBs.");
     println();
     print_color("@ ", color);
-    print("show_mcb_alloc\tsma\t\tShows all allocated MCBs.");
+    print("mcb_show_alloc\tmsl\t\tShows all allocated MCBs.");
     println();
     print_color("@ ", color);
-    print("show_mcb_all\t\tsmall\t\tShows all MCBs.");
+    print("mcb_show_all\t\tmsa\t\tShows all MCBs.");
     println();
 
     println();
