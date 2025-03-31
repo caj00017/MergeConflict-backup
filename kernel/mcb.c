@@ -128,7 +128,7 @@ mcb* mcb_find(unsigned int start_addr) {
 
     // MCB not found
     print("MCB not found: 0x");
-    print(itoa((int)start_addr, NULL, 16));
+    print(itoa((int)start_addr, NULL, 10));
     return NULL;
 }
 

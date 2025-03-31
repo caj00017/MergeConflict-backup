@@ -811,13 +811,14 @@ int comexec(void) {
 
         println();
         print("Creating MCB at: 0x");
-        print(itoa(start_addr, addr_response, 16));
+        print(itoa(start_addr, addr_response, 10));
+        print("...");
 
         mcb* new_mcb = mcb_setup(start_addr, size);
         list* free_list = return_list(0);
         mcb_insert(free_list, new_mcb);
 
-        print("Created new ");
+        print("\nCreated new ");
         show_mcb(new_mcb);
         return 0;
     }
@@ -837,14 +838,14 @@ int comexec(void) {
 
         println();
         print("Deleting MCB at 0x");
-        print(itoa(addr, response, 16));
+        print(itoa(addr, response, 10));
         print("...\n");
 
         mcb* mcb = mcb_find(addr);
         if (mcb == NULL) {
             println();
             print("MCB not found at 0x");
-            print(itoa(addr, response, 16));
+            print(itoa(addr, response, 10));
             return 0; // continue running comexec
         }
         else {
@@ -857,7 +858,7 @@ int comexec(void) {
 
             println();
             print("Deleted MCB at 0x");
-            print(itoa(addr, response, 16));
+            print(itoa(addr, response, 10));
         }
         return 0;
     }
@@ -877,14 +878,14 @@ int comexec(void) {
 
         println();
         print("Locating MCB: ");
-        print(itoa(addr, response, 16));
+        print(itoa(addr, response, 10));
         print("...");
         println();
 
         mcb* mcb = mcb_find(addr);
         if (mcb == NULL) {
             print("MCB not found at 0x");
-            print(itoa(addr, response, 16));
+            print(itoa(addr, response, 10));
             return 0; // continue running comexec
         }
 
