@@ -5,6 +5,25 @@ list ALLOCATED = {1, NULL, NULL};
 list FREE = {0, NULL, NULL};
 char str[100] = { 0 }; // string buffer for printing with itoa()
 
+void initialize_heap(size_t size) {
+    void* heap = kmalloc(size, 0, NULL); //allocate singular page for heap
+    if(heap == NULL) {
+        print("Heap allocation failed\n");
+        return;
+    }
+
+    //i noticed that there's no flag to check if the mcb is related to a free or alloced block
+    mcb* new_mcb = mcb_setup(heap, (int)size);
+
+
+    mcb_insert(return_list(0), new_mcb) //set the head of the free list to the new MCB
+
+    //initialize allocated list to be empty
+    //maybe not necessary?
+    ALLOCATED.head = NULL;
+
+}
+
 mcb* mcb_setup(unsigned int start_addr, int size) {
     mcb* new_mcb = sys_alloc_mem(sizeof(mcb));
     if (new_mcb == NULL) {
@@ -182,3 +201,4 @@ void show_free_mem(void) {
         current_mcb = current_mcb->next_node;
     }
 }
+
