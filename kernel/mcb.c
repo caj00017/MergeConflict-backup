@@ -1,4 +1,5 @@
 #include <mcb.h>
+#include <mpx/vm.h>
 
 // allocated and free lists
 list ALLOCATED = {1, NULL, NULL};
@@ -13,10 +14,10 @@ void initialize_heap(size_t size) {
     }
 
     //i noticed that there's no flag to check if the mcb is related to a free or alloced block
-    mcb* new_mcb = mcb_setup(heap, (int)size);
+    mcb* new_mcb = mcb_setup((unsigned int)heap, (int)size);
 
 
-    mcb_insert(return_list(0), new_mcb) //set the head of the free list to the new MCB
+    mcb_insert(return_list(0), new_mcb); //set the head of the free list to the new MCB
 
     //initialize allocated list to be empty
     //maybe not necessary?
@@ -128,6 +129,7 @@ void mcb_insert(list* list, mcb* new_mcb) {
      * The current implementation is for testing purposes only. 
      * 
      * IW - Wrote a bunch of stuff and have not tested. Going to look into testing tomorrow.
+     * !!!!!!!!!!!!!!!!!Write one for when its inserts before the first pointer!!!!!!!!!!!!!!
      */
 
     // if list is empty, insert new MCB as head and tail
@@ -144,7 +146,9 @@ void mcb_insert(list* list, mcb* new_mcb) {
 
         while(tempPtr->next_node != NULL){
             //Check to see if its position is found
-            //
+
+            
+            //check to see if it goes between this node and the next
             if (  (new_mcb->start_addr >= tempPtr->start_addr)  &&  (new_mcb->start_addr < tempPtr->next_node->start_addr) ) {
                 mcb * combined_mcb;
 
@@ -231,6 +235,7 @@ void mcb_insert(list* list, mcb* new_mcb) {
 
         }
 
+        /* <LAST MEMORY BLOCK>*/
         // Check if it can be combined with preivous
         if (0 && FREE.head == list->head){
             mcb * combined_mcb = mcb_setup(tempPtr->start_addr, (tempPtr->size + new_mcb->size) ); 
