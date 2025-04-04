@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 int atoi(const char *s)
 {
@@ -96,6 +97,101 @@ unsigned int intToBCD(unsigned int num) {
 
 	// return BCD
     return bcd;
+}
+
+int Math_power(int num, int exponent){
+	int new_num = 0;
+	if(exponent == 0){
+		return 1;
+	}
+	else{
+		new_num = num;
+		for(int i = 1; i < exponent; i++){
+			new_num = new_num * num;
+		}
+	}
+	return new_num;
+}
+
+unsigned int HextoDec(char *hex, int hex_size){
+	char tempchar = 0;
+	int tempnum = 0;
+	int dec = 0;
+	int power = 0;
+
+	for(int i = hex_size - 1; i >= 0; i--){
+		tempchar = hex[i];
+		if(strcmp(&tempchar, "F")){
+			tempnum = 15;
+		}
+		else if(strcmp(&tempchar, "E")){
+			tempnum = 14;
+		}
+		else if(strcmp(&tempchar, "D")){
+			tempnum = 13;
+		}
+		else if(strcmp(&tempchar, "C")){
+			tempnum = 12;
+		}
+		else if(strcmp(&tempchar, "B")){
+			tempnum = 11;
+		}
+		else if(strcmp(&tempchar, "A")){
+			tempnum = 10;
+		}
+		else{
+			tempnum = atoi(&tempchar) - 48;
+		}
+		dec = dec + (tempnum * Math_power(16, power));
+		power++;
+	}
+
+	return dec;
+}
+
+char* DectoHex(unsigned int dec){
+	char hexarr[100];
+	char str[100];
+	int storenum = 0;
+	char storechar;
+	char* storechar_ptr;
+	int location = 0;
+
+	while(dec > 16){
+		storenum = dec % 16;
+		dec = dec / 16;
+		if(storenum == 15){
+			storechar = 'F';
+		}
+		else if(storenum == 14){
+			storechar = 'E';
+		}
+		else if(storenum == 13){
+			storechar = 'D';
+		}
+		else if(storenum == 12){
+			storechar = 'C';
+		}
+		else if(storenum == 11){
+			storechar = 'B';
+		}
+		else if(storenum == 10){
+			storechar = 'A';
+		}
+		else{
+			storechar_ptr = itoa(storenum, str, 10);
+			hexarr[location] = *storechar_ptr;
+			location++;
+			continue;
+		}
+		hexarr[location] = storechar;
+		location++;
+	}
+
+	char* hexarr_ptr = hexarr;
+
+	return hexarr_ptr;
+	
 }
 
 
