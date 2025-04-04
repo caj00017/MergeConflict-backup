@@ -44,6 +44,7 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
 
     new_mcb->next_node = NULL;
     new_mcb->prev_node = NULL;
+    new_mcb->status = 0; // 0 - free, 1 - allocated
 
     return new_mcb;
 }
@@ -360,6 +361,11 @@ void show_mcb(mcb* mcb) {
     clear(str);
     print("\nSize: ");
     print(itoa(mcb->size, str, 10));
+    println();
+
+    clear(str);
+    print("Status: ");
+    print(itoa(mcb->status, str, 10));
     println();
 }
 
