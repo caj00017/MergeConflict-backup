@@ -34,6 +34,15 @@ typedef struct {
 mcb* mcb_setup(unsigned int start_addr, int size);
 
 /**
+ * 
+ * @brief Setup a new memory block with the given size.
+ * @param size The size of the Memory
+ * @return A the start address of the memory
+ * @author Izaak Whetsell
+ */
+void * allocate_memory(size_t size);
+
+/**
  * @brief Return the list based on the list type.
  * @param list_type The type of the list (0 for free, 1 for allocated).
  * @return A pointer to the requested list.
