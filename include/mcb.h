@@ -13,6 +13,7 @@
     int size; // size of the block (in bytes)
     struct mcb* next_node;
     struct mcb* prev_node;
+    int status; // 0 - free, 1 - allocated
 } mcb;
 
 // CJ - i'm not sure how the list should be defined at the moment
