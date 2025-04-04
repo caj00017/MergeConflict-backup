@@ -266,3 +266,9 @@ void trim(char sentence[]){
 	return;
 }
 
+void clear(char* arr) {
+	for (size_t i = 0; i < sizeof(arr); i++) {
+		arr[i] = 0;
+	}
+}
+
