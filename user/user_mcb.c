@@ -22,7 +22,7 @@ void show_alloc_mem(void) {
 
     print("\n==========================");
     print("\nAllocated MCBs:");
-    print("\n==========================\n");
+    print("\n==========================");
 
     if (current_mcb == NULL) {
         print("\nNo allocated MCBs found.\n");
@@ -43,7 +43,7 @@ void show_free_mem(void) {
 
     print("\n==========================");
     print("\nFree MCBs:");
-    print("\n==========================\n");
+    print("\n==========================");
 
     if (current_mcb == NULL) {
         print("\nNo free MCBs found.\n");
