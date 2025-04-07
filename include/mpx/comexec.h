@@ -1,6 +1,8 @@
 #ifndef COMEXEC
 #define COMEXEC
 
+extern char color[10]; // color to be set by the user, blue by default
+
 /** 
 * @file comexec.h
 * @brief Functions for processing and executing commands.

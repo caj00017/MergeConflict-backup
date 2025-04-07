@@ -365,9 +365,9 @@ int show_PCB(char* name){
  */
 int show_ready_PCB(void){
 
-    print("\n==========================");
+    print_color("\n==========================", color);
     print("\nReady Processes:");
-    print("\n==========================");
+    print_color("\n==========================", color);
 
     //For each process in Ready State, display the process
     queue* ready = return_queue(0);
@@ -391,9 +391,9 @@ int show_ready_PCB(void){
  */
 int show_blocked_PCB(void){
 
-    print("\n==========================");
+    print_color("\n==========================", color);
     print("\nBlocked Processes:");
-    print("\n==========================");
+    print_color("\n==========================", color);
 
     //For each process in Blocked State, display the process
     queue* blocked = return_queue(1);

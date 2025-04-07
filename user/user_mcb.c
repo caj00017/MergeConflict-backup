@@ -20,9 +20,9 @@ void show_alloc_mem(void) {
     list* allocated_list = return_list(1);
     mcb* current_mcb = allocated_list->head;
 
-    print("\n==========================");
+    print_color("\n==========================", color);
     print("\nAllocated MCBs:");
-    print("\n==========================");
+    print_color("\n==========================", color);
 
     if (current_mcb == NULL) {
         print("\nNo allocated MCBs found.\n");
@@ -41,9 +41,9 @@ void show_free_mem(void) {
     list* free_list = return_list(0);
     mcb* current_mcb = free_list->head;
 
-    print("\n==========================");
+    print_color("\n==========================", color);
     print("\nFree MCBs:");
-    print("\n==========================");
+    print_color("\n==========================", color);
 
     if (current_mcb == NULL) {
         print("\nNo free MCBs found.\n");
