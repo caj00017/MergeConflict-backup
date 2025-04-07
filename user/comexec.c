@@ -862,6 +862,37 @@ int comexec(void) {
         }
         return 0;
     }
+    else if (strcmp(buf, "mcb_free") == 0 || strcmp(buf, "mf") == 0) {
+        unsigned int addr;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the address of the memory to free (In Hexadecimal): ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        addr = (unsigned int)atoi(response);
+
+        println();
+        print("Freeing Memory at location 0x");
+        print(itoa(addr, response, 16));
+        print("...\n");
+
+        int status = free_memory((void*)addr);
+
+        if(status == 1){
+            print("Memory not found or not allocated");
+            return 0;
+        }
+
+        println();
+        print("Memory Freed Successfully");
+
+        return 0;
+    }
     else if (strcmp(buf, "mcb_show") == 0 || strcmp(buf, "ms") == 0) {
         unsigned int addr;
         char response[100] = { 0 };
@@ -929,6 +960,7 @@ int comexec(void) {
         trim(size_response);
 
         size = atoi(size_response);
+        
 
 
         unsigned int start_addr = (unsigned int) allocate_memory(size);

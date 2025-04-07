@@ -64,6 +64,14 @@ void * allocate_memory(size_t size);
 list* return_list(int list_type);
 
 /**
+ * @brief Frees memory at the given address
+ * @param addr The address of the memory that is being freed
+ * @return A 0 on success or a 1 on a fail
+ * @author Tanner Forbes
+ */
+int free_memory(void *addr);
+
+/**
  * @brief Insert a new MCB into the specified list.
  * @param list The list to insert the MCB into.
  * @param new_mcb The MCB to insert.

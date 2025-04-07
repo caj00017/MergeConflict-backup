@@ -119,6 +119,58 @@ void * allocate_memory(size_t size){
     //Make sure memory is not being over written.
 }
 
+int free_memory(void *addr){
+    
+    // search allocated list
+    list* allocated_list = return_list(1);
+    mcb* current_mcb = allocated_list->head;
+    while (current_mcb != NULL) {
+        if (current_mcb->start_addr == (unsigned int)addr) {
+            break;
+        }
+        current_mcb = current_mcb->next_node;
+    }
+
+    if(current_mcb == NULL){
+        return 1;
+    }
+
+    mcb_remove(&ALLOCATED, current_mcb);
+    mcb_insert(&FREE, current_mcb);
+
+    return 0;
+
+    // mcb *prev_mcb = current_mcb->prev_node;
+    // mcb *next_mcb = current_mcb->next_node;
+
+    // int prev = 0;
+    // int next = 0;
+
+    // if((prev_mcb->start_addr + prev_mcb->size + 1) == current_mcb->start_addr - sizeof(mcb) - 1){
+    //     prev = 1;
+    // }
+
+    // if((current_mcb->start_addr + current_mcb->size + 1) == next_mcb->start_addr - sizeof(mcb) - 1){
+    //     next = 1;
+    // }
+
+    // if(prev == 1 && next == 1){
+    //     prev_mcb->size = prev_mcb->size + sizeof(mcb) + sizeof(mcb) + current_mcb->size + next_mcb->size + 2;
+    //     mcb_remove(&FREE, current_mcb);
+    //     mcb_remove(&FREE, next_mcb);
+    // }
+    // else if(prev == 1 && next == 0){
+    //     prev_mcb->size = prev_mcb->size + sizeof(mcb) + current_mcb->size + 1;
+    //     mcb_remove(&FREE, current_mcb);
+    // }
+    // else if(prev == 0 && next == 1){
+    //     current_mcb->size = current_mcb->size + sizeof(mcb) + next_mcb->size + 1;
+    //     mcb_remove(&FREE, next_mcb);
+    // }
+
+    return 0;
+}
+
 
 void mcb_insert(list* list, mcb* new_mcb) {
 
