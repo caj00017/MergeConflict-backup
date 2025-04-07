@@ -874,11 +874,11 @@ int comexec(void) {
         sys_req(READ, COM1, response, sizeof(response));
         trim(response);
 
-        addr = (unsigned int)atoi(response);
+        addr = Hex2Dec(response, sizeof(response));
 
         println();
         print("Freeing Memory at location 0x");
-        print(itoa(addr, response, 16));
+        print(itoa(addr, response, 10));
         print("...\n");
 
         int status = free_memory((void*)addr);
@@ -960,7 +960,7 @@ int comexec(void) {
         trim(size_response);
 
         size = atoi(size_response);
-        
+
 
 
         unsigned int start_addr = (unsigned int) allocate_memory(size);

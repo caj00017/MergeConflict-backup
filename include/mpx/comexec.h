@@ -2,6 +2,7 @@
 #define COMEXEC
 
 extern char color[10]; // color to be set by the user, blue by default
+#include <stdlib.h>
 
 /** 
 * @file comexec.h
