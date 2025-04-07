@@ -1,6 +1,8 @@
 #ifndef COMEXEC
 #define COMEXEC
 
+#include <stdlib.h>
+
 /** 
 * @file comexec.h
 * @brief Functions for processing and executing commands.

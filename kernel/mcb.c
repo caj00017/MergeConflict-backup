@@ -35,7 +35,7 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
     clear(str);
     new_mcb->start_addr = start_addr + sizeof(mcb);
     print("\nStart address intialized: 0x");
-    print(itoa((int)new_mcb->start_addr, str, 10));
+    print(itoa((int)new_mcb->start_addr, str, 16));
 
     clear(str);
     new_mcb->size = size;
@@ -455,14 +455,14 @@ mcb* mcb_find(unsigned int start_addr) {
     // MCB not found
     clear(str);
     print("MCB not found: 0x");
-    print(itoa((int)start_addr, str, 10));
+    print(itoa((int)start_addr, str, 16));
     return NULL;
 }
 
 void show_mcb(mcb* mcb) {
     clear(str);
     print("MCB: 0x");
-    print(itoa((int)mcb->start_addr, str, 10));
+    print(itoa((int)mcb->start_addr, str, 16));
 
     clear(str);
     print("\nSize: ");

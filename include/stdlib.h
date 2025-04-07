@@ -13,29 +13,4 @@
 */
 int atoi(const char *s);
 
-/**
- * @brief Function which converts an integer to an ASCII string
- * @param num The integer to be converted
- * @param str Pointer to the location of the new ASCII string
- * @param base Numeral system to use (i.e. base 10, base 2, base 8, etc.)
- * @author Tanner Forbes
- */
-char* itoa(int num, char* str, int base);
-
-/**
-* @brief Function which converts a BCD value to a char.
-* @param bcd The BCD value to be converted to char.
-* @return The char value derived from the BCD
-* @author Tanner Forbes
-*/
-char bcdToChar(unsigned char bcd);
-
-/**
-* @brief Function which converts an int to a BCD value
-* @param num The unsigned int value (0-99 only) to be converted to BCD
-* @return the BCD value derived from the int 
-* @author Chris Jones
-*/
-unsigned int intToBCD(unsigned int num);
-
 #endif
