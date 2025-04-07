@@ -365,26 +365,26 @@ unsigned int Hex2Dec(char *hex, int hex_size){
 
 	for(int i = hex_size - 1; i >= 0; i--){
 		tempchar = hex[i];
-		if(strcmp(&tempchar, "f")){
+		if(tempchar == 'f'){
 			tempnum = 15;
 		}
-		else if(strcmp(&tempchar, "e")){
+		else if(tempchar == 'e'){ 
 			tempnum = 14;
 		}
-		else if(strcmp(&tempchar, "d")){
+		else if(tempchar == 'd'){ 
 			tempnum = 13;
 		}
-		else if(strcmp(&tempchar, "c")){
+		else if(tempchar == 'c'){
 			tempnum = 12;
 		}
-		else if(strcmp(&tempchar, "b")){
+		else if(tempchar == 'b'){
 			tempnum = 11;
 		}
-		else if(strcmp(&tempchar, "a")){
+		else if(tempchar == 'a'){ 
 			tempnum = 10;
 		}
 		else{
-			tempnum = atoi(&tempchar) - 48;
+			tempnum = tempchar - 48;
 		}
 		dec = dec + (tempnum * Math_power(16, power));
 		power++;

@@ -457,39 +457,3 @@ mcb* mcb_find(unsigned int start_addr) {
     return NULL;
 }
 
-void show_mcb(mcb* mcb) {
-    clear(str);
-    print("MCB: 0x");
-    print(itoa((int)mcb->start_addr, str, 16));
-
-    clear(str);
-    print("\nSize: ");
-    print(itoa(mcb->size, str, 10));
-    println();
-
-    clear(str);
-    print("Status: ");
-    print(itoa(mcb->status, str, 10));
-    println();
-}
-
-void show_alloc_mem(void) {
-    list* allocated_list = return_list(1);
-    mcb* current_mcb = allocated_list->head;
-    while (current_mcb != NULL) {
-        print("[ALLOCATED] ");
-        show_mcb(current_mcb);
-        current_mcb = current_mcb->next_node;
-    }
-}
-
-void show_free_mem(void) {
-    list* free_list = return_list(0);
-    mcb* current_mcb = free_list->head;
-    while (current_mcb != NULL) {
-        print("[FREE] ");
-        show_mcb(current_mcb);
-        current_mcb = current_mcb->next_node;
-    }
-}
-

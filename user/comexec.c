@@ -874,17 +874,17 @@ int comexec(void) {
         sys_req(READ, COM1, response, sizeof(response));
         trim(response);
 
-        addr = Hex2Dec(response, sizeof(response));
+        addr = Hex2Dec(response, strlen(response));
 
         println();
         print("Freeing Memory at location 0x");
-        print(itoa(addr, response, 10));
+        print(itoa(addr, response, 16));
         print("...\n");
 
         int status = free_memory((void*)addr);
 
         if(status == 1){
-            print("Memory not found or not allocated");
+            print_error("Memory not found or not allocated");
             return 0;
         }
 
@@ -949,6 +949,7 @@ int comexec(void) {
 
         // prompt for size
         int size;
+        char str[25] = {0};
         char size_response[100] = { 0 };
         println();
         print("Please enter the size of the MCB to create: ");
@@ -961,14 +962,19 @@ int comexec(void) {
 
         size = atoi(size_response);
 
-
-
         unsigned int start_addr = (unsigned int) allocate_memory(size);
 
         if((void *)start_addr == NULL){
             println();
             print_error("An error occured while allocating memory.");
             // println();
+        }
+        else{
+            println();
+            print("Start address intialized: 0x");
+            print(itoa((int)start_addr, str, 16));
+            print("\nSize initialized: ");
+            print(size_response);
         }
         // char* word = NULL;
         // print(itoa(start_addr, size_response, 10));

@@ -3,7 +3,7 @@
 void show_mcb(mcb* mcb) {
     clear(str);
     print("MCB: 0x");
-    print(itoa((int)mcb->start_addr, str, 10));
+    print(itoa((int)mcb->start_addr, str, 16));
 
     clear(str);
     print("\nSize: ");
