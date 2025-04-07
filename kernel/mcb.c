@@ -1,10 +1,8 @@
 #include <mcb.h>
-#include <mpx/vm.h>
 
-// allocated and free lists
 list ALLOCATED = {1, NULL, NULL};
 list FREE = {0, NULL, NULL};
-char str[100] = { 0 }; // string buffer for printing with itoa()
+char str[100] = { 0 };
 
 void initialize_heap(size_t size) {
     void* heap = kmalloc(size, 0, NULL); //allocate singular page for heap

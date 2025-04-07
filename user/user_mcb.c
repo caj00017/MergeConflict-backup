@@ -1,0 +1,59 @@
+#include <mcb.h>
+
+void show_mcb(mcb* mcb) {
+    clear(str);
+    print("MCB: 0x");
+    print(itoa((int)mcb->start_addr, str, 10));
+
+    clear(str);
+    print("\nSize: ");
+    print(itoa(mcb->size, str, 10));
+    println();
+
+    clear(str);
+    print("Status: ");
+    print(itoa(mcb->status, str, 10));
+    println();
+}
+
+void show_alloc_mem(void) {
+    list* allocated_list = return_list(1);
+    mcb* current_mcb = allocated_list->head;
+
+    print("\n==========================");
+    print("\nAllocated MCBs:");
+    print("\n==========================");
+
+    if (current_mcb == NULL) {
+        print("\nNo allocated MCBs found.\n");
+        return;
+    }
+
+    while (current_mcb != NULL) {
+        print("\n[ALLOCATED] ");
+        show_mcb(current_mcb);
+        current_mcb = current_mcb->next_node;
+        println();
+    }
+}
+
+void show_free_mem(void) {
+    list* free_list = return_list(0);
+    mcb* current_mcb = free_list->head;
+
+    print("\n==========================");
+    print("\nFree MCBs:");
+    print("\n==========================");
+
+    if (current_mcb == NULL) {
+        print("\nNo free MCBs found.\n");
+        return;
+    }
+
+    while (current_mcb != NULL) {
+        print("\n[FREE] ");
+        show_mcb(current_mcb);
+        current_mcb = current_mcb->next_node;
+        println();
+    }
+}

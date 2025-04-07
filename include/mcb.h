@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <mpx/vm.h>
 
 /**
  * @file mcb.h
@@ -8,7 +9,7 @@
  * @authors Chris Jones
  */
 
- typedef struct mcb {
+typedef struct mcb {
     unsigned int start_addr; // base address of usable memory, first byte after MCB
     int size; // size of the block (in bytes)
     struct mcb* next_node;
@@ -24,6 +25,10 @@ typedef struct {
     mcb* tail;
 } list;
 
+ // allocated and free lists
+ extern list ALLOCATED;
+ extern list FREE;
+ extern char str[100]; // string buffer for printing with itoa()
 
 /** 
  * @brief Allocated memory block of free memory for memory manager

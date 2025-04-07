@@ -15,7 +15,7 @@
 #include <mpx/alarm.h>
 #include <mcb.h>
 
-char* color = "blue"; // color to be set by the user, blue by default
+char color[10] = "blue"; // color to be set by the user, blue by default
 
 int comexec(void) {
 
@@ -105,7 +105,7 @@ int comexec(void) {
 
             // ensure valid input
             if(strcmp(color_response, "green") == 0 || strcmp(color_response, "yellow") == 0 || strcmp(color_response, "blue") == 0 || strcmp(color_response, "magenta") == 0 || strcmp(color_response, "cyan") == 0){
-                color = color_response;
+                strcpy(color, color_response);
                 print("\nColor changed to: ");
                 print_color(color, color);
                 break;
