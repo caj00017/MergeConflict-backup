@@ -24,6 +24,14 @@ typedef struct {
     mcb* tail;
 } list;
 
+
+/** 
+ * @brief Allocated memory block of free memory for memory manager
+ * @param size The size of memory to be allocated
+ * @author Evan Humphrey
+ */
+void initialize_heap(size_t size);
+
 /**
  * @brief Setup a new MCB with the given start address and size.
  * @param start_addr The starting address of the MCB.

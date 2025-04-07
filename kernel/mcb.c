@@ -65,15 +65,13 @@ void * allocate_memory(size_t size){
 
     //Possibly change mcb size to size_t????
 
-    //No point in allocating zero bytes or fewer
-    if(size <= 0){
+    
+    // Check if Free has anything
+    if(FREE.head == NULL || FREE.head->size == 0){
+        print_error("There was not enough free memory to allocate.");
         return NULL;
     }
 
-    // Check if Free has anything
-    if(FREE.head == NULL){
-        return NULL;
-    }
 
     //Pointer to find best fit and temp pointer to iterate through list->
     mcb* bestFitPtr = NULL;

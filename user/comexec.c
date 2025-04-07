@@ -933,11 +933,19 @@ int comexec(void) {
 
         unsigned int start_addr = (unsigned int) allocate_memory(size);
 
-        char* word = NULL;
-        print(itoa(start_addr, word, 10));
-        mcb *new_mcb = mcb_find(start_addr);
-        print("\nCreated new ");
-        show_mcb(new_mcb);
+        if((void *)start_addr == NULL){
+            println();
+            print_error("An error occured while allocating memory.");
+            // println();
+        }
+        // char* word = NULL;
+        // print(itoa(start_addr, size_response, 10));
+        // mcb *new_mcb = mcb_find(start_addr);
+        // print("\nCreated new ");
+        // show_mcb(new_mcb);
+        for (int i = 0; i<(int)start_addr; i++){
+            break;
+        }
         return 0;
     }
 
@@ -1162,6 +1170,9 @@ int help(void) {
     println();
     print_color("@ ", color);
     print("mcb_show_all\t\tmsa\t\tShows all MCBs.");
+    println();
+    print_color("@ ", color);
+    print("allocate_mem\t\tam\t\tAllocates memory from heap.");
     println();
 
     println();
