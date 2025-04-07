@@ -914,6 +914,41 @@ int comexec(void) {
         return 0;
     }
 
+    else if (strcmp(buf, "allocate_mem") == 0 || strcmp(buf, "am") == 0) {
+
+        // prompt for size
+        int size;
+        char size_response[100] = { 0 };
+        println();
+        print("Please enter the size of the MCB to create: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, size_response, sizeof(size_response));
+        trim(size_response);
+
+        size = atoi(size_response);
+
+
+        unsigned int start_addr = (unsigned int) allocate_memory(size);
+
+        if((void *)start_addr == NULL){
+            println();
+            print_error("An error occured while allocating memory.");
+            // println();
+        }
+        // char* word = NULL;
+        // print(itoa(start_addr, size_response, 10));
+        // mcb *new_mcb = mcb_find(start_addr);
+        // print("\nCreated new ");
+        // show_mcb(new_mcb);
+        for (int i = 0; i<(int)start_addr; i++){
+            break;
+        }
+        return 0;
+    }
+
     // --------------------------------------------------------------------- // 
     // ---------------------- BONUS + TEST COMMAND LOGIC ------------------- //
     // --------------------------------------------------------------------- // 
@@ -1135,6 +1170,9 @@ int help(void) {
     println();
     print_color("@ ", color);
     print("mcb_show_all\t\tmsa\t\tShows all MCBs.");
+    println();
+    print_color("@ ", color);
+    print("allocate_mem\t\tam\t\tAllocates memory from heap.");
     println();
 
     println();
