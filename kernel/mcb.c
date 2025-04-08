@@ -99,7 +99,7 @@ void * allocate_memory(size_t size){
 
     //Get the new address for the smaller block
     unsigned int start_address_free = bestFitPtr->start_addr + size; //Need to check
-    unsigned int start_address_alloc = bestFitPtr->start_addr;
+    unsigned int start_address_alloc = bestFitPtr->start_addr - sizeof(mcb);
 
     //Insert the allocated memory block into the proper list-> 
     mcb * allocPtr = mcb_setup( start_address_alloc , size );
@@ -140,33 +140,6 @@ int free_memory(void *addr){
 
     return 0;
 
-    // mcb *prev_mcb = current_mcb->prev_node;
-    // mcb *next_mcb = current_mcb->next_node;
-
-    // int prev = 0;
-    // int next = 0;
-
-    // if((prev_mcb->start_addr + prev_mcb->size + 1) == current_mcb->start_addr - sizeof(mcb) - 1){
-    //     prev = 1;
-    // }
-
-    // if((current_mcb->start_addr + current_mcb->size + 1) == next_mcb->start_addr - sizeof(mcb) - 1){
-    //     next = 1;
-    // }
-
-    // if(prev == 1 && next == 1){
-    //     prev_mcb->size = prev_mcb->size + sizeof(mcb) + sizeof(mcb) + current_mcb->size + next_mcb->size + 2;
-    //     mcb_remove(&FREE, current_mcb);
-    //     mcb_remove(&FREE, next_mcb);
-    // }
-    // else if(prev == 1 && next == 0){
-    //     prev_mcb->size = prev_mcb->size + sizeof(mcb) + current_mcb->size + 1;
-    //     mcb_remove(&FREE, current_mcb);
-    // }
-    // else if(prev == 0 && next == 1){
-    //     current_mcb->size = current_mcb->size + sizeof(mcb) + next_mcb->size + 1;
-    //     mcb_remove(&FREE, next_mcb);
-    // }
 
     return 0;
 }
@@ -174,13 +147,6 @@ int free_memory(void *addr){
 
 void mcb_insert(list* list, mcb* new_mcb) {
 
-    /**
-     * CJ - Note: the logic for this function is subject to change based on the start address of the MCB. 
-     * The current implementation is for testing purposes only. 
-     * 
-     * IW - Wrote a bunch of stuff and have not tested. Going to look into testing tomorrow.
-     * !!!!!!!!!!!!!!!!!Write one for when its inserts before the first pointer!!!!!!!!!!!!!!
-     */
 
     // if list is empty, insert new MCB as head and tail
     if (list->head == NULL) {
@@ -188,182 +154,194 @@ void mcb_insert(list* list, mcb* new_mcb) {
         list->tail = new_mcb;
         return ;
     } 
-    //Append New MCB
-    else {
-        //Create temp pointer to iterate through 
-        mcb* tempPtr = list->head;
-
-        while(tempPtr->next_node != NULL){
-            mcb * combined_mcb;
-
-            // Check if its before the temp node:
-            if (new_mcb->start_addr < tempPtr->start_addr ){
-
-                //check if they combine
-                if(  (new_mcb->start_addr + new_mcb->size + sizeof(mcb) == tempPtr->start_addr )   && (list->head == FREE.head) ){
-                    //Combine the new and current mcbs.
-                    combined_mcb = mcb_setup(new_mcb->start_addr, (tempPtr->size + new_mcb->size + sizeof(mcb)) ); 
-
-                    //Attach combined 
-                    combined_mcb->next_node = tempPtr;
-                    
-                    if(tempPtr->prev_node == NULL){
-                        combined_mcb->prev_node = NULL;
-                        FREE.head = combined_mcb;
-                    }
-                    else{
-                        combined_mcb->prev_node = tempPtr->prev_node;
-                        tempPtr-> prev_node->next_node = combined_mcb;
-                    }
-
-                    tempPtr->prev_node = combined_mcb;
-
-                    //Remove the temp mcb
-                    mcb_remove(&FREE, tempPtr); 
-                    tempPtr = NULL;
-
-                }
-                else{
-                    //Place before current but don't combine
-                    new_mcb->next_node = tempPtr;
-
-                    //Check if previous is NULL
-                    if(tempPtr->prev_node == NULL){
-                        new_mcb->prev_node = NULL;
-                        list->head = new_mcb;
-                    }
-                    else{
-                        tempPtr->prev_node->next_node = new_mcb;
-                        new_mcb->prev_node = tempPtr->prev_node;
-                    }
-                    
-                    tempPtr->prev_node = new_mcb;
-
-                    tempPtr = NULL;
-                    return;
-                }
 
 
-                return;
-            }
+    /* ADD NEW MCB TO THE LIST*/
+    
+    //Create temp pointer to iterate through 
+    mcb* tempPtr = list->head;
+    mcb * combined_mcb;
 
-            //check to see if it goes between this node and the next
-            if (  (new_mcb->start_addr >= tempPtr->start_addr)  &&  (new_mcb->start_addr < tempPtr->next_node->start_addr) ) {
-                
+    /*CHECK BEFORE CURRENT*/
+    // Since we know there is one at the head, check to see if the new one goes before it.
+    if(new_mcb->start_addr < tempPtr->start_addr){
+      
+        //Check if they combine (only on Free list)
+        if( (new_mcb->start_addr + new_mcb->size + sizeof(mcb) == tempPtr->start_addr )   && (list->head == FREE.head) ){
+            //Combine the new and current mcbs.
+            combined_mcb = mcb_setup(new_mcb->start_addr- sizeof(mcb), (tempPtr->size + new_mcb->size) ); 
 
-                // Check to see if we can attach it to the surrounding memory blocks( ONLY DO THIS FOR FREE LIST!  )
-                //I am not sure how the memory addressing works. Skipping for now.                                              !!!!!!!!!!!!!!!!!!!!!!!!
-
-                // Check if it matches previous block
-                if(( (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr)  && (list->head == FREE.head)) {  
-                    //Combining the temp and new
-                    combined_mcb = mcb_setup(tempPtr->start_addr, (tempPtr->size + new_mcb->size) ); 
-                     
-                    //Attach combined to next
-                    combined_mcb->next_node = tempPtr->next_node; 
-                    tempPtr->next_node->prev_node = combined_mcb; 
-
-                    //Attach combined to previous 
-                    combined_mcb->prev_node =  tempPtr; 
-                    tempPtr->next_node = combined_mcb;
-
-                    mcb_remove(&FREE, tempPtr);  //Remove the uncombined section
-
-                    return;
-
-                }
-                // check if it matches next block
-                else if(( (new_mcb->start_addr + new_mcb->size + sizeof(mcb)) == tempPtr->next_node->start_addr)  && (list->head == FREE.head )) {
-                    //Combining next and new
-                    combined_mcb = mcb_setup(new_mcb->start_addr, (tempPtr->next_node->size + new_mcb->size) );
-                    
-                    //Attach combined to next
-                    combined_mcb->next_node = tempPtr->next_node; 
-                    tempPtr->next_node->prev_node = combined_mcb; 
-
-                    //Attach combined to previous (override)
-                    combined_mcb->prev_node =  tempPtr; 
-                    tempPtr->next_node = combined_mcb; 
-                    
-                    //Remove the next node
-                    mcb_remove(&FREE,combined_mcb->next_node);
-
-                    tempPtr = NULL;
-                    return;
-                    
-                }
-                //check if both blocks match
-                else if (  (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr && 
-                        ( (new_mcb->start_addr + new_mcb->size + sizeof(mcb)) == tempPtr->next_node->start_addr) &&
-                        (list->head == FREE.head) ){// Perfect Fit!!!
-                    //Combining next and new
-                    combined_mcb = mcb_setup(tempPtr->start_addr, (tempPtr->size + tempPtr->next_node->size + new_mcb->size) ); 
-                    
-
-                    //Attach combined to next
-                    combined_mcb->next_node = tempPtr->next_node; 
-                    tempPtr->next_node->prev_node = combined_mcb; 
-
-                    //Attach combined to previous (override)
-                    combined_mcb->prev_node =  tempPtr; 
-                    tempPtr->next_node = combined_mcb; 
-                    
-                    //Remove the next node and previous nodes
-                    mcb_remove(&FREE, combined_mcb->next_node);
-                    mcb_remove(&FREE, tempPtr);
-
-
-                    tempPtr =NULL;
-
-                    return;
-                }
-                else{ // No matches
-                    //Correct spot, doesn't pair with the next door blocks.
-
-                    new_mcb->next_node = tempPtr->next_node;
-                    tempPtr->next_node->prev_node = new_mcb;
-
-                    new_mcb->prev_node = tempPtr;
-                    tempPtr->next_node = new_mcb;
-
-                    tempPtr = NULL;
-                    return;
-
-                }
-
-
-            }
-
-            // Not it the correct position. Continue to next location.
-            tempPtr = tempPtr->next_node;
-
-        }
-
-        /* <LAST MEMORY BLOCK>*/
-        // Check if it can be combined with preivous
-        if (  ((tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr )  && FREE.head == list->head){
-            //Create combined mcb
-            mcb * combined_mcb = mcb_setup(tempPtr->start_addr, (tempPtr->size + new_mcb->size) ); 
-
-            //Add combined memory block to tail
-            tempPtr->next_node = combined_mcb;
-            combined_mcb->prev_node = tempPtr;
+            //Attach combined 
+            combined_mcb->next_node = tempPtr;
             
-            list->tail = combined_mcb;
+            if(tempPtr->prev_node == NULL){
+                combined_mcb->prev_node = NULL;
+                FREE.head = combined_mcb;
+            }
+            else{
+                combined_mcb->prev_node = tempPtr->prev_node;
+                tempPtr-> prev_node->next_node = combined_mcb;
+            }
 
-            // remove temp
-            mcb_remove(list,tempPtr);
+            tempPtr->prev_node = combined_mcb;
+
+            //Remove the temp mcb
+            mcb_remove(&FREE, tempPtr); 
+            tempPtr = NULL;
+
+            return;
 
         }
         else{
-            //Not combinable, still last memory block in list
-            tempPtr->next_node = new_mcb;
-            new_mcb->prev_node = tempPtr;
+            //Place before current but don't combine
+            new_mcb->next_node = tempPtr;
 
-            list->tail = new_mcb;
+            //Check if previous is NULL
+            if(tempPtr->prev_node == NULL){
+                new_mcb->prev_node = NULL;
+                list->head = new_mcb;
+            }
+            else{
+                tempPtr->prev_node->next_node = new_mcb;
+                new_mcb->prev_node = tempPtr->prev_node;
+            }
+            
+            tempPtr->prev_node = new_mcb;
+
+            tempPtr = NULL;
+            return;
+        }
+    }
+
+    while(tempPtr != NULL){
+        
+        /* CHECK IF THERE IS A NEXT MCB*/
+        if(tempPtr->next_node == NULL){
+            // The temp node is the last one in the list
+
+            //Check to see if the last one can be combined
+            if (( (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr)  && FREE.head == list->head){
+                    //Create combined mcb
+                    mcb * combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + new_mcb->size) ); 
+
+                    //Add combined memory block to tail
+                    tempPtr->next_node = combined_mcb;
+                    combined_mcb->prev_node = tempPtr;
+                    
+                    list->tail = combined_mcb;
+
+                    // remove temp
+                    mcb_remove(list,tempPtr);
+
+                }
+                 // Otherwise place at the end of list
+                else{
+                    tempPtr->next_node = new_mcb;
+                    new_mcb->prev_node = tempPtr;
+
+                    list->tail = new_mcb;
+                }  
+
+
+            return;
         }
 
+
+        /*CHECK BETWEEN CURRENT AND NEXT*/
+
+        //Since it was not found to be before the current, check between the current and the next.
+        if (  (new_mcb->start_addr >= tempPtr->start_addr)  &&  (new_mcb->start_addr < tempPtr->next_node->start_addr) ) {
+        
+            /* CHECK TO SEE IF MEMORY BLOCKS COMBINE (Only for FREE list)*/
+
+            //check if both blocks match
+            if (  (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr && 
+                    ( (new_mcb->start_addr + new_mcb->size + sizeof(mcb)) == tempPtr->next_node->start_addr) &&
+                    (list->head == FREE.head) ){// Perfect Fit!!!
+                //Combining next and new
+                combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + tempPtr->next_node->size + new_mcb->size) ); 
+                
+
+                //Attach combined to next
+                combined_mcb->next_node = tempPtr->next_node; 
+                tempPtr->next_node->prev_node = combined_mcb; 
+
+                //Attach combined to previous (override)
+                combined_mcb->prev_node =  tempPtr; 
+                tempPtr->next_node = combined_mcb; 
+                
+                //Remove the next node and previous nodes
+                mcb_remove(&FREE, combined_mcb->next_node);
+                mcb_remove(&FREE, tempPtr);
+
+
+                tempPtr =NULL;
+
+                return;
+            }
+            // Check if it matches previous block
+            else if(( (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr)  && (list->head == FREE.head)) {  
+                //Combining the temp and new
+                combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + new_mcb->size) ); 
+                
+                //Attach combined to next
+                combined_mcb->next_node = tempPtr->next_node; 
+                tempPtr->next_node->prev_node = combined_mcb; 
+
+                //Attach combined to previous 
+                combined_mcb->prev_node =  tempPtr; 
+                tempPtr->next_node = combined_mcb;
+
+                mcb_remove(&FREE, tempPtr);  //Remove the uncombined section
+
+                return;
+
+            }
+            // check if it matches next block
+            else if(( (new_mcb->start_addr + new_mcb->size + sizeof(mcb)) == tempPtr->next_node->start_addr)  && (list->head == FREE.head )) {
+                //Combining next and new
+                combined_mcb = mcb_setup(new_mcb->start_addr - sizeof(mcb), (tempPtr->next_node->size + new_mcb->size) );
+                
+                //Attach combined to next
+                combined_mcb->next_node = tempPtr->next_node; 
+                tempPtr->next_node->prev_node = combined_mcb; 
+
+                //Attach combined to previous (override)
+                combined_mcb->prev_node =  tempPtr; 
+                tempPtr->next_node = combined_mcb; 
+                
+                //Remove the next node
+                mcb_remove(&FREE,combined_mcb->next_node);
+
+                tempPtr = NULL;
+                return;
+                
+            }
+            else{ // No matches or not in free list
+                //Correct spot, doesn't pair with the next door blocks.
+
+                new_mcb->next_node = tempPtr->next_node;
+                tempPtr->next_node->prev_node = new_mcb;
+
+                new_mcb->prev_node = tempPtr;
+                tempPtr->next_node = new_mcb;
+
+                tempPtr = NULL;
+                return;
+
+            }
+
+
+        }
+
+
+        // Not it the correct position. Continue to next location.
+        tempPtr = tempPtr->next_node;
     }
+
+    // It didn't find a spot anywhere in the list for it. Only happens if stack_addr is messed up. (guessing)
+    print_error("ERROR INSERTING OF MCB");
+    return;
 
 }
 
