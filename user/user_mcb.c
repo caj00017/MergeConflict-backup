@@ -1,18 +1,19 @@
 #include <mcb.h>
+#include <conversions.h>
 
 void show_mcb(mcb* mcb) {
     clear(str);
     print("MCB: 0x");
-    print(itoa((int)mcb->start_addr, str, 10));
+    print(custom_itoa((int)mcb->start_addr, str, 16));
 
     clear(str);
     print("\nSize: ");
-    print(itoa(mcb->size, str, 10));
+    print(custom_itoa(mcb->size, str, 10));
     println();
 
     clear(str);
     print("Status: ");
-    print(itoa(mcb->status, str, 10));
+    print(custom_itoa(mcb->status, str, 10));
     println();
 }
 

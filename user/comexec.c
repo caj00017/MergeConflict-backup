@@ -384,7 +384,7 @@ int comexec(void) {
         print("Setting priority for PCB: ");
         print(name);
         print(" to ");
-        print(itoa(priority, str, 10));
+        print(custom_itoa(priority, str, 10));
 
         set_PCB_priority(name, priority);
 
@@ -811,7 +811,7 @@ int comexec(void) {
 
         println();
         print("Creating MCB at: 0x");
-        print(itoa(start_addr, addr_response, 10));
+        print(custom_itoa(start_addr, addr_response, 10));
         print("...");
 
         mcb* new_mcb = mcb_setup(start_addr, size);
@@ -838,14 +838,14 @@ int comexec(void) {
 
         println();
         print("Deleting MCB at 0x");
-        print(itoa(addr, response, 10));
+        print(custom_itoa(addr, response, 10));
         print("...\n");
 
         mcb* mcb = mcb_find(addr);
         if (mcb == NULL) {
             println();
             print("MCB not found at 0x");
-            print(itoa(addr, response, 10));
+            print(custom_itoa(addr, response, 10));
             return 0; // continue running comexec
         }
         else {
@@ -858,39 +858,8 @@ int comexec(void) {
 
             println();
             print("Deleted MCB at 0x");
-            print(itoa(addr, response, 10));
+            print(custom_itoa(addr, response, 10));
         }
-        return 0;
-    }
-    else if (strcmp(buf, "mcb_free") == 0 || strcmp(buf, "mf") == 0) {
-        unsigned int addr;
-        char response[100] = { 0 };
-        println();
-        print("Please enter the address of the memory to free (In Hexadecimal): ");
-
-        //Write formatting for entry and read from the command line
-        println();
-        print_color("@ ", color);
-        sys_req(READ, COM1, response, sizeof(response));
-        trim(response);
-
-        addr = Hex2Dec(response, sizeof(response));
-
-        println();
-        print("Freeing Memory at location 0x");
-        print(itoa(addr, response, 10));
-        print("...\n");
-
-        int status = free_memory((void*)addr);
-
-        if(status == 1){
-            print("Memory not found or not allocated");
-            return 0;
-        }
-
-        println();
-        print("Memory Freed Successfully");
-
         return 0;
     }
     else if (strcmp(buf, "mcb_show") == 0 || strcmp(buf, "ms") == 0) {
@@ -909,14 +878,14 @@ int comexec(void) {
 
         println();
         print("Locating MCB: ");
-        print(itoa(addr, response, 10));
+        print(custom_itoa(addr, response, 10));
         print("...");
         println();
 
         mcb* mcb = mcb_find(addr);
         if (mcb == NULL) {
             print("MCB not found at 0x");
-            print(itoa(addr, response, 10));
+            print(custom_itoa(addr, response, 10));
             return 0; // continue running comexec
         }
 
@@ -961,8 +930,6 @@ int comexec(void) {
 
         size = atoi(size_response);
 
-
-
         unsigned int start_addr = (unsigned int) allocate_memory(size);
 
         if((void *)start_addr == NULL){
@@ -978,6 +945,46 @@ int comexec(void) {
         for (int i = 0; i<(int)start_addr; i++){
             break;
         }
+        return 0;
+    }
+    else if (strcmp(buf, "free_mem") == 0 || strcmp(buf, "fm") == 0) {
+
+        // Initializing variables used
+        unsigned int addr;
+        char response[100] = { 0 };
+        println();
+
+        // Asking for location of memory to free
+        print("Please enter the address of the memory to free (In Hexadecimal): ");
+
+        // Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        print(" 0x");
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        // Converting to decimal in order to use in free_memory
+        addr = Hex2Dec(response, strlen(response));
+
+        println();
+        print("Freeing Memory at location 0x");
+        print(custom_itoa(addr, response, 16));
+        print("...\n");
+
+        // Attempting to free memory at specified locaiton
+        int status = free_memory((void*)addr);
+
+        // If failed prints error statement and returns
+        if(status == 1){
+            print("Memory not found or not allocated");
+            return 0;
+        }
+
+        // If success prints message and returns
+        println();
+        print("Memory Freed Successfully");
+
         return 0;
     }
 
@@ -1205,6 +1212,9 @@ int help(void) {
     println();
     print_color("@ ", color);
     print("allocate_mem\t\tam\t\tAllocates memory from heap.");
+    println();
+    print_color("@ ", color);
+    print("free_mem\t\tfm\t\tFrees memory from the heap at a specified location.");
     println();
 
     println();

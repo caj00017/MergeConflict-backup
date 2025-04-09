@@ -9,6 +9,7 @@
         "sys_call.h": "c",
         "alarm.h": "c",
         "stddef.h": "c",
-        "pcb.h": "c"
+        "pcb.h": "c",
+        "string.h": "c"
     }
 }

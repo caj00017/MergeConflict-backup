@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <mpx/vm.h>
+#include <conversions.h>
 
 /**
  * @file mcb.h

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <processes.h>
+#include <conversions.h>
 
 /**
  * Create PCB
@@ -305,7 +306,7 @@ int show_PCB(char* name){
 
     char* class_str;
     char* state_str;
-    char* priority_str = itoa(PCB->priority,str,10);
+    char* priority_str = custom_itoa(PCB->priority,str,10);
 
     switch(PCB->class) {
         case 0:

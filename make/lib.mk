@@ -9,8 +9,11 @@ lib/core.o: lib/core.c include/mpx/serial.h include/mpx/device.h \
 
 lib/ctype.o: lib/ctype.c include/ctype.h
 
+lib/conversions.o: lib/conversions.c include/conversions.h
+
 LIB_OBJECTS=\
 	lib/string.o\
 	lib/stdlib.o\
 	lib/core.o\
-	lib/ctype.o
+	lib/ctype.o\
+	lib/conversions.o
