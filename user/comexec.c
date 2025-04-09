@@ -14,6 +14,7 @@
 #include <mpx/sys_call.h>
 #include <mpx/alarm.h>
 #include <mcb.h>
+#include <conversions.h>
 
 char color[10] = "blue"; // color to be set by the user, blue by default
 
@@ -878,7 +879,7 @@ int comexec(void) {
 
         println();
         print("Freeing Memory at location 0x");
-        print(itoa(addr, response, 16));
+        print(custom_itoa(addr, response, 16));
         print("...\n");
 
         int status = free_memory((void*)addr);
@@ -972,7 +973,7 @@ int comexec(void) {
         else{
             println();
             print("Start address intialized: 0x");
-            print(itoa((int)start_addr, str, 16));
+            print(custom_itoa((int)start_addr, str, 16));
             print("\nSize initialized: ");
             print(size_response);
         }
