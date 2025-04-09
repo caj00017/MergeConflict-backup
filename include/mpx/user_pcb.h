@@ -2,6 +2,7 @@
 #define U_PCB
 
 #include <mpx/pcb.h>
+#include <mpx/comexec.h>
 
 /**
  @file mpx/user_pcb.h

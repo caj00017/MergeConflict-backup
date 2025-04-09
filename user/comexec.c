@@ -862,6 +862,37 @@ int comexec(void) {
         }
         return 0;
     }
+    else if (strcmp(buf, "mcb_free") == 0 || strcmp(buf, "mf") == 0) {
+        unsigned int addr;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the address of the memory to free (In Hexadecimal): ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        addr = Hex2Dec(response, strlen(response));
+
+        println();
+        print("Freeing Memory at location 0x");
+        print(itoa(addr, response, 16));
+        print("...\n");
+
+        int status = free_memory((void*)addr);
+
+        if(status == 1){
+            print_error("Memory not found or not allocated");
+            return 0;
+        }
+
+        println();
+        print("Memory Freed Successfully");
+
+        return 0;
+    }
     else if (strcmp(buf, "mcb_show") == 0 || strcmp(buf, "ms") == 0) {
         unsigned int addr;
         char response[100] = { 0 };
@@ -918,6 +949,7 @@ int comexec(void) {
 
         // prompt for size
         int size;
+        char str[25] = {0};
         char size_response[100] = { 0 };
         println();
         print("Please enter the size of the MCB to create: ");
@@ -936,6 +968,13 @@ int comexec(void) {
             println();
             print_error("An error occured while allocating memory.");
             // println();
+        }
+        else{
+            println();
+            print("Start address intialized: 0x");
+            print(itoa((int)start_addr, str, 16));
+            print("\nSize initialized: ");
+            print(size_response);
         }
         // char* word = NULL;
         // print(itoa(start_addr, size_response, 10));
