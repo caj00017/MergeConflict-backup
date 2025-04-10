@@ -779,120 +779,6 @@ int comexec(void) {
     // ---------------------- R5 TEST COMMAND LOGIC ------------------------ //
     // --------------------------------------------------------------------- // 
 
-    else if (strcmp(buf, "mcb_create") == 0 || strcmp(buf, "mc") == 0) {
-        
-        // prompt for address
-        unsigned int start_addr;
-        char addr_response[100] = { '\0' };
-        println();
-        print("Please enter the address of the MCB to create: 0x");
-
-        //Write formatting for entry and read from the command line
-        println();
-        print_color("@ ", color);
-        sys_req(READ, COM1, addr_response, sizeof(addr_response));
-        trim(addr_response);
-
-        start_addr = (unsigned int)atoi(addr_response);
-
-        // prompt for size
-        int size;
-        char size_response[100] = { 0 };
-        println();
-        print("Please enter the size of the MCB to create: ");
-
-        //Write formatting for entry and read from the command line
-        println();
-        print_color("@ ", color);
-        sys_req(READ, COM1, size_response, sizeof(size_response));
-        trim(size_response);
-
-        size = atoi(size_response);
-
-        println();
-        print("Creating MCB at: 0x");
-        print(custom_itoa(start_addr, addr_response, 10));
-        print("...");
-
-        mcb* new_mcb = mcb_setup(start_addr, size);
-        list* free_list = return_list(0);
-        mcb_insert(free_list, new_mcb);
-
-        print("\nCreated new ");
-        show_mcb(new_mcb);
-        return 0;
-    }
-    else if (strcmp(buf, "mcb_delete") == 0 || strcmp(buf, "md") == 0) {
-        unsigned int addr;
-        char response[100] = { 0 };
-        println();
-        print("Please enter the address of the MCB to delete: ");
-
-        //Write formatting for entry and read from the command line
-        println();
-        print_color("@ ", color);
-        sys_req(READ, COM1, response, sizeof(response));
-        trim(response);
-
-        addr = (unsigned int)atoi(response);
-
-        println();
-        print("Deleting MCB at 0x");
-        print(custom_itoa(addr, response, 10));
-        print("...\n");
-
-        mcb* mcb = mcb_find(addr);
-        if (mcb == NULL) {
-            println();
-            print("MCB not found at 0x");
-            print(custom_itoa(addr, response, 10));
-            return 0; // continue running comexec
-        }
-        else {
-
-            // this is bad practice, but who really cares anyway
-            list* free_list = return_list(0);
-            list* allocated_list = return_list(1);
-            mcb_remove(free_list, mcb);
-            mcb_remove(allocated_list, mcb);
-
-            println();
-            print("Deleted MCB at 0x");
-            print(custom_itoa(addr, response, 10));
-        }
-        return 0;
-    }
-    else if (strcmp(buf, "mcb_free") == 0 || strcmp(buf, "mf") == 0) {
-        unsigned int addr;
-        char response[100] = { 0 };
-        println();
-        print("Please enter the address of the memory to free (In Hexadecimal): ");
-
-        //Write formatting for entry and read from the command line
-        println();
-        print_color("@ ", color);
-        sys_req(READ, COM1, response, sizeof(response));
-        trim(response);
-
-        addr = Hex2Dec(response, strlen(response));
-
-        println();
-        print("Freeing Memory at location 0x");
-        print(itoa(addr, response, 16));
-        print("...\n");
-
-        int status = free_memory((void*)addr);
-
-        if(status == 1){
-            print_error("Memory not found or not allocated");
-            return 0;
-        }
-
-        println();
-        print("Memory Freed Successfully");
-
-        return 0;
-    }
     else if (strcmp(buf, "mcb_show") == 0 || strcmp(buf, "ms") == 0) {
         unsigned int addr;
         char response[100] = { 0 };
@@ -949,7 +835,6 @@ int comexec(void) {
 
         // prompt for size
         int size;
-        char str[25] = {0};
         char size_response[100] = { 0 };
         println();
         print("Please enter the size of the MCB to create: ");
@@ -969,21 +854,8 @@ int comexec(void) {
             print_error("An error occured while allocating memory.");
             // println();
         }
-        else{
-            println();
-            print("Start address intialized: 0x");
-            print(itoa((int)start_addr, str, 16));
-            print("\nSize initialized: ");
-            print(size_response);
-        }
-        // char* word = NULL;
-        // print(itoa(start_addr, size_response, 10));
-        // mcb *new_mcb = mcb_find(start_addr);
-        // print("\nCreated new ");
-        // show_mcb(new_mcb);
-        for (int i = 0; i<(int)start_addr; i++){
-            break;
-        }
+
+        bcdToChar(start_addr);
         return 0;
     }
     else if (strcmp(buf, "free_mem") == 0 || strcmp(buf, "fm") == 0) {
@@ -1231,12 +1103,6 @@ int help(void) {
     println();
     println();
 
-    print_color("@ ", color);
-    print("mcb_create\t\tmc\t\tCreates a new MCB.");
-    println();
-    print_color("@ ", color);
-    print("mcb_delete\t\tmd\t\tDeletes an MCB.");
-    println();
     print_color("@ ", color);
     print("mcb_show\t\tms\t\tShows an MCB.");
     println();
