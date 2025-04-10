@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <conversions.h>
 
 char* custom_itoa(int num, char* str, int base){
 	

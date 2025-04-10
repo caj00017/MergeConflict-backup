@@ -14,6 +14,7 @@
 #include <mpx/sys_call.h>
 #include <mpx/alarm.h>
 #include <mcb.h>
+#include <conversions.h>
 
 char color[10] = "blue"; // color to be set by the user, blue by default
 
