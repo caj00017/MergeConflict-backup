@@ -69,7 +69,10 @@ void * allocate_memory(size_t size){
         print_error("There was not enough free memory to allocate.");
         return NULL;
     }
-
+    else if (size <= 0){
+        print_error("Size passed is too small to allocate.");
+        return NULL;
+    }
 
     //Pointer to find best fit and temp pointer to iterate through list->
     mcb* bestFitPtr = NULL;
@@ -80,7 +83,7 @@ void * allocate_memory(size_t size){
         if (bestFitPtr == NULL  &&  tempPtr->size >= (int) size){
             bestFitPtr = tempPtr;
         }
-        else if (tempPtr->size < bestFitPtr->size &&  tempPtr->size >= (int) size){
+        else if (bestFitPtr != NULL &&  tempPtr->size >= (int) size && tempPtr->size < bestFitPtr->size ){
             bestFitPtr = tempPtr;
         }
         
@@ -219,7 +222,6 @@ void mcb_insert(list* list, mcb* new_mcb) {
         if(tempPtr->next_node == NULL){
             // The temp node is the last one in the list
 
-            //Check to see if the last one can be combined
             if (( (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr)  && FREE.head == list->head){
                     //Create combined mcb
                     mcb * combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + new_mcb->size) ); 
@@ -255,13 +257,11 @@ void mcb_insert(list* list, mcb* new_mcb) {
             /* CHECK TO SEE IF MEMORY BLOCKS COMBINE (Only for FREE list)*/
 
             //check if both blocks match
-            if (  (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr && 
-                    ( (new_mcb->start_addr + new_mcb->size + sizeof(mcb)) == tempPtr->next_node->start_addr) &&
-                    (list->head == FREE.head) ){// Perfect Fit!!!
+            if ( (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr && ( (new_mcb->start_addr + new_mcb->size + sizeof(mcb)) == tempPtr->next_node->start_addr) && (list->head == FREE.head) ){
+                
                 //Combining next and new
                 combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + tempPtr->next_node->size + new_mcb->size) ); 
                 
-
                 //Attach combined to next
                 combined_mcb->next_node = tempPtr->next_node; 
                 tempPtr->next_node->prev_node = combined_mcb; 
@@ -273,7 +273,6 @@ void mcb_insert(list* list, mcb* new_mcb) {
                 //Remove the next node and previous nodes
                 mcb_remove(&FREE, combined_mcb->next_node);
                 mcb_remove(&FREE, tempPtr);
-
 
                 tempPtr =NULL;
 
