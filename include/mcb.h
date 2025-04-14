@@ -22,14 +22,13 @@ typedef struct mcb {
 // CJ - i'm not sure how the list should be defined at the moment
 // this struct is based on the queue def. in pcb.h and is subject to change.
 typedef struct {
-    int list_type; // 0 - free, 1 - allocated.
     mcb* head;
     mcb* tail;
 } list;
 
  // allocated and free lists
- extern list ALLOCATED;
- extern list FREE;
+
+ extern list MCB_LIST;
  extern char str[100]; // string buffer for printing with itoa()
 
 /** 
@@ -59,11 +58,10 @@ void * allocate_memory(size_t size);
 
 /**
  * @brief Return the list based on the list type.
- * @param list_type The type of the list (0 for free, 1 for allocated).
  * @return A pointer to the requested list.
  * @author Chris Jones
  */
-list* return_list(int list_type);
+list* return_list();
 
 /**
  * @brief Frees memory at the given address
@@ -79,7 +77,7 @@ int free_memory(void *addr);
  * @param new_mcb The MCB to insert.
  * @author Chris Jones
  */
-void mcb_insert(list* list, mcb* new_mcb);
+void mcb_insert( mcb* new_mcb);
 
 /**
  * @brief Remove an MCB from the specified list.
@@ -87,7 +85,7 @@ void mcb_insert(list* list, mcb* new_mcb);
  * @param current_mcb The MCB to remove.
  * @author Chris Jones
  */
-void mcb_remove(list* list, mcb* current_mcb);
+void mcb_remove( mcb* current_mcb);
 
 /**
  * @brief Find an MCB in the specified list based on the start address.

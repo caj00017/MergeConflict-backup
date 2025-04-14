@@ -8,7 +8,7 @@ void show_mcb(mcb* mcb) {
 
     clear(str);
     print("\nSize: ");
-    print(custom_itoa(mcb->size, str, 10));
+    print(custom_itoa((mcb->size+20), str, 10));
     println();
 
     clear(str);
@@ -18,7 +18,7 @@ void show_mcb(mcb* mcb) {
 }
 
 void show_alloc_mem(void) {
-    list* allocated_list = return_list(1);
+    list* allocated_list = return_list();
     mcb* current_mcb = allocated_list->head;
 
     print_color("\n==========================", color);
@@ -29,20 +29,24 @@ void show_alloc_mem(void) {
         print("\nNo allocated MCBs found.\n");
         return;
     }
-
-    while (current_mcb != NULL) {
-        print("\n[ALLOCATED] ");
-        show_mcb(current_mcb);
-        current_mcb = current_mcb->next_node;
-        println();
+    while (current_mcb != NULL ) {
+        if(current_mcb->status == 1){
+            print("\n[ALLOCATED] ");
+            show_mcb(current_mcb);
+            current_mcb = current_mcb->next_node;
+            println();
+        }
+        else{
+            current_mcb = current_mcb->next_node;
+        }
     }
 }
 
 void show_free_mem(void) {
-    list* free_list = return_list(0);
+    list* free_list = return_list();
     mcb* current_mcb = free_list->head;
 
-    print_color("\n==========================", color);
+    print_color("\n\n==========================", color);
     print("\nFree MCBs:");
     print_color("\n==========================", color);
 
@@ -52,9 +56,14 @@ void show_free_mem(void) {
     }
 
     while (current_mcb != NULL) {
-        print("\n[FREE] ");
-        show_mcb(current_mcb);
-        current_mcb = current_mcb->next_node;
-        println();
+        if(current_mcb->status == 0){
+            print("\n[FREE] ");
+            show_mcb(current_mcb);
+            current_mcb = current_mcb->next_node;
+            println();
+        }
+        else{
+            current_mcb = current_mcb->next_node;
+        }
     }
 }
