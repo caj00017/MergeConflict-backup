@@ -143,7 +143,7 @@ char* substr(char* str, int index) {
 	size_t size = strlen(str) - index;
 
 	// allocate memory for substring
-	char* substr = sys_alloc_mem(size);
+	char* substr = sys_alloc_mem(size, "SUBSTRING");
 	if (substr == NULL) {
 		return "ERROR";
 	}
@@ -271,5 +271,20 @@ void clear(char* arr) {
 	for (size_t i = 0; i < sizeof(arr); i++) {
 		arr[i] = 0;
 	}
+}
+
+char* strcat(char* des, const char* src){
+	int i = 0;
+	int j = 0;
+	while(des[i] != '\0'){
+		i++;
+	}
+	while(src[j] != '\0'){
+		des[i] = src[j];
+		i++;
+		j++;
+	}
+	des[i] = '\0';
+	return des;
 }
 

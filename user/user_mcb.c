@@ -15,6 +15,11 @@ void show_mcb(mcb* mcb) {
     print("Status: ");
     print(custom_itoa(mcb->status, str, 10));
     println();
+
+    clear(str);
+    print("Name: ");
+    print(mcb->name);
+    println();
 }
 
 void show_alloc_mem(void) {

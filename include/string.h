@@ -141,4 +141,14 @@ void trim(char sentence[]);
  */
 void clear(char* arr);
 
+
+/**
+ * @brief Function which concatenates two strings
+ * @param des The string to be concatenated to
+ * @param src The string to be concatenated from
+ * @return The concatenated string
+ * @author Tanner Forbes
+ */
+ char* strcat(char* des, const char* src);
+
 #endif
