@@ -1,8 +1,8 @@
 #include <mcb.h>
 
-#define MCB_REGION_SIZE 4096
+#define MCB_ARR_SIZE 4096
 
-char mcb_arr[MCB_REGION_SIZE];
+char mcb_arr[MCB_ARR_SIZE];
 int mcb_offset = 0;
 list ALLOCATED = {1, NULL, NULL};
 list FREE = {0, NULL, NULL};
@@ -52,7 +52,7 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
 }
 
 mcb* alloc_mcb(){
-    if(mcb_offset + sizeof(mcb) > MCB_REGION_SIZE){
+    if(mcb_offset + sizeof(mcb) > MCB_ARR_SIZE){
         return NULL;
     }
 
