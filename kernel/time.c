@@ -4,6 +4,7 @@
 #include <string.h>
 #include <mpx/interrupts.h>
 #include <conversions.h>
+#include <memory.h>
 
 //global variable to check if the user has set the time yet
 int set_time_run = 0;
@@ -158,11 +159,13 @@ int set_time(char buf[]){
 
             sys_req(WRITE, COM1, "\nTime set to: ", sizeof("\nTime set to: "));
             get_time();
+
         }
 
         // re-enable interrupts
         sti();
 
+        sys_free_mem(time);
         return 0;
 }
 
@@ -301,6 +304,8 @@ int set_date(char buf[]){
         // re-enable interrupts
         sti();
         }
+
+    sys_free_mem(date);
     return 0;
 }
 
