@@ -792,18 +792,18 @@ int comexec(void) {
         sys_req(READ, COM1, response, sizeof(response));
         trim(response);
 
-        addr = (unsigned int)atoi(response);
+        addr = Hex2Dec(response, strlen(response));
 
         println();
         print("Locating MCB: ");
-        print(custom_itoa(addr, response, 10));
+        print(custom_itoa(addr, response, 16));
         print("...");
         println();
 
         mcb* mcb = mcb_find(addr);
         if (mcb == NULL) {
             print("MCB not found at 0x");
-            print(custom_itoa(addr, response, 10));
+            print(custom_itoa(addr, response, 16));
             return 0; // continue running comexec
         }
 
