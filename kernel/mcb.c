@@ -130,6 +130,9 @@ void * allocate_memory(size_t size, char* name){
     }   
     
     bestFitPtr = NULL;
+    
+    // update the status of the allocated block
+    allocPtr->status = 1; // 1 - allocated
 
     //Return address of block not mcb
     return (void *) allocPtr->start_addr;
