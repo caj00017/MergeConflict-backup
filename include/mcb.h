@@ -17,6 +17,7 @@ typedef struct mcb {
     struct mcb* next_node;
     struct mcb* prev_node;
     int status; // 0 - free, 1 - allocated
+    char* name;
 } mcb;
 
 // CJ - i'm not sure how the list should be defined at the moment
@@ -46,7 +47,7 @@ void initialize_heap(size_t size);
  * @return A pointer to the newly created MCB.
  * @author Chris Jones
  */
-mcb* mcb_setup(unsigned int start_addr, int size);
+mcb* mcb_setup(unsigned int start_addr, int size, char* name);
 
 /**
  * 
@@ -55,7 +56,7 @@ mcb* mcb_setup(unsigned int start_addr, int size);
  * @return A the start address of the memory
  * @author Izaak Whetsell
  */
-void * allocate_memory(size_t size);
+void * allocate_memory(size_t size, char* name);
 
 /**
  * @brief Return the list based on the list type.

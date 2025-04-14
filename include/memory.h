@@ -13,7 +13,7 @@
  @param size The amount of memory, in bytes, to allocate
  @return NULL on error, otherwise the address of the newly allocated memory
 */
-void *sys_alloc_mem(size_t size);
+void *sys_alloc_mem(size_t size, char* name);
 
 /**
  Free dynamic memory.
@@ -27,6 +27,6 @@ int sys_free_mem(void *ptr);
  @param alloc_fn A function that dynamically allocates memory
  @param free_fn A function that frees dynamically allocated memory
 */
-void sys_set_heap_functions(void * (*alloc_fn)(size_t), int (*free_fn)(void *));
+void sys_set_heap_functions(void * (*alloc_fn)(size_t, char*), int (*free_fn)(void *));
 
 #endif

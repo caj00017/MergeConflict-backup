@@ -16,7 +16,7 @@ void initialize_heap(size_t size) {
     }
 
     //i noticed that there's no flag to check if the mcb is related to a free or alloced block
-    mcb* new_mcb = mcb_setup((unsigned int)heap, (int)size);
+    mcb* new_mcb = mcb_setup((unsigned int)heap, (int)size, "HEAP");
 
 
     mcb_insert(return_list(0), new_mcb); //set the head of the free list to the new MCB
@@ -27,7 +27,7 @@ void initialize_heap(size_t size) {
 
 }
 
-mcb* mcb_setup(unsigned int start_addr, int size) {
+mcb* mcb_setup(unsigned int start_addr, int size, char* name) {
     mcb* new_mcb = alloc_mcb();
     if (new_mcb == NULL) {
         return NULL; // memory allocation failed
@@ -44,6 +44,7 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
     print("\nSize initialized: ");
     print(custom_itoa(new_mcb->size, str, 10));
 
+    new_mcb->name = name;
     new_mcb->next_node = NULL;
     new_mcb->prev_node = NULL;
     new_mcb->status = 0; // 0 - free, 1 - allocated
@@ -51,7 +52,7 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
     return new_mcb;
 }
 
-mcb* alloc_mcb(){
+mcb* alloc_mcb(void){
     if(mcb_offset + sizeof(mcb) > MCB_ARR_SIZE){
         return NULL;
     }
@@ -73,7 +74,7 @@ list* return_list(int list_type) {
 }
 
 
-void * allocate_memory(size_t size){
+void * allocate_memory(size_t size, char* name){
 
     //Possibly change mcb size to size_t????
 
@@ -119,13 +120,13 @@ void * allocate_memory(size_t size){
     unsigned int start_address_alloc = bestFitPtr->start_addr - sizeof(mcb);
 
     //Insert the allocated memory block into the proper list-> 
-    mcb * allocPtr = mcb_setup( start_address_alloc , size );
+    mcb * allocPtr = mcb_setup( start_address_alloc , size, name );
     mcb_insert( &ALLOCATED , allocPtr); // Allocated Block
 
     //Check if it was a perfect fit
     if( start_address_free != 0){
         //Place the reduced free memory block back in
-        mcb_insert( &FREE , mcb_setup( start_address_free,  (bestFitPtr->size - size) )); //Smaller Free Block
+        mcb_insert( &FREE , mcb_setup( start_address_free,  (bestFitPtr->size - size), name )); //Smaller Free Block
     }   
     
     bestFitPtr = NULL;
@@ -186,7 +187,7 @@ void mcb_insert(list* list, mcb* new_mcb) {
         //Check if they combine (only on Free list)
         if( (new_mcb->start_addr + new_mcb->size + sizeof(mcb) == tempPtr->start_addr )   && (list->head == FREE.head) ){
             //Combine the new and current mcbs.
-            combined_mcb = mcb_setup(new_mcb->start_addr- sizeof(mcb), (tempPtr->size + new_mcb->size) ); 
+            combined_mcb = mcb_setup(new_mcb->start_addr- sizeof(mcb), (tempPtr->size + new_mcb->size), new_mcb->name ); 
 
             //Attach combined 
             combined_mcb->next_node = tempPtr;
@@ -238,7 +239,7 @@ void mcb_insert(list* list, mcb* new_mcb) {
 
             if (( (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr)  && FREE.head == list->head){
                     //Create combined mcb
-                    mcb * combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + new_mcb->size) ); 
+                    mcb * combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + new_mcb->size), new_mcb->name ); 
 
                     //Add combined memory block to tail
                     tempPtr->next_node = combined_mcb;
@@ -274,7 +275,7 @@ void mcb_insert(list* list, mcb* new_mcb) {
             if ( (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr && ( (new_mcb->start_addr + new_mcb->size + sizeof(mcb)) == tempPtr->next_node->start_addr) && (list->head == FREE.head) ){
                 
                 //Combining next and new
-                combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + tempPtr->next_node->size + new_mcb->size) ); 
+                combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + tempPtr->next_node->size + new_mcb->size), new_mcb->name ); 
                 
                 //Attach combined to next
                 combined_mcb->next_node = tempPtr->next_node; 
@@ -295,7 +296,7 @@ void mcb_insert(list* list, mcb* new_mcb) {
             // Check if it matches previous block
             else if(( (tempPtr->start_addr + tempPtr->size + sizeof(mcb)) == new_mcb->start_addr)  && (list->head == FREE.head)) {  
                 //Combining the temp and new
-                combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + new_mcb->size) ); 
+                combined_mcb = mcb_setup(tempPtr->start_addr - sizeof(mcb), (tempPtr->size + new_mcb->size), new_mcb->name ); 
                 
                 //Attach combined to next
                 combined_mcb->next_node = tempPtr->next_node; 
@@ -313,7 +314,7 @@ void mcb_insert(list* list, mcb* new_mcb) {
             // check if it matches next block
             else if(( (new_mcb->start_addr + new_mcb->size + sizeof(mcb)) == tempPtr->next_node->start_addr)  && (list->head == FREE.head )) {
                 //Combining next and new
-                combined_mcb = mcb_setup(new_mcb->start_addr - sizeof(mcb), (tempPtr->next_node->size + new_mcb->size) );
+                combined_mcb = mcb_setup(new_mcb->start_addr - sizeof(mcb), (tempPtr->next_node->size + new_mcb->size), new_mcb->name );
                 
                 //Attach combined to next
                 combined_mcb->next_node = tempPtr->next_node; 
