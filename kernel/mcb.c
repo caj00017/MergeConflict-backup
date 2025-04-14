@@ -1,5 +1,9 @@
 #include <mcb.h>
 
+#define MCB_REGION_SIZE 4096
+
+char mcb_arr[MCB_REGION_SIZE];
+int mcb_offset = 0;
 list ALLOCATED = {1, NULL, NULL};
 list FREE = {0, NULL, NULL};
 char str[100] = { 0 };
@@ -24,7 +28,7 @@ void initialize_heap(size_t size) {
 }
 
 mcb* mcb_setup(unsigned int start_addr, int size) {
-    mcb* new_mcb = sys_alloc_mem(sizeof(mcb));
+    mcb* new_mcb = alloc_mcb();
     if (new_mcb == NULL) {
         return NULL; // memory allocation failed
     }
@@ -44,6 +48,16 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
     new_mcb->prev_node = NULL;
     new_mcb->status = 0; // 0 - free, 1 - allocated
 
+    return new_mcb;
+}
+
+mcb* alloc_mcb(){
+    if(mcb_offset + sizeof(mcb) > MCB_REGION_SIZE){
+        return NULL;
+    }
+
+    mcb* new_mcb = (mcb*)(mcb_arr + mcb_offset);
+    mcb_offset += sizeof(mcb);
     return new_mcb;
 }
 

@@ -65,6 +65,8 @@ void * allocate_memory(size_t size);
  */
 list* return_list(int list_type);
 
+mcb* alloc_mcb();
+
 /**
  * @brief Frees memory at the given address
  * @param addr The address of the memory that is being freed
