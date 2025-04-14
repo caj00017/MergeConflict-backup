@@ -94,16 +94,16 @@ int pcb_free(pcb* pcbPtr){
         return 1;
     }
 
-    //attempt to free memory from Ptr
-    if(sys_free_mem(pcbPtr)){
-        
-        //return 0 on success
-        return 0;
-    }
-    else{
+    // free dynamically allocated members of pcb
+    sys_free_mem(pcbPtr->stack);
+    sys_free_mem(pcbPtr->name);
 
-        //return 1 on failure
-        return 1;
+    // free pcb itself
+    int status = sys_free_mem(pcbPtr);
+    if (status == 0) {
+        return 0; // success
+    } else {
+        return 1; // failure
     }
 }
 

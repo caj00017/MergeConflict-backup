@@ -65,7 +65,7 @@ void * allocate_memory(size_t size);
  */
 list* return_list(int list_type);
 
-mcb* alloc_mcb();
+mcb* alloc_mcb(void);
 
 /**
  * @brief Frees memory at the given address

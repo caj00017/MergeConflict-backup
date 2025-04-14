@@ -51,7 +51,7 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
     return new_mcb;
 }
 
-mcb* alloc_mcb(){
+mcb* alloc_mcb(void){
     if(mcb_offset + sizeof(mcb) > MCB_REGION_SIZE){
         return NULL;
     }
