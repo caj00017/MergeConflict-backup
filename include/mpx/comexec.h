@@ -17,7 +17,7 @@ extern char color[10]; // color to be set by the user, blue by default
 * @return Status code indicating shutdown (1), successful command execution (0), or an invalid command (-1).
 * @authors Tanner Forbes, Chris Jones, Izaak Whetsell, Evan Humphrey
 */
-int comexec();
+int comexec(void);
 
 /**
  * @brief Terminates the command handling sequence.
