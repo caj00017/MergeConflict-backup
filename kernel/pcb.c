@@ -19,9 +19,13 @@ pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_p
     // allocate memory for stack
     if((strcmp(name, "comhand") == 0)  || (strcmp(name, "sysidleprocess") == 0) ){
         new_pcb->stack = (unsigned char*)sys_alloc_mem(4096, "PCB_STACK"); // allocate 4096 bytes for comhand stack
+        // create room for context at the top of the stack
+        new_pcb->stack_ptr = new_pcb->stack + (4096 - sizeof(context) - 2); 
     }
     else {
         new_pcb->stack = (unsigned char*)sys_alloc_mem(1024, "PCB_STACK"); // allocate 1024 bytes for pcb stack
+        // create room for context at the top of the stack
+        new_pcb->stack_ptr = new_pcb->stack + (1024 - sizeof(context) - 2); 
     }
 
     new_pcb->class = class;
@@ -35,9 +39,6 @@ pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_p
     /* <<<< Creating the Context >>>>  */
     //Allocate memory for the context
     context* ctx;
-
-    // create room for context at the top of the stack
-    new_pcb->stack_ptr = new_pcb->stack + (4096 - sizeof(context) - 2); 
 
     // create context
     ctx = (context*)new_pcb->stack_ptr; //does this need to 
