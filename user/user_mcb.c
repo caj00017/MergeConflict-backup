@@ -8,9 +8,9 @@ void show_mcb(mcb* mcb) {
 
     clear(str);
     print("\nSize: ");
-    print(custom_itoa((mcb->size+20), str, 10));
+    print(custom_itoa((mcb->size+sizeof(*mcb)), str, 10));
     println();
-
+    
     clear(str);
     print("Status: ");
     print(custom_itoa(mcb->status, str, 10));

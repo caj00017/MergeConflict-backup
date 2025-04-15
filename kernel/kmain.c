@@ -90,7 +90,7 @@ void kmain(void)
 	
 	// R5: sys_set_heap_functions(...);
 	initialize_heap(50000);
-	sys_set_heap_functions(allocate_memory, free_memory);
+	// sys_set_heap_functions(allocate_memory, free_memory);
 
 	// 9) YOUR command handler -- *create and #include an appropriate .h file*
 	// Pass execution to your command handler so the user can interact with

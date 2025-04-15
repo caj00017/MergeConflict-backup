@@ -38,7 +38,7 @@ mcb* mcb_setup(unsigned int start_addr, int size, char* name) {
     clear(str);
     new_mcb->size = size - sizeof(mcb);
     print("\nSize initialized: ");
-    print(custom_itoa((new_mcb->size+20), str, 10));
+    print(custom_itoa((new_mcb->size+ sizeof(mcb)), str, 10));
 
     new_mcb->name = name;
     new_mcb->next_node = NULL;
