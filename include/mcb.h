@@ -46,7 +46,7 @@ void initialize_heap(size_t size);
  * @return A pointer to the newly created MCB.
  * @author Chris Jones
  */
-mcb* mcb_setup(unsigned int start_addr, int size, char* name);
+mcb* mcb_setup(unsigned int start_addr, int size);
 
 /**
  * 
@@ -55,14 +55,14 @@ mcb* mcb_setup(unsigned int start_addr, int size, char* name);
  * @return A the start address of the memory
  * @author Izaak Whetsell
  */
-void * allocate_memory(size_t size, char* name);
+void * allocate_memory(size_t size);
 
 /**
  * @brief Return the list based on the list type.
  * @return A pointer to the requested list.
  * @author Chris Jones
  */
-list* return_list();
+list* return_list(void);
 
 mcb* alloc_mcb(void);
 

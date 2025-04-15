@@ -16,14 +16,14 @@ void initialize_heap(size_t size) {
     }
 
     //i noticed that there's no flag to check if the mcb is related to a free or alloced block
-    mcb* new_mcb = mcb_setup((unsigned int)heap, (int)size, "HEAP");
+    mcb* new_mcb = mcb_setup((unsigned int)heap, (int)size);
     new_mcb->status = 0; // Set status to free
 
     mcb_insert(new_mcb); //set the head of the list to the new MCB
 
 }
 
-mcb* mcb_setup(unsigned int start_addr, int size, char* name) {
+mcb* mcb_setup(unsigned int start_addr, int size) {
     mcb* new_mcb = alloc_mcb();
     if (new_mcb == NULL) {
         return NULL; // memory allocation failed
@@ -40,7 +40,6 @@ mcb* mcb_setup(unsigned int start_addr, int size, char* name) {
     print("\nSize initialized: ");
     print(custom_itoa((new_mcb->size+ sizeof(mcb)), str, 10));
 
-    new_mcb->name = name;
     new_mcb->next_node = NULL;
     new_mcb->prev_node = NULL;
 
@@ -58,12 +57,12 @@ mcb* alloc_mcb(void){
     return new_mcb;
 }
 
-list* return_list() {
+list* return_list(void) {
     return &MCB_LIST;
 }
 
 
-void * allocate_memory(size_t size, char* name){
+void * allocate_memory(size_t size){
 
     //Check if size is an appropriate value
     if(size<=0){
@@ -108,14 +107,14 @@ void * allocate_memory(size_t size, char* name){
     
 
     //Insert the allocated memory block into the proper list-> 
-    mcb * allocPtr = mcb_setup( start_address_alloc , size, name );
+    mcb * allocPtr = mcb_setup( start_address_alloc , size );
     allocPtr->status = 1; // Change status to allocated
     mcb_insert(allocPtr); // Allocated Block
 
     //Check if it was a perfect fit
     if(start_address_free != 0){
         //Place the reduced free memory block back in
-        mcb * freePtr = mcb_setup( start_address_free,  (bestFitPtr->size - size + sizeof(mcb)), name );
+        mcb * freePtr = mcb_setup( start_address_free,  (bestFitPtr->size - size + sizeof(mcb)) );
         freePtr->status = 0;
         mcb_insert(freePtr); //Smaller Free Block
     }   

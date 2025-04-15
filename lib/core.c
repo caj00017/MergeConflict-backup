@@ -13,7 +13,7 @@
 
 /* For R5: Pointers to student provided functions */
 /* DO NOT SET MANUALLY, CALL sys_set_heap_functions() !!! */
-static void * (*malloc_function)(size_t, char*) = NULL;
+static void * (*malloc_function)(size_t) = NULL;
 static int (*free_function)(void *) = NULL;
 
 /* Standard memcpy() - required because compiler may insert calls to it */
@@ -41,16 +41,16 @@ void *memset(void *s, int c, size_t n)
 /* This causes R5 to go into full effect, replacing default heap functions
  * with those implemented by students. */
 /***********************************************************************/
-void sys_set_heap_functions(void * (*alloc_fn)(size_t, char*), int (*free_fn)(void *))
+void sys_set_heap_functions(void * (*alloc_fn)(size_t), int (*free_fn)(void *))
 {
 	malloc_function = alloc_fn;
 	free_function = free_fn;
 }
 
 /* Allocate memory using the student function if available, fallback to kmalloc(). */
-void *sys_alloc_mem(size_t size, char* name)
+void *sys_alloc_mem(size_t size)
 {
-	return malloc_function ? malloc_function(size, name) : kmalloc(size, 0, NULL);
+	return malloc_function ? malloc_function(size) : kmalloc(size, 0, NULL);
 }
 
 /* Free memory if a student function is available, otherwise NOP. */

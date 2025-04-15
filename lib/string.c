@@ -143,7 +143,7 @@ char* substr(char* str, int index) {
 	size_t size = strlen(str) - index;
 
 	// allocate memory for substring
-	char* substr = sys_alloc_mem(size, "SUBSTRING");
+	char* substr = sys_alloc_mem(size);
 	if (substr == NULL) {
 		return "ERROR";
 	}

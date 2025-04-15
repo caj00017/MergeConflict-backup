@@ -49,7 +49,7 @@ void alarm_process(void) {
 int create_alarm(char* message, char* time) {
 
     // create alarm params process
-    alarm_params* params = (alarm_params*)sys_alloc_mem(sizeof(alarm_params), "ALARM_PARAMS");
+    alarm_params* params = (alarm_params*)sys_alloc_mem(sizeof(alarm_params));
 
     // copy message and time to params
     strcpy(params->message, message);
