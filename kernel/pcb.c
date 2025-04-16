@@ -13,7 +13,7 @@ pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_p
     pcb* new_pcb = pcb_allocate();
     
     // Allocate memory and copy the name
-    new_pcb->name = (char*)sys_alloc_mem((strlen(name) + 1));
+    // new_pcb->name = (char*)sys_alloc_mem((strlen(name) + 1));
     strcpy(new_pcb->name, name);
 
     // allocate memory for stack

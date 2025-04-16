@@ -848,7 +848,7 @@ int comexec(void) {
 
         size = atoi(size_response);
 
-        unsigned int start_addr = (unsigned int) allocate_memory(size, "MCB_START_ADDR");
+        unsigned int start_addr = (unsigned int) allocate_memory(size);
 
         if((void *)start_addr == NULL){
             println();
