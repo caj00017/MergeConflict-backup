@@ -21,6 +21,7 @@ context* sys_call(context* ctx) {
     
     if(op == 0) /* EXIT */{
         //Delete Currently Running PCB
+        pcb_free(CURRENT_PCB);
         CURRENT_PCB = NULL;
 
         //check if there is a ready process in the queue
