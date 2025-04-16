@@ -435,7 +435,7 @@ int Load_R3(void){
 
     // Check for Process 1
     if( pcb_find("Process 1") == NULL){
-        pcb* PCB1 = pcb_setup("Process 1", 1, 1, 1, proc1, NULL); //Name, Class, Priority, State, Function
+        pcb* PCB1 = pcb_setup("Process 1", 0, 1, 1, proc1, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 1\n");
         pcb_insert(PCB1);
     }
@@ -445,7 +445,7 @@ int Load_R3(void){
 
     // Check for Process 2
     if( pcb_find("Process 2") == NULL){
-        pcb* PCB2 = pcb_setup("Process 2", 1, 2, 1, proc2, NULL); //Name, Class, Priority, State, Function
+        pcb* PCB2 = pcb_setup("Process 2", 0, 2, 1, proc2, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 2\n");
         pcb_insert(PCB2);
     }
@@ -455,7 +455,7 @@ int Load_R3(void){
 
     // Check for Process 3
     if( pcb_find("Process 3") == NULL){
-        pcb* PCB3 = pcb_setup("Process 3", 1, 3, 1, proc3, NULL); //Name, Class, Priority, State, Function
+        pcb* PCB3 = pcb_setup("Process 3", 0, 3, 1, proc3, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 3\n");
         pcb_insert(PCB3);
     }
@@ -465,7 +465,7 @@ int Load_R3(void){
 
     // Check for Process 4
     if( pcb_find("Process 4") == NULL){
-        pcb* PCB4 = pcb_setup("Process 4", 1, 4, 1, proc4, NULL); //Name, Class, Priority, State, Function
+        pcb* PCB4 = pcb_setup("Process 4", 0, 4, 1, proc4, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 4\n");
         pcb_insert(PCB4);
     }
@@ -475,7 +475,7 @@ int Load_R3(void){
 
     // Check for Process 5
     if( pcb_find("Process 5") == NULL){
-        pcb* PCB5 = pcb_setup("Process 5", 1, 5, 1, proc5, NULL); //Name, Class, Priority, State, Function
+        pcb* PCB5 = pcb_setup("Process 5", 0, 5, 1, proc5, NULL); //Name, Class, Priority, State, Function
         print("Finished Loading: Process 5");
         pcb_insert(PCB5);
     }
