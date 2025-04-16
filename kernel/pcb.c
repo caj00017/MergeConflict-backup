@@ -13,15 +13,19 @@ pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_p
     pcb* new_pcb = pcb_allocate();
     
     // Allocate memory and copy the name
-    new_pcb->name = (char*)sys_alloc_mem(strlen(name) + 1);
+    // new_pcb->name = (char*)sys_alloc_mem((strlen(name) + 1));
     strcpy(new_pcb->name, name);
 
     // allocate memory for stack
     if((strcmp(name, "comhand") == 0)  || (strcmp(name, "sysidleprocess") == 0) ){
         new_pcb->stack = (unsigned char*)sys_alloc_mem(4096); // allocate 4096 bytes for comhand stack
+        // create room for context at the top of the stack
+        new_pcb->stack_ptr = new_pcb->stack + (4096 - sizeof(context) - 2); 
     }
     else {
         new_pcb->stack = (unsigned char*)sys_alloc_mem(1024); // allocate 1024 bytes for pcb stack
+        // create room for context at the top of the stack
+        new_pcb->stack_ptr = new_pcb->stack + (1024 - sizeof(context) - 2); 
     }
 
     new_pcb->class = class;
@@ -35,9 +39,6 @@ pcb* pcb_setup(char* name, int class, int priority, int state, void (*function_p
     /* <<<< Creating the Context >>>>  */
     //Allocate memory for the context
     context* ctx;
-
-    // create room for context at the top of the stack
-    new_pcb->stack_ptr = new_pcb->stack + (4096 - sizeof(context) - 2); 
 
     // create context
     ctx = (context*)new_pcb->stack_ptr; //does this need to 
@@ -94,16 +95,16 @@ int pcb_free(pcb* pcbPtr){
         return 1;
     }
 
-    //attempt to free memory from Ptr
-    if(sys_free_mem(pcbPtr)){
-        
-        //return 0 on success
-        return 0;
-    }
-    else{
+    // free dynamically allocated members of pcb
+    sys_free_mem(pcbPtr->stack);
+    sys_free_mem(pcbPtr->name);
 
-        //return 1 on failure
-        return 1;
+    // free pcb itself
+    int status = sys_free_mem(pcbPtr);
+    if (status == 0) {
+        return 0; // success
+    } else {
+        return 1; // failure
     }
 }
 

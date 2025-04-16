@@ -134,5 +134,21 @@ void print_color(const char* sentence, const char* color_code);
  */
 void trim(char sentence[]);
 
-#endif
+/**
+ * @brief Clears a string by setting all characters to 0
+ * @param arr The string to be cleared
+ * @author Chris Jones
+ */
+void clear(char* arr);
 
+
+/**
+ * @brief Function which concatenates two strings
+ * @param des The string to be concatenated to
+ * @param src The string to be concatenated from
+ * @return The concatenated string
+ * @author Tanner Forbes
+ */
+ char* strcat(char* des, const char* src);
+
+#endif

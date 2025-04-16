@@ -21,7 +21,7 @@ enum pcb_state {
 };
 
 typedef struct pcb {
-    char* name;
+    char name[50];
     int class; /* 0 - user process, 1 - kernel process */
     int priority; /* 0-9 */
     int state; /* 0-4 */  //possible change to enum.

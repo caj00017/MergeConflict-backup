@@ -21,4 +21,5 @@ KERNEL_OBJECTS=\
   kernel/time.o\
   kernel/pcb.o\
   kernel/sys_call.o\
-  kernel/alarm.o
+  kernel/alarm.o\
+  kernel/mcb.o

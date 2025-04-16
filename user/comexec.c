@@ -13,8 +13,10 @@
 #include <mpx/user_pcb.h>
 #include <mpx/sys_call.h>
 #include <mpx/alarm.h>
+#include <mcb.h>
+#include <conversions.h>
 
-char* color = "blue"; // color to be set by the user, blue by default
+char color[10] = "blue"; // color to be set by the user, blue by default
 
 int comexec(void) {
 
@@ -104,7 +106,7 @@ int comexec(void) {
 
             // ensure valid input
             if(strcmp(color_response, "green") == 0 || strcmp(color_response, "yellow") == 0 || strcmp(color_response, "blue") == 0 || strcmp(color_response, "magenta") == 0 || strcmp(color_response, "cyan") == 0){
-                color = color_response;
+                strcpy(color, color_response);
                 print("\nColor changed to: ");
                 print_color(color, color);
                 break;
@@ -383,7 +385,7 @@ int comexec(void) {
         print("Setting priority for PCB: ");
         print(name);
         print(" to ");
-        print(itoa(priority, str, 10));
+        print(custom_itoa(priority, str, 10));
 
         set_PCB_priority(name, priority);
 
@@ -775,6 +777,130 @@ int comexec(void) {
     }
 
     // --------------------------------------------------------------------- // 
+    // ---------------------- R5 TEST COMMAND LOGIC ------------------------ //
+    // --------------------------------------------------------------------- // 
+
+    else if (strcmp(buf, "mcb_show") == 0 || strcmp(buf, "ms") == 0) {
+        unsigned int addr;
+        char response[100] = { 0 };
+        println();
+        print("Please enter the address of the MCB to show: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        addr = Hex2Dec(response, strlen(response));
+
+        println();
+        print("Locating MCB: ");
+        print(custom_itoa(addr, response, 16));
+        print("...");
+        println();
+
+        mcb* mcb = mcb_find(addr);
+        if (mcb == NULL) {
+            print("MCB not found at 0x");
+            print(custom_itoa(addr, response, 16));
+            return 0; // continue running comexec
+        }
+
+        println();
+        show_mcb(mcb);
+
+        return 0;
+    }
+    else if (strcmp(buf, "mcb_show_free") == 0 || strcmp(buf, "msf") == 0) {
+        println();
+        print("Showing free MCBs...\n");
+        show_free_mem();
+        return 0;
+    }
+    else if (strcmp(buf, "mcb_show_alloc") == 0 || strcmp(buf, "msl") == 0) {
+        println();
+        print("Showing allocated MCBs...\n");
+        show_alloc_mem();
+        return 0;
+    }
+    else if (strcmp(buf, "mcb_show_all") == 0 || strcmp(buf, "msa") == 0) {
+        println();
+        print("Showing all MCBs...\n");
+        show_alloc_mem();
+        show_free_mem();
+        return 0;
+    }
+
+    else if (strcmp(buf, "allocate_mem") == 0 || strcmp(buf, "am") == 0) {
+
+        // prompt for size
+        int size;
+        char size_response[100] = { 0 };
+        println();
+        print("Please enter the size of the MCB to create: ");
+
+        //Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        sys_req(READ, COM1, size_response, sizeof(size_response));
+        trim(size_response);
+
+        size = atoi(size_response);
+
+        unsigned int start_addr = (unsigned int) allocate_memory(size);
+
+        if((void *)start_addr == NULL){
+            println();
+            print_error("An error occured while allocating memory.");
+            // println();
+        }
+
+        bcdToChar(start_addr);
+        return 0;
+    }
+    else if (strcmp(buf, "free_mem") == 0 || strcmp(buf, "fm") == 0) {
+
+        // Initializing variables used
+        unsigned int addr;
+        char response[100] = { 0 };
+        println();
+
+        // Asking for location of memory to free
+        print("Please enter the address of the memory to free (In Hexadecimal): ");
+
+        // Write formatting for entry and read from the command line
+        println();
+        print_color("@ ", color);
+        print(" 0x");
+        sys_req(READ, COM1, response, sizeof(response));
+        trim(response);
+
+        // Converting to decimal in order to use in free_memory
+        addr = Hex2Dec(response, strlen(response));
+
+        println();
+        print("Freeing Memory at location 0x");
+        print(custom_itoa(addr, response, 16));
+        print("...\n");
+
+        // Attempting to free memory at specified locaiton
+        int status = free_memory((void*)addr);
+
+        // If failed prints error statement and returns
+        if(status == 1){
+            print("Memory not found or not allocated");
+            return 0;
+        }
+
+        // If success prints message and returns
+        println();
+        print("Memory Freed Successfully");
+
+        return 0;
+    }
+
+    // --------------------------------------------------------------------- // 
     // ---------------------- BONUS + TEST COMMAND LOGIC ------------------- //
     // --------------------------------------------------------------------- // 
 
@@ -969,6 +1095,32 @@ int help(void) {
     println();
     print_color("@ ", color);
     print("load_p5\tlp5\tLoads suspended test processes 5.");
+    println();
+
+    // R5 commands
+    println();
+    println();
+    print_color("===================================================================================================", color);
+    println();
+    println();
+
+    print_color("@ ", color);
+    print("mcb_show\t\tms\t\tShows an MCB.");
+    println();
+    print_color("@ ", color);
+    print("mcb_show_free\t\tmsf\t\tShows all free MCBs.");
+    println();
+    print_color("@ ", color);
+    print("mcb_show_alloc\tmsl\t\tShows all allocated MCBs.");
+    println();
+    print_color("@ ", color);
+    print("mcb_show_all\t\tmsa\t\tShows all MCBs.");
+    println();
+    print_color("@ ", color);
+    print("allocate_mem\t\tam\t\tAllocates memory from heap.");
+    println();
+    print_color("@ ", color);
+    print("free_mem\t\tfm\t\tFrees memory from the heap at a specified location.");
     println();
 
     println();

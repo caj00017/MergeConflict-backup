@@ -2,6 +2,7 @@
 #include <memory.h>
 #include <ctype.h>
 #include <sys_req.h>
+#include <stdlib.h>
 
 /* memcpy() and memset() are in core.c */
 
@@ -264,5 +265,26 @@ void trim(char sentence[]){
 	}
 
 	return;
+}
+
+void clear(char* arr) {
+	for (size_t i = 0; i < sizeof(arr); i++) {
+		arr[i] = 0;
+	}
+}
+
+char* strcat(char* des, const char* src){
+	int i = 0;
+	int j = 0;
+	while(des[i] != '\0'){
+		i++;
+	}
+	while(src[j] != '\0'){
+		des[i] = src[j];
+		i++;
+		j++;
+	}
+	des[i] = '\0';
+	return des;
 }
 

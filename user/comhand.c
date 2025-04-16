@@ -34,7 +34,7 @@ void comhand(void) {
 
 //Get it the O and S are capitalized for 'OS' (I'm hilarious)
 void rOver_Startup(void){
-    print_color(" ______________________ ","blue");
+    print_color("\n ______________________ ","blue");
     println();
     print_color("/ ~~ MERGE CONFLICT ~~ \\","blue");
     println();

@@ -8,6 +8,7 @@
 #include <mpx/comhand.h>
 #include <mpx/pcb.h>
 #include <processes.h>
+#include <mcb.h>
 
 static void klogv(device dev, const char *msg)
 {
@@ -86,8 +87,10 @@ void kmain(void)
 	// 8) MPX Modules -- *headers vary*
 	// Module specific initialization -- not all modules require this.
 	klogv(COM1, "Initializing MPX modules...");
+	
 	// R5: sys_set_heap_functions(...);
-	// R4: create commhand and idle processes
+	initialize_heap(50000);
+	// sys_set_heap_functions(allocate_memory, free_memory);
 
 	// 9) YOUR command handler -- *create and #include an appropriate .h file*
 	// Pass execution to your command handler so the user can interact with
@@ -95,6 +98,7 @@ void kmain(void)
 	klogv(COM1, "Transferring control to commhand...");
 	// pcb* comhand_pcb = pcb_setup("comhand", 1, 0, 1, comhand);
 	// pcb_insert(comhand_pcb);
+	
 
 	pcb* sysidleprocess = pcb_setup("sysidleprocess", 1, 9, 1, sys_idle_process, NULL);
 	pcb_insert(sysidleprocess);

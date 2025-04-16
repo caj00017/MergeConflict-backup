@@ -7,4 +7,5 @@ USER_OBJECTS=\
 	user/core.o \
 	user/comhand.o \
 	user/comexec.o \
-	user/user_pcb.o
+	user/user_pcb.o \
+	user/user_mcb.o

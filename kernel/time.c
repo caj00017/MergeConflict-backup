@@ -3,6 +3,8 @@
 #include <mpx/io.h>
 #include <string.h>
 #include <mpx/interrupts.h>
+#include <conversions.h>
+#include <memory.h>
 
 //global variable to check if the user has set the time yet
 int set_time_run = 0;
@@ -23,7 +25,7 @@ int get_time(void){
             if(set_time_run == 0){
                 
                 //if time hasn't been set converting all get time calls to EST
-                time_ptr = (itoa(bcdToChar(inb(0x71)) - 47, str, 10));
+                time_ptr = (custom_itoa(bcdToChar(inb(0x71)) - 47, str, 10));
 
                 //checking if current hour is 01 and subtracting 5 to convert to EST
                 if(strcmp(time_ptr, "1") == 0){
@@ -47,12 +49,12 @@ int get_time(void){
 
                 //All other hours can have an included -5 offset and still avoid overflow
                 else{
-                    time_ptr = (itoa(bcdToChar(inb(0x71)) - 52, str, 10));
+                    time_ptr = (custom_itoa(bcdToChar(inb(0x71)) - 52, str, 10));
                 }
             }
             else{
             //changing the hour bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 47, str, 10)); //regular offset
+            time_ptr = (custom_itoa(bcdToChar(inb(0x71)) - 47, str, 10)); //regular offset
             }
 
             // write the hour to the terminal (size checking)
@@ -71,7 +73,7 @@ int get_time(void){
         outb(0x70, 0x02);
 
             //changing the minute bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+            time_ptr = (custom_itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
             // write the minute to the terminal (size checking)
             if (atoi(time_ptr) <= 9) {
@@ -88,7 +90,7 @@ int get_time(void){
         outb(0x70, 0x00);
 
             //changing the second bit from bcd to a char ptr
-            time_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+            time_ptr = (custom_itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
             // write the second to the terminal (size checking)
             if (atoi(time_ptr) <= 9) {
@@ -157,11 +159,13 @@ int set_time(char buf[]){
 
             sys_req(WRITE, COM1, "\nTime set to: ", sizeof("\nTime set to: "));
             get_time();
+
         }
 
         // re-enable interrupts
         sti();
 
+        sys_free_mem(time);
         return 0;
 }
 
@@ -181,7 +185,7 @@ int get_date(void){
         outb(0x70, 0x08);      
 
             //changing the bit from bcd to a char ptr                      
-            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));  
+            date_ptr = (custom_itoa(bcdToChar(inb(0x71)) - 48, str, 10));  
 
             // write the month to the terminal (size checking)
             if (atoi(date_ptr) <= 9) {
@@ -198,7 +202,7 @@ int get_date(void){
         outb(0x70, 0x07);
 
             //changing the bit from bcd to a char ptr                             
-            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+            date_ptr = (custom_itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
             // write the day to the terminal (size checking)
             if (atoi(date_ptr) <= 9) {
@@ -215,7 +219,7 @@ int get_date(void){
         outb(0x70, 0x09);  
 
             //changing the bit from bcd to a char ptr                             
-            date_ptr = (itoa(bcdToChar(inb(0x71)) - 48, str, 10));
+            date_ptr = (custom_itoa(bcdToChar(inb(0x71)) - 48, str, 10));
 
             //writing the year to the terminal
             sys_req(WRITE, COM1, date_ptr, 2);
@@ -300,6 +304,8 @@ int set_date(char buf[]){
         // re-enable interrupts
         sti();
         }
+
+    sys_free_mem(date);
     return 0;
 }
 

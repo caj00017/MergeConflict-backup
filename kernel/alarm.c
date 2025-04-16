@@ -37,6 +37,7 @@ void alarm_process(void) {
                     println();
                     print("[ALARM "); print(alarm->name); print("]: "); print(args->message);
                     println();
+                    sys_free_mem(alarm->params); // free params memory
                     sys_req(EXIT);
                 }
             }
