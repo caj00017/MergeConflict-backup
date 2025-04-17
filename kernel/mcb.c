@@ -32,13 +32,15 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
     // initialize members
     clear(str);
     new_mcb->start_addr = start_addr + sizeof(mcb);
-    print("\nStart address intialized: 0x");
+    print("Start address intialized: 0x");
     print(custom_itoa((int)new_mcb->start_addr, str, 16));
+    println();
 
     clear(str);
     new_mcb->size = size - sizeof(mcb);
-    print("\nSize initialized: ");
+    print("Size initialized: ");
     print(custom_itoa((new_mcb->size+ sizeof(mcb)), str, 10));
+    println();
 
     new_mcb->next_node = NULL;
     new_mcb->prev_node = NULL;
