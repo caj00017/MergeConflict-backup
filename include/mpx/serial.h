@@ -8,10 +8,10 @@ typedef struct dcb {
     int open;
     int status;
     int event_flag;
-    char *input_buf;
+    char* input_buf;
     size_t input_len;
     size_t input_count;
-    char *output_buf;
+    char* output_buf;
     size_t output_len;
     size_t output_count;
     char ring_buffer[128];
@@ -22,13 +22,13 @@ typedef struct dcb {
 } dcb;
 
 typedef struct iocb {
-    struct pcb *process;
+    struct pcb* process;
     int operation;
     char *buffer;
     size_t length;
     size_t transferred;
     int event_flag;
-    struct iocb *next;
+    struct iocb* next;
 } iocb;
 
 /** 
