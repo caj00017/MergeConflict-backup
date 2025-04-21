@@ -4,6 +4,33 @@
 #include <stddef.h>
 #include <mpx/device.h>
 
+typedef struct dcb {
+    int open;
+    int status;
+    int event_flag;
+    char *input_buf;
+    size_t input_len;
+    size_t input_count;
+    char *output_buf;
+    size_t output_len;
+    size_t output_count;
+    char ring_buffer[128];
+    int ring_start;
+    int ring_end;
+    int ring_count;
+    struct iocb *queue_head;
+} dcb;
+
+typedef struct iocb {
+    struct pcb *process;
+    int operation;
+    char *buffer;
+    size_t length;
+    size_t transferred;
+    int event_flag;
+    struct iocb *next;
+} iocb;
+
 /** 
     @brief Character Code for Up Arrow Key
 */
