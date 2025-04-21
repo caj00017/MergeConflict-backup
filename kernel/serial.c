@@ -231,3 +231,70 @@ void buffer_refresh(char *buffer, int buf_length, int pos) {
 		serial_out(COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
 	}
 }
+
+int serial_open(device dev, int speed)
+{
+	int dno = serial_devno(dev);
+	if (dno == -1) {
+		return -1;
+	}
+	if (initialized[dno] == 0) {
+		serial_init(dev);
+	}
+	return 0;
+}
+
+int serial_close(device dev)
+{
+	int dno = serial_devno(dev);
+	if (dno == -1) {
+		return -1;
+	}
+	initialized[dno] = 0;
+	return 0;
+}
+
+int serial_read(device dev, char *buf, size_t len)
+{
+	int dno = serial_devno(dev);
+	if (dno == -1 || initialized[dno] == 0) {
+		return -1;
+	}
+	return serial_poll(dev, buf, len);
+}
+
+int serial_write(device dev, const char *buf, size_t len)
+{
+	int dno = serial_devno(dev);
+	if (dno == -1 || initialized[dno] == 0) {
+		return -1;
+	}
+	return serial_out(dev, buf, len);
+}
+
+void serial_interrupt(device dev)
+{
+	int dno = serial_devno(dev);
+	if (dno == -1 || initialized[dno] == 0) {
+		return;
+	}
+	serial_input_interrupt(dev);
+}
+
+void serial_input_interrupt(device dev)
+{
+	int dno = serial_devno(dev);
+	if (dno == -1 || initialized[dno] == 0) {
+		return;
+	}
+	serial_read(dev, NULL, 0);
+}
+
+void serial_output_interrupt(device dev)
+{
+	int dno = serial_devno(dev);
+	if (dno == -1 || initialized[dno] == 0) {
+		return;
+	}
+	serial_write(dev, NULL, 0);
+}
