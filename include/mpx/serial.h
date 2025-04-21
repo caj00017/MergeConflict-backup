@@ -116,4 +116,18 @@ int serial_poll(device dev, char *buffer, size_t len);
  */
 void buffer_refresh(char *buffer, int buf_length, int pos);
 
+int serial_open(device dev, int speed);
+
+int serial_close(device dev);
+
+int serial_read(device dev, char *buf, size_t len);
+
+int serial_write(device dev, const char *buf, size_t len);
+
+void serial_interrupt(device dev);
+
+void serial_input_interrupt(device dev);
+
+void serial_output_interrupt(device dev);
+
 #endif
