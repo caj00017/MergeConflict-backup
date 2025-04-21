@@ -231,3 +231,36 @@ void buffer_refresh(char *buffer, int buf_length, int pos) {
 		serial_out(COM1, "\033[1D", sizeof("\033[1D")); //escape sequence to move cursor left
 	}
 }
+
+int serial_open(device dev, int speed) {
+
+}
+
+int serial_close(device dev) {
+
+}
+
+int serial_read(device dev, char *buf, size_t len) {
+	//This function is not implemented in this version of the code
+	return -1;
+}
+
+int serial_write(device dev, const char *buf, size_t len) {
+	//This function is not implemented in this version of the code
+	return -1;
+}
+
+void serial_interrupt(device dev) {
+	//This function is not implemented in this version of the code
+	return;
+}
+
+void serial_input_interrupt(device dev) {
+	//This function is not implemented in this version of the code
+	return;
+}
+
+void serial_output_interrupt(device dev) {
+	//This function is not implemented in this version of the code
+	return;
+}
