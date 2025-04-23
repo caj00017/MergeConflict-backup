@@ -5,6 +5,7 @@
 #include <mpx/device.h>
 
 typedef struct dcb {
+    device dev;
     int open;
     int status;
     int event_flag;
