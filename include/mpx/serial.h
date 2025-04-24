@@ -11,16 +11,20 @@ typedef struct dcb {
     int open; // 0 closed, 1 open
     int status; // 0 idle, 1 reading, 2 writing
     int* event_flag; // for i/o completion signaling (0 = start, 1 = complete)
+
     char* input_buf; // pointer to input buffer
     size_t input_len; // number of characters to read
     size_t input_count; // number of characters read
+
     char* output_buf; // pointer to output buffer
     size_t output_len; // number of characters to write
     size_t output_count; // number of characters written
+
     char ring_buffer[MAX_RING_BUFFER_SIZE]; // ring buffer for preloading chars before a read
     int ring_start; // index of the head of the ring buffer
     int ring_end; // index of the tail of the ring buffer
     int ring_count; // # of characters in the ring buffer
+    
     struct iocb *queue_head; // to track i/o requests waiting to use this device
 } dcb;
 
@@ -127,10 +131,10 @@ int serial_read(device dev, char *buf, size_t len);
 
 int serial_write(device dev, const char *buf, size_t len);
 
-void serial_interrupt(device dev);
+void serial_interrupt(void);
 
-void serial_input_interrupt(device dev);
+void serial_input_interrupt(dcb* dev);
 
-void serial_output_interrupt(device dev);
+void serial_output_interrupt(dcb* dev);
 
 #endif

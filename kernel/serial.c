@@ -544,29 +544,166 @@ int serial_write(device dev, const char *buf, size_t len)
 	return serial_out(dev, buf, len);
 }
 
-void serial_interrupt(device dev)
+
+void serial_interrupt(void)
 {
-	int dno = serial_devno(dev);
-	if (dno == -1 || initialized[dno] == 0) {
+	/*REMINDER TO GET CORRECT DCB??*/
+
+	// Disable Interrupts 
+	cli ();
+
+	dcb* DCB = &COM1_DCB;
+
+	//Check to see if port is open
+	if(DCB->open != 0){
+		// Port is NOT open  ---  Clear interrupt and return
+		outb(0x20 , 0x20 ); // Send EOI to to register to clear
 		return;
+	} 
+
+	//Read from 
+	unsigned char interrupt_ID = inb(IIR);  // UART REGISTER ID
+
+	//check to see if interrupt was caused by serial port
+	if(interrupt_ID & (1)) {
+
+		//Identify Interrupt from register
+		if( !(interrupt_ID & (1<<2))  &&  !(interrupt_ID & (1<<1)) ){ //0b0000100 - try this method if fails
+			// 00 - MODEM STATUS INTERRUPT
+			// Read from MSR and continue
+			inb(MSR);
+		}
+		else if( !(interrupt_ID & (1<<2))  &&  (interrupt_ID & (1<<1))){
+			// 01 - OUTPUT INTERRUPT
+			// Send to secondary function
+			serial_output_interrupt(DCB); // Pass the DCB Device 
+
+		}
+		else if( (interrupt_ID & (1<<2))  &&  !(interrupt_ID & (1<<1))){
+			// 10 - INPUT INTERRUPT	
+			// Send to secondary function
+			serial_input_interrupt(DCB);
+
+		}
+		else if( (interrupt_ID & (1<<2))  &&  (interrupt_ID & (1<<1))){
+			// 11 - LINE STATUS INTERRUPT
+			// Read from LSR and continue
+			inb(LSR);
+		}
+		else{
+			// Failed to identify interrupt ID
+			// Huh
+		}
 	}
-	serial_input_interrupt(dev);
+
+	//clear the interrupt by sending EOI to PIC command register
+	outb (0x20 , 0x20 );
+
+	// Enable Interrupts
+	sti ();
 }
 
-void serial_input_interrupt(device dev)
+
+void serial_input_interrupt(dcb* DCB)
 {
-	int dno = serial_devno(dev);
-	if (dno == -1 || initialized[dno] == 0) {
-		return;
+
+	// Read char from the register
+	unsigned char in_data = inb(DCB->dev);
+
+	// Check current status:
+	if(DCB->status != 1) { 
+		/* NOT CURRENTLY READING */
+
+		//Check availability of ring buffer.
+		if( DCB->ring_count > 0 && (DCB->ring_start == DCB->ring_end)  ) { 
+			//Buffer is full, discard char 
+			in_data = 0;
+			return ;
+		}
+		else{
+			//Store char in ring buffer
+			if(DCB->ring_start == 127){
+				//Add item then rotate to array beginning
+				DCB->ring_buffer[DCB->ring_start] = in_data;
+				DCB->ring_start++;
+				DCB->ring_count++;
+			}
+			return;
+		}
+			
 	}
-	serial_read(dev, NULL, 0);
+	else {
+		/* CURRENTLY READING */
+
+		//Store char in requestor input buffer - TODO               < -------------------
+		DCB->input_buf[DCB->input_count] = in_data;
+		DCB->input_count ++;
+
+		// Check if count has not been completed and check if not a newline
+		if(DCB->input_count == DCB->input_len && in_data != '\n'){
+			//Don't signal Complete
+			return;
+		}
+
+		/*End Reached. Signal Complete*/
+
+		//Set status to idle
+		DCB->status = 0;
+
+		//Set event flag 												<-------------------
+
+		return;
+		// and return requestors count value ??
+	}
+
 }
 
-void serial_output_interrupt(device dev)
+
+
+
+void serial_output_interrupt(dcb* DCB)
 {
-	int dno = serial_devno(dev);
-	if (dno == -1 || initialized[dno] == 0) {
-		return;
+
+	// Check current status:
+	if(DCB->status != 2) { 
+		/* NOT CURRENTLY WRITING */
+		//Return and ingore interrupt
+		return ;
 	}
-	serial_write(dev, NULL, 0);
+	else {
+		/* CURRENTLY WRITING */
+
+		//Check if count is finished
+		if(DCB->output_count < DCB->output_len){
+			// Count Not Finished
+
+			// Get next character from requestor output buffer                <-----------
+			unsigned char data_out = DCB->output_buf[DCB->output_count];
+			DCB->output_count ++;
+
+			// Store in output register
+			outb(DCB->dev, data_out);
+
+			return ;
+
+
+		}
+		else{
+			/*Count Finished*/
+			
+			//Reset Status to IDLE
+			DCB->status = 0;
+			//Set event flag 												<-------------
+
+			// Disable write interrupts by clearing bit 1 in the interrupt enable register
+
+			outb(IER, ( inb(IER)  & 31));  //Is bit 1 the a, b, g, or h  in the 8bit  'abcd efgh'
+
+			return;
+			//Return count value??
+		}
+
+	}
+
 }
+
