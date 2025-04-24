@@ -234,14 +234,174 @@ void buffer_refresh(char *buffer, int buf_length, int pos) {
 
 int serial_open(device dev, int speed)
 {
+	// int dno = serial_devno(dev);
+	// if (dno == -1) {
+	// 	return -1;
+	// }
+	// if (initialized[dno] == 0) {
+	// 	serial_init(dev);
+	// }
+	// return 0;
+
+	/** The following documentation is from the document 
+	* entitled "Module R6: Interrupt Driven I/O" 
+	*/
+
+	/**
+	* 1. Ensure that the parameters are valid,
+	* and that the device is not currently open.
+	*/
+
+	if (	
+		speed != 110
+		&& speed != 150
+		&& speed != 300
+		&& speed != 600
+		&& speed != 1200
+		&& speed != 2400
+		&& speed != 4800
+		&& speed != 9600
+		&& speed != 19200
+	) {
+		return -102; // verify baud rate is valid
+	}
+
 	int dno = serial_devno(dev);
 	if (dno == -1) {
-		return -1;
+		return -1; // verify device is valid, this status code may be wrong
 	}
-	if (initialized[dno] == 0) {
-		serial_init(dev);
+
+	if (initialized[dno] != 1) {
+		return -103; // verify device is not open
 	}
-	return 0;
+
+	/**
+	* 2. Initialize the DCB. 
+	* In partciular, this should include:
+	*/
+
+		dcb* new_dcb = (dcb*)sys_alloc_mem(sizeof(dcb));
+
+	 	// indicating that the device is open
+		new_dcb->open = 1;
+		
+	 	// setting the event flag to 0
+		new_dcb->event_flag = 0;
+
+	 	// setting the initial device status to idle
+		new_dcb->status = 0;
+
+	 	// initializing the ring buffer parameters
+
+		new_dcb->input_buf = NULL;
+		new_dcb->input_len = 0;
+		new_dcb->input_count = 0;
+
+		new_dcb->output_buf = NULL;
+		new_dcb->output_len = 0;
+		new_dcb->output_count = 0;
+
+		memset(new_dcb->ring_buffer, 0, sizeof(new_dcb->ring_buffer)); // init ring buffer to 0
+		new_dcb->ring_start = 0;
+		new_dcb->ring_end = 0;
+		new_dcb->ring_count = 0;
+
+		new_dcb->queue_head = NULL; // initialize the queue head to NULL
+	
+	/**
+	* 3. Install the new handler in the interrupt vector.
+	*/
+
+	int vector;
+	switch (dno) {
+		case 0:
+		case 2:
+			vector = 0x24; // IRQ 4
+			break;
+		case 1:
+		case 3:
+			vector = 0x23; // IRQ 3
+			break;
+		default:
+			return -1; // invalid device number
+	}
+
+	// CJ - Need serial_isr implementation. This step may look something like:
+	// idt_install(vector, serial_isr);
+
+	/**
+	* 4. Compute the required baud rate divisor.
+	*/
+
+	uint16_t baud_rate_div = 115200 / (long)speed;
+
+	/**
+	* 5. Store the value 0x80 in the Line Control Register.
+	* This allows the first two port addresses to access the
+	* Baud Rate Divisor register.
+	*/
+
+	outb(dev + LCR, 0x80);	//set line control register, from serial_init()
+
+	/**
+	* 6. Store the high order and low order bytes of the
+	* baud rate divisor into the MSB and LSB registers,
+	* respectively.
+	*/
+
+	uint8_t lsb = baud_rate_div & 0xFF;	// least significant byte
+	uint8_t msb = (baud_rate_div >> 8) & 0xFF;	// most significant byte
+	outb(dev + DLL, lsb);	//set bsd least sig bit
+	outb(dev + DLM, msb);	//brd most significant bit
+
+	/**
+	* 7. Store the value 0x03 in the LCR.
+	* This sets the line characteristics to 8 data bits,
+	* 1 stop bit, and no parity. It also restores normal
+	* functioning of the first two ports.
+	*/
+
+	outb(dev + LCR, 0x03);	//lock divisor; 8bits, no parity, one stop
+
+	/**
+	* 8. Enable the appropriate level in the PIC mask register.
+	*/
+
+	int irq;
+	switch (dno) {
+		case 0:
+		case 2:
+			irq = 4; 
+			break;
+		case 1:
+		case 3:
+			irq = 3; 
+			break;
+		default:
+			return -1; // invalid device number
+	}
+
+	/* Adapted from example code in Section 3.6 */
+	cli();
+	int mask = inb(0x21);
+	mask &= ~(1 << irq); // set bit at index = irq to 0
+	outb(0x21, mask);	// enable IRQ 3 or 4 in PIC
+	sti();
+
+	/**
+	* 9. Enable overall serial port interrupt by storing the
+	* value 0x08 in the Modem Control register
+	*/
+	outb(dev + MCR, 0x08);
+
+	/**
+	* 10. Enable input ready interrupts only by storing the value
+	* 0x01 in the Interrupt Enable register.
+	*/
+	outb(dev + IER, 0x01);
+
+	initialized[dno] = 1; // mark the device as initialized
+	return 0; // success
 }
 
 int serial_close(device dev)
