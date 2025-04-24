@@ -1,4 +1,5 @@
 #include <mpx/sys_call.h>
+#include <mpx/serial.h>
 
 // global PCB pointer
 pcb* CURRENT_PCB = NULL;
@@ -83,7 +84,18 @@ context* sys_call(context* ctx) {
             return next_ctx;
         }
 
-    }
+    // }
+    // else if (op == 2) /* READ */{
+    //     if(ctx->EBX->status == 0){
+    //         serial_read();
+    //     }
+    // }
+    
+    // else if (op == 3) /* WRITE */{
+    //     if(ctx->EBX->status == 0){
+    //         serial_write();
+    //     }
+    // }
     //if the op code is 2 or 3, then the call is to READ or WRITE
     else {
         //in that case we just need to make sure that we return the current context
@@ -109,3 +121,9 @@ pcb* find_first_ready(void) {
     }
     return NULL;
 }
+
+// void IO_Scheduler(context* ctx) {
+//     if(op_code == 0 || op_code ==  1){
+//         return;
+//     }
+// }

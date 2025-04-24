@@ -24,6 +24,81 @@ enum uart_registers {
 	SCR = 7,	// Scratch
 };
 
+struct dcb COM1_DCB = {
+	.dev = COM1,
+	.open = 1,
+	.status = 0,
+	.event_flag = NULL,
+	.input_buf = buffer[100],
+	.input_len = 0,
+	.input_count = 0,
+	.output_buf = buffer[100],
+	.output_len = 0,
+	.output_count = 0,
+	.ring_buffer = {0},
+	.ring_start = 0,
+	.ring_end = 0,
+	.ring_count = 0,
+	.queue_head = NULL,
+}
+
+struct dcb COM2_DCB = {
+	.dev = COM2,
+	.open = 1,
+	.status = 0,
+	.event_flag = NULL,
+	.input_buf = buffer[100],
+	.input_len = 0,
+	.input_count = 0,
+	.output_buf = buffer[100],
+	.output_len = 0,
+	.output_count = 0,
+	.ring_buffer = {0},
+	.ring_start = 0,
+	.ring_end = 0,
+	.ring_count = 0,
+	.queue_head = NULL,
+
+}
+
+struct dcb COM3_DCB = {
+	.dev = COM3,
+	.open = 1,
+	.status = 0,
+	.event_flag = NULL,
+	.input_buf = buffer[100],
+	.input_len = 0,
+	.input_count = 0,
+	.output_buf = buffer[100],
+	.output_len = 0,
+	.output_count = 0,
+	.ring_buffer = {0},
+	.ring_start = 0,
+	.ring_end = 0,
+	.ring_count = 0,
+	.queue_head = NULL,
+
+}
+
+struct dcb COM4_DCB = {
+	.dev = COM4,
+	.open = 1,
+	.status = 0,
+	.event_flag = NULL,
+	.input_buf = buffer[100],
+	.input_len = 0,
+	.input_count = 0,
+	.output_buf = buffer[100],
+	.output_len = 0,
+	.output_count = 0,
+	.ring_buffer = {0},
+	.ring_start = 0,
+	.ring_end = 0,
+	.ring_count = 0,
+	.queue_head = NULL,
+
+}
+
 static int initialized[4] = { 0 };
 
 static int serial_devno(device dev)
@@ -416,6 +491,106 @@ int serial_close(device dev)
 
 int serial_read(device dev, char *buf, size_t len)
 {
+	//dev could be COM1 - COM4
+	dcb* current_dev;
+	//1) validate the supplied params
+	//a) check that the device number is valid (COM1 - COM4)
+	case(serial_devno(dev)) {
+		case COM1:
+			current_dev = &COM1_DCB;
+			break;
+		case COM2:
+			current_dev = &COM2_DCB;
+			break;
+		case COM3:
+			current_dev = &COM3_DCB;
+			break;
+		case COM4:
+			current_dev = &COM4_DCB;
+			break;
+		default:
+			return -1; // Invalid device number
+	}
+
+	//b) check that the device is open (initialized[dno] == 1)
+	if(initialized[serial_devno(dev)] == 0) {
+		//if the device is not open, return -301
+		return -301;
+	}
+	//c) check that the buffer is not NULL
+	if(buf == NULL) {
+		//if the buffer is null, return -302
+		return -302;
+	}
+	//d) check that the indicated length is not greater than the size of the buffer or less than zero
+	if(len < 0 || len > MAX_RING_BUFFER_SIZE) {
+		//if the length is less than zero or greater than the size of the buffer, return -303
+		return -303;
+	}
+
+	//2) ensure that the status of the port is idle
+	//a) check that the status is not reading or writing (status == IDLE)
+	if(current_dev->status != IDLE) {
+		//if the status is not idle, return -304
+		return -304;
+	}
+	//b) check that the input buffer is not NULL (input_buf == NULL)
+	if(current_dev->input_buf == NULL) {
+		//if the input buffer is null, return -305
+		return -305;
+	}
+
+
+	//3) Initialize the input buffer variables (not the ring buffer!) and set the status to reading
+	//a) set the input buffer to the supplied buffer (input_buf = buf)
+	current_dev->input_buf = buf;
+	//b) set the input length to the supplied length (input_len = len)
+	current_dev->input_len = len;
+	//c) set the input count to zero (input_count = 0)
+	current_dev->input_count = 0;
+	//d) set the status to reading (status = READING)
+	current_dev->status = READING;
+
+	//4) Clear the caller’s event flag
+	//a) check that the event flag is not NULL (event_flag == NULL)
+	if(current_dev->event_flag == NULL) {
+		//if the event flag is null, return -306
+		return -306;
+	}
+	//b) clear the event flag (event_flag = 0)
+	current_dev->event_flag = 0;
+
+	//5) Copy characters from the ring buffer to the requestor’s buffer, until the ring buffer is emptied, the
+	//requested count has been reached, or a new-line (ENTER) code has been found. The copied characters
+	//should, of course, be removed from the ring buffer. Either input interrupts or all interrupts should be
+	//disabled during the copying
+	//a) check that the ring buffer is not empty (ring_count == 0)
+	if(current_dev->ring_count == 0) {
+		//if the ring buffer is empty, return -307
+		return -307;
+	}
+	//b) check that the requested count has not been reached (input_count == input_len)
+	if(current_dev->input_count == current_dev->input_len) {
+		//if the requested count has been reached, return -308
+		return -308;
+	}
+	//c) check that a new-line code has not been found (new_line == 0)
+	if(current_dev->input_buf[current_dev->input_count] != NEWLINE) {
+		//if a new-line code has been found, return -309
+		return -309;
+	}	
+	
+
+	//6) If more characters are needed, return. If the block is complete, continue with step 7
+	
+
+	//7) Reset the DCB status to idle, set the event flag, and return the actual count to the requestor’s variable
+
+	//Notice that it is not necessary for serial read() to enable or disable input interrupts, except while
+	//the ring buffer is being accessed. These are always enabled while the port is open. However, we must not
+	//allow the process of removing characters from the ring buffer to be interrupted by an attempt to put a new
+	//character in
+
 	int dno = serial_devno(dev);
 	if (dno == -1 || initialized[dno] == 0) {
 		return -1;
