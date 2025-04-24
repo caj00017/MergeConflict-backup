@@ -5,6 +5,11 @@
 #include <string.h>
 #include <mpx/serial.h>
 #include <mpx/comexec.h>
+#include <memory.h>
+#include <mpx/interrupts.h>
+
+// declare assembly stub
+extern void serial_isr(void);
 
 //Function protos
 void buffer_refresh(char *buffer, int buf_length, int pos);
@@ -24,80 +29,11 @@ enum uart_registers {
 	SCR = 7,	// Scratch
 };
 
-struct dcb COM1_DCB = {
-	.dev = COM1,
-	.open = 1,
-	.status = 0,
-	.event_flag = NULL,
-	.input_buf = buffer[100],
-	.input_len = 0,
-	.input_count = 0,
-	.output_buf = buffer[100],
-	.output_len = 0,
-	.output_count = 0,
-	.ring_buffer = {0},
-	.ring_start = 0,
-	.ring_end = 0,
-	.ring_count = 0,
-	.queue_head = NULL,
-}
-
-struct dcb COM2_DCB = {
-	.dev = COM2,
-	.open = 1,
-	.status = 0,
-	.event_flag = NULL,
-	.input_buf = buffer[100],
-	.input_len = 0,
-	.input_count = 0,
-	.output_buf = buffer[100],
-	.output_len = 0,
-	.output_count = 0,
-	.ring_buffer = {0},
-	.ring_start = 0,
-	.ring_end = 0,
-	.ring_count = 0,
-	.queue_head = NULL,
-
-}
-
-struct dcb COM3_DCB = {
-	.dev = COM3,
-	.open = 1,
-	.status = 0,
-	.event_flag = NULL,
-	.input_buf = buffer[100],
-	.input_len = 0,
-	.input_count = 0,
-	.output_buf = buffer[100],
-	.output_len = 0,
-	.output_count = 0,
-	.ring_buffer = {0},
-	.ring_start = 0,
-	.ring_end = 0,
-	.ring_count = 0,
-	.queue_head = NULL,
-
-}
-
-struct dcb COM4_DCB = {
-	.dev = COM4,
-	.open = 1,
-	.status = 0,
-	.event_flag = NULL,
-	.input_buf = buffer[100],
-	.input_len = 0,
-	.input_count = 0,
-	.output_buf = buffer[100],
-	.output_len = 0,
-	.output_count = 0,
-	.ring_buffer = {0},
-	.ring_start = 0,
-	.ring_end = 0,
-	.ring_count = 0,
-	.queue_head = NULL,
-
-}
+// global variables for each device
+struct dcb COM1_DCB;
+struct dcb COM2_DCB;
+struct dcb COM3_DCB;
+struct dcb COM4_DCB;
 
 static int initialized[4] = { 0 };
 
@@ -401,14 +337,14 @@ int serial_open(device dev, int speed)
 			return -1; // invalid device number
 	}
 
-	// CJ - Need serial_isr implementation. This step may look something like:
-	// idt_install(vector, serial_isr);
+	idt_install(vector, (void (*)(void*))serial_isr);
 
 	/**
 	* 4. Compute the required baud rate divisor.
 	*/
 
-	uint16_t baud_rate_div = 115200 / (long)speed;
+	// unsigned short = 16 bit
+	unsigned short baud_rate_div = 115200 / (long)speed;
 
 	/**
 	* 5. Store the value 0x80 in the Line Control Register.
@@ -424,8 +360,9 @@ int serial_open(device dev, int speed)
 	* respectively.
 	*/
 
-	uint8_t lsb = baud_rate_div & 0xFF;	// least significant byte
-	uint8_t msb = (baud_rate_div >> 8) & 0xFF;	// most significant byte
+	// unsigned char = 8 bit
+	unsigned char lsb = baud_rate_div & 0xFF;	// least significant byte
+	unsigned char msb = (baud_rate_div >> 8) & 0xFF;	// most significant byte
 	outb(dev + DLL, lsb);	//set bsd least sig bit
 	outb(dev + DLM, msb);	//brd most significant bit
 
@@ -495,7 +432,7 @@ int serial_read(device dev, char *buf, size_t len)
 	dcb* current_dev;
 	//1) validate the supplied params
 	//a) check that the device number is valid (COM1 - COM4)
-	case(serial_devno(dev)) {
+	switch (serial_devno(dev)) {
 		case COM1:
 			current_dev = &COM1_DCB;
 			break;
@@ -549,7 +486,7 @@ int serial_read(device dev, char *buf, size_t len)
 	//c) set the input count to zero (input_count = 0)
 	current_dev->input_count = 0;
 	//d) set the status to reading (status = READING)
-	current_dev->status = READING;
+	current_dev->status = 1;
 
 	//4) Clear the caller’s event flag
 	//a) check that the event flag is not NULL (event_flag == NULL)

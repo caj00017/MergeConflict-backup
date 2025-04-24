@@ -84,7 +84,7 @@ context* sys_call(context* ctx) {
             return next_ctx;
         }
 
-    // }
+    }
     // else if (op == 2) /* READ */{
     //     if(ctx->EBX->status == 0){
     //         serial_read();
