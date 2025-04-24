@@ -5,10 +5,10 @@
 #include <mpx/device.h>
 
 typedef struct dcb {
-    device dev;
-    int open;
-    int status;
-    int event_flag;
+    int dev;
+    int open; //0 = closed, 1 = open
+    int status; //0 = idle, 1 = reading, 2 = writing
+    int* event_flag;
     char* input_buf;
     size_t input_len;
     size_t input_count;
