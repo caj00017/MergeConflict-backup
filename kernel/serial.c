@@ -645,12 +645,11 @@ void serial_input_interrupt(dcb* DCB)
 		else{
 			//Store char in ring buffer
 			DCB->ring_buffer[DCB->ring_end] = in_data;
-			
 			//Increase count of items
 			DCB->ring_count++;
 
 			//Condition to checkif at end of array so we can wrap around to front
-			DCB->ring_end +=  (DCB->ring_end == 127) ? -127 : 1 ;  // Reset to 0 or add 1
+			DCB->ring_end =  (DCB->ring_end +1) % MAX_RING_BUFFER_SIZE ;  // Reset to 0 or add 1
 
 			return;
 		}
@@ -703,6 +702,7 @@ void serial_output_interrupt(dcb* DCB)
 
 			// Get next character from requestor output buffer                <-----------
 			unsigned char data_out = DCB->output_buf[DCB->output_count];
+			DCB->output_buf[DCB->output_count] = '\0';
 			DCB->output_count --;
 
 			// Store in output register
