@@ -123,8 +123,21 @@ int serial_poll(device dev, char *buffer, size_t len);
  */
 void buffer_refresh(char *buffer, int buf_length, int pos);
 
+/**
+ * @brief Opens a serial port for communication
+ * @param dev The serial port to open (COM1, COM2, COM3, or COM4)
+ * @param speed The baud rate for the serial port (e.g., 9600, 19200)
+ * @return 0 on success, non-zero on failure
+ * @author Chris Jones
+ */
 int serial_open(device dev, int speed);
 
+/**
+ * @brief Closes a serial port
+ * @param dev The serial port to close (COM1, COM2, COM3, or COM4)
+ * @return 0 on success, non-zero on failure
+ * @author Chris Jones
+ */
 int serial_close(device dev);
 
 int serial_read(device dev, char *buf, size_t len);
@@ -137,8 +150,20 @@ void serial_input_interrupt(dcb* dev);
 
 void serial_output_interrupt(dcb* dev);
 
+/**
+ * @brief Get the DCB for a given device number
+ * @param devno The device number (0-3 for COM1-COM4)
+ * @return Pointer to the DCB structure for the device
+ * @author Chris Jones
+ */
 dcb* get_dcb(int devno);
 
+/**
+ * @brief Get the IRQ number for a given device number
+ * @param devno The device number (0-3 for COM1-COM4)
+ * @return The IRQ number for the device
+ * @author Chris Jones
+ */
 int get_irq(int devno);
 
 #endif
