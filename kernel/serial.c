@@ -630,7 +630,7 @@ void serial_input_interrupt(dcb* DCB)
 {
 
 	// Read char from the register
-	unsigned char in_data = inb(DCB->dev);
+	unsigned char in_data = inb(RBR);
 
 	// Check current status:
 	if(DCB->status != 1) { 
@@ -706,7 +706,7 @@ void serial_output_interrupt(dcb* DCB)
 			DCB->output_count --;
 
 			// Store in output register
-			outb(DCB->dev, data_out);
+			outb(THR, data_out);
 
 			return ;
 
