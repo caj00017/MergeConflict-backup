@@ -282,7 +282,7 @@ int serial_open(device dev, int speed)
 		return -1; // verify device is valid, this status code may be wrong
 	}
 
-	if (initialized[dno] != 1) {
+	if (initialized[dno] == 1) {
 		return -103; // verify device is not open
 	}
 
@@ -379,19 +379,7 @@ int serial_open(device dev, int speed)
 	* 8. Enable the appropriate level in the PIC mask register.
 	*/
 
-	int irq;
-	switch (dno) {
-		case 0:
-		case 2:
-			irq = 4; 
-			break;
-		case 1:
-		case 3:
-			irq = 3; 
-			break;
-		default:
-			return -1; // invalid device number
-	}
+	int irq = get_irq(dno); // get the IRQ number for the device
 
 	/* Adapted from example code in Section 3.6 */
 	cli();
@@ -418,12 +406,46 @@ int serial_open(device dev, int speed)
 
 int serial_close(device dev)
 {
+	/**
+	* 1. Ensure that the port is currently open.
+	*/
+
 	int dno = serial_devno(dev);
 	if (dno == -1) {
-		return -1;
+		return -1; // verify device is valid, this status code may be wrong
 	}
-	initialized[dno] = 0;
-	return 0;
+
+	if (initialized[dno] != 1) {
+		return -201; // verify device is open
+	}
+
+	/**
+	* 2. Clear the open indicator in the DCB
+	*/
+	dcb* this_dcb = get_dcb(dno);
+	this_dcb->open = 0; // mark the device as closed
+
+	/**
+	* 3. Disable the appropriate level in the PIC mask register.
+	*/
+
+	int irq = get_irq(dno);
+
+	/* Adapted from example code in Section 3.6 */
+	cli();
+	int mask = inb(0x21);
+	mask |= (1 << irq); // set bit at index = irq to 0
+	outb(0x21, mask);	// disable IRQ 3 or 4 in PIC
+	sti();
+
+	/**
+	* 4. Disable all interrupts in the ACC by loading zero values
+	* to the Modem Status register and the Interrupt Enable register.
+	*/
+	outb(dev + MSR, 0x00);
+	outb(dev + IER, 0x00);
+
+	return 0; // success
 }
 
 int serial_read(device dev, char *buf, size_t len)
@@ -705,5 +727,38 @@ void serial_output_interrupt(dcb* DCB)
 
 	}
 
+}
+
+dcb* get_dcb(int devno) {
+	// Get the DCB for the specified device number
+	switch (devno) {
+	case 0:
+		return &COM1_DCB;
+	case 1:
+		return &COM2_DCB;
+	case 2:
+		return &COM3_DCB;
+	case 3:
+		return &COM4_DCB;
+	default:
+		return NULL; // Invalid device number
+	}
+}
+
+int get_irq(int devno) {
+	int irq;
+	switch (devno) {
+		case 0:
+		case 2:
+			irq = 4; 
+			break;
+		case 1:
+		case 3:
+			irq = 3; 
+			break;
+		default:
+			return -1; // invalid device number
+	}
+	return irq;
 }
 

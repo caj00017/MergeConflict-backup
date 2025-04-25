@@ -137,4 +137,8 @@ void serial_input_interrupt(dcb* dev);
 
 void serial_output_interrupt(dcb* dev);
 
+dcb* get_dcb(int devno);
+
+int get_irq(int devno);
+
 #endif
