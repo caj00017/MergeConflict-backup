@@ -637,19 +637,21 @@ void serial_input_interrupt(dcb* DCB)
 		/* NOT CURRENTLY READING */
 
 		//Check availability of ring buffer.
-		if( DCB->ring_count > 0 && (DCB->ring_start == DCB->ring_end)  ) { 
+		if( DCB->ring_count > 0 && (DCB->ring_start == DCB->ring_end)  ) {  // ??????????????
 			//Buffer is full, discard char 
 			in_data = 0;
 			return ;
 		}
 		else{
 			//Store char in ring buffer
-			if(DCB->ring_start == 127){
-				//Add item then rotate to array beginning
-				DCB->ring_buffer[DCB->ring_start] = in_data;
-				DCB->ring_start++;
-				DCB->ring_count++;
-			}
+			DCB->ring_buffer[DCB->ring_end] = in_data;
+			
+			//Increase count of items
+			DCB->ring_count++;
+
+			//Condition to checkif at end of array so we can wrap around to front
+			DCB->ring_end +=  (DCB->ring_end == 127) ? -127 : 1 ;  // Reset to 0 or add 1
+
 			return;
 		}
 			
@@ -657,7 +659,7 @@ void serial_input_interrupt(dcb* DCB)
 	else {
 		/* CURRENTLY READING */
 
-		//Store char in requestor input buffer - TODO               < -------------------
+		//Store char in requestor input buffer - TODO               < ------------------- This might cause issue by not checking count>=len
 		DCB->input_buf[DCB->input_count] = in_data;
 		DCB->input_count ++;
 
@@ -673,7 +675,7 @@ void serial_input_interrupt(dcb* DCB)
 		DCB->status = 0;
 
 		//Set event flag 												<-------------------
-
+		*(DCB->event_flag) = 1;
 		return;
 		// and return requestors count value ??
 	}
@@ -696,12 +698,12 @@ void serial_output_interrupt(dcb* DCB)
 		/* CURRENTLY WRITING */
 
 		//Check if count is finished
-		if(DCB->output_count < DCB->output_len){
+		if(DCB->output_count < DCB->output_len && DCB->output_count >= 0){
 			// Count Not Finished
 
 			// Get next character from requestor output buffer                <-----------
 			unsigned char data_out = DCB->output_buf[DCB->output_count];
-			DCB->output_count ++;
+			DCB->output_count --;
 
 			// Store in output register
 			outb(DCB->dev, data_out);
@@ -716,10 +718,9 @@ void serial_output_interrupt(dcb* DCB)
 			//Reset Status to IDLE
 			DCB->status = 0;
 			//Set event flag 												<-------------
-
+			*(DCB->event_flag) = 1;
 			// Disable write interrupts by clearing bit 1 in the interrupt enable register
-
-			outb(IER, ( inb(IER)  & 31));  //Is bit 1 the a, b, g, or h  in the 8bit  'abcd efgh'
+			outb(IER, ( inb(IER)  & 253));  //1111 1101
 
 			return;
 			//Return count value??
@@ -728,6 +729,8 @@ void serial_output_interrupt(dcb* DCB)
 	}
 
 }
+
+
 
 dcb* get_dcb(int devno) {
 	// Get the DCB for the specified device number
