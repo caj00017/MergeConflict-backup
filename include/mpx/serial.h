@@ -7,21 +7,25 @@
 #include <mpx/device.h>
 
 typedef struct dcb {
-    int dev;
-    int open; //0 = closed, 1 = open
-    int status; //0 = idle, 1 = reading, 2 = writing
-    int* event_flag;
-    char* input_buf;
-    size_t input_len;
-    size_t input_count;
-    char* output_buf;
-    size_t output_len;
-    size_t output_count;
-    char ring_buffer[MAX_RING_BUFFER_SIZE];
-    int ring_start;
-    int ring_end;
-    int ring_count;
-    struct iocb *queue_head;
+    int dev;    
+    int open; // 0 closed, 1 open
+    int status; // 0 idle, 1 reading, 2 writing
+    int* event_flag; // for i/o completion signaling (0 = start, 1 = complete)
+
+    char* input_buf; // pointer to input buffer
+    size_t input_len; // number of characters to read
+    size_t input_count; // number of characters read
+
+    char* output_buf; // pointer to output buffer
+    size_t output_len; // number of characters to write
+    size_t output_count; // number of characters written
+
+    char ring_buffer[MAX_RING_BUFFER_SIZE]; // ring buffer for preloading chars before a read
+    int ring_start; // index of the head of the ring buffer
+    int ring_end; // index of the tail of the ring buffer
+    int ring_count; // # of characters in the ring buffer
+    
+    struct iocb *queue_head; // to track i/o requests waiting to use this device
 } dcb;
 
 typedef struct iocb {
@@ -119,19 +123,48 @@ int serial_poll(device dev, char *buffer, size_t len);
  */
 void buffer_refresh(char *buffer, int buf_length, int pos);
 
+/**
+ * @brief Opens a serial port for communication
+ * @param dev The serial port to open (COM1, COM2, COM3, or COM4)
+ * @param speed The baud rate for the serial port (e.g., 9600, 19200)
+ * @return 0 on success, non-zero on failure
+ * @author Chris Jones
+ */
 int serial_open(device dev, int speed);
 
+/**
+ * @brief Closes a serial port
+ * @param dev The serial port to close (COM1, COM2, COM3, or COM4)
+ * @return 0 on success, non-zero on failure
+ * @author Chris Jones
+ */
 int serial_close(device dev);
 
 int serial_read(device dev, char *buf, size_t len);
 
-int serial_write(device dev, const char *buf, size_t len);
+int serial_write(device dev, char *buf, size_t len);
 
-void serial_interrupt(device dev);
+void serial_interrupt(void);
 
-void serial_input_interrupt(device dev);
+void serial_input_interrupt(dcb* dev);
 
-void serial_output_interrupt(device dev);
+void serial_output_interrupt(dcb* dev);
+
+/**
+ * @brief Get the DCB for a given device number
+ * @param devno The device number (0-3 for COM1-COM4)
+ * @return Pointer to the DCB structure for the device
+ * @author Chris Jones
+ */
+dcb* get_dcb(int devno);
+
+/**
+ * @brief Get the IRQ number for a given device number
+ * @param devno The device number (0-3 for COM1-COM4)
+ * @return The IRQ number for the device
+ * @author Chris Jones
+ */
+int get_irq(int devno);
 
 dcb* get_dcb(int dev);
 

@@ -22,4 +22,5 @@ KERNEL_OBJECTS=\
   kernel/pcb.o\
   kernel/sys_call.o\
   kernel/alarm.o\
-  kernel/mcb.o
+  kernel/mcb.o\
+  kernel/serial_isr.o
