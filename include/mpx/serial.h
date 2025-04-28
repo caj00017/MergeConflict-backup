@@ -1,6 +1,8 @@
 #ifndef MPX_SERIAL_H
 #define MPX_SERIAL_H
 
+#define MAX_RING_BUFFER_SIZE 128
+
 #include <stddef.h>
 #include <mpx/device.h>
 
@@ -15,7 +17,7 @@ typedef struct dcb {
     char* output_buf;
     size_t output_len;
     size_t output_count;
-    char ring_buffer[128];
+    char ring_buffer[MAX_RING_BUFFER_SIZE];
     int ring_start;
     int ring_end;
     int ring_count;
@@ -130,5 +132,11 @@ void serial_interrupt(device dev);
 void serial_input_interrupt(device dev);
 
 void serial_output_interrupt(device dev);
+
+dcb* get_dcb(int dev);
+
+iocb* iocb_setup(struct pcb* current_pcb, char* new_buffer, size_t new_length, int op_code);
+
+void iocb_clear(struct iocb* cur_iocb);
 
 #endif

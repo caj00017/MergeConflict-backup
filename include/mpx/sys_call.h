@@ -2,6 +2,7 @@
 #include <mpx/pcb.h>
 #include <stddef.h>
 #include <sys_req.h>
+#include <mpx/serial.h>
 
 // global PCB pointer
 extern pcb* CURRENT_PCB;
@@ -26,3 +27,7 @@ context* sys_call(context* ctx);
  * @authors Chris Jones, Evan Humphrey
  */
 pcb* find_first_ready(void);
+
+int IO_Scheduler(context* ctx, int op_code);
+
+void IO_Completion(context* ctx, iocb* current_iocb);

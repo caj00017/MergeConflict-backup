@@ -5,6 +5,7 @@
 #include <string.h>
 #include <mpx/serial.h>
 #include <mpx/comexec.h>
+#include <memory.h>
 
 //Function protos
 void buffer_refresh(char *buffer, int buf_length, int pos);
@@ -24,80 +25,11 @@ enum uart_registers {
 	SCR = 7,	// Scratch
 };
 
-struct dcb COM1_DCB = {
-	.dev = COM1,
-	.open = 1,
-	.status = 0,
-	.event_flag = NULL,
-	.input_buf = buffer[100],
-	.input_len = 0,
-	.input_count = 0,
-	.output_buf = buffer[100],
-	.output_len = 0,
-	.output_count = 0,
-	.ring_buffer = {0},
-	.ring_start = 0,
-	.ring_end = 0,
-	.ring_count = 0,
-	.queue_head = NULL,
-}
+struct dcb COM1_DCB;
+struct dcb COM2_DCB;
+struct dcb COM3_DCB;
+struct dcb COM4_DCB;
 
-struct dcb COM2_DCB = {
-	.dev = COM2,
-	.open = 1,
-	.status = 0,
-	.event_flag = NULL,
-	.input_buf = buffer[100],
-	.input_len = 0,
-	.input_count = 0,
-	.output_buf = buffer[100],
-	.output_len = 0,
-	.output_count = 0,
-	.ring_buffer = {0},
-	.ring_start = 0,
-	.ring_end = 0,
-	.ring_count = 0,
-	.queue_head = NULL,
-
-}
-
-struct dcb COM3_DCB = {
-	.dev = COM3,
-	.open = 1,
-	.status = 0,
-	.event_flag = NULL,
-	.input_buf = buffer[100],
-	.input_len = 0,
-	.input_count = 0,
-	.output_buf = buffer[100],
-	.output_len = 0,
-	.output_count = 0,
-	.ring_buffer = {0},
-	.ring_start = 0,
-	.ring_end = 0,
-	.ring_count = 0,
-	.queue_head = NULL,
-
-}
-
-struct dcb COM4_DCB = {
-	.dev = COM4,
-	.open = 1,
-	.status = 0,
-	.event_flag = NULL,
-	.input_buf = buffer[100],
-	.input_len = 0,
-	.input_count = 0,
-	.output_buf = buffer[100],
-	.output_len = 0,
-	.output_count = 0,
-	.ring_buffer = {0},
-	.ring_start = 0,
-	.ring_end = 0,
-	.ring_count = 0,
-	.queue_head = NULL,
-
-}
 
 static int initialized[4] = { 0 };
 
@@ -309,6 +241,8 @@ void buffer_refresh(char *buffer, int buf_length, int pos) {
 
 int serial_open(device dev, int speed)
 {
+	(void)speed;
+
 	int dno = serial_devno(dev);
 	if (dno == -1) {
 		return -1;
@@ -335,7 +269,7 @@ int serial_read(device dev, char *buf, size_t len)
 	dcb* current_dev;
 	//1) validate the supplied params
 	//a) check that the device number is valid (COM1 - COM4)
-	case(serial_devno(dev)) {
+	switch(serial_devno(dev)) {
 		case COM1:
 			current_dev = &COM1_DCB;
 			break;
@@ -389,7 +323,7 @@ int serial_read(device dev, char *buf, size_t len)
 	//c) set the input count to zero (input_count = 0)
 	current_dev->input_count = 0;
 	//d) set the status to reading (status = READING)
-	current_dev->status = READING;
+	current_dev->status = 1;
 
 	//4) Clear the caller’s event flag
 	//a) check that the event flag is not NULL (event_flag == NULL)
@@ -472,4 +406,44 @@ void serial_output_interrupt(device dev)
 		return;
 	}
 	serial_write(dev, NULL, 0);
+}
+
+dcb* get_dcb(int devno){
+	
+	switch (devno){
+	case 0:
+		return &COM1_DCB;
+	case 1:
+		return &COM2_DCB;
+	case 2:
+		return &COM3_DCB;
+	case 3:
+		return &COM4_DCB;
+	default:
+		return NULL;
+	}
+}
+
+iocb* iocb_setup(struct pcb* current_pcb, char* new_buffer, size_t new_length, int op_code){
+    iocb* new_iocb = (iocb*)sys_alloc_mem(sizeof(iocb));
+	if(new_iocb == NULL){
+		return NULL;
+	}
+
+	new_iocb->process = current_pcb;
+	new_iocb->buffer = new_buffer;
+	new_iocb->length = new_length;
+	new_iocb->event_flag = 0;
+	new_iocb->transferred = 0;
+	new_iocb->operation = op_code;
+	new_iocb->next = NULL;
+
+	return new_iocb;
+}
+
+void iocb_clear(iocb* cur_iocb){
+	cur_iocb->process = NULL;
+	cur_iocb->buffer = NULL;
+	cur_iocb->length = 0;
+	cur_iocb->operation = -1;
 }
