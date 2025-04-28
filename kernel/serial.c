@@ -35,6 +35,8 @@ struct dcb COM2_DCB;
 struct dcb COM3_DCB;
 struct dcb COM4_DCB;
 
+static int serial_event_flag = 1; // global event flag for serial devices
+
 static int initialized[4] = { 0 };
 
 static int serial_devno(device dev)
@@ -454,7 +456,7 @@ int serial_read(device dev, char *buf, size_t len)
 	dcb* current_dev;
 	//1) validate the supplied params
 	//a) check that the device number is valid (COM1 - COM4)
-	switch (serial_devno(dev)) {
+	switch(serial_devno(dev)) {
 		case COM1:
 			current_dev = &COM1_DCB;
 			break;
@@ -482,15 +484,15 @@ int serial_read(device dev, char *buf, size_t len)
 		return -302;
 	}
 	//d) check that the indicated length is not greater than the size of the buffer or less than zero
-	if(len < 0 || len > MAX_RING_BUFFER_SIZE) {
+	if(len < 0 || len > (size_t)MAX_RING_BUFFER_SIZE) {
 		//if the length is less than zero or greater than the size of the buffer, return -303
 		return -303;
 	}
 
 	//2) ensure that the status of the port is idle
 	//a) check that the status is not reading or writing (status == IDLE)
-	if(current_dev->status != IDLE) {
-		//if the status is not idle, return -304
+	if(current_dev->status != 0 /*IDLE*/) {
+		//if the status is not idle, that means it's busy, return -304
 		return -304;
 	}
 	//b) check that the input buffer is not NULL (input_buf == NULL)
@@ -508,7 +510,7 @@ int serial_read(device dev, char *buf, size_t len)
 	//c) set the input count to zero (input_count = 0)
 	current_dev->input_count = 0;
 	//d) set the status to reading (status = READING)
-	current_dev->status = 1;
+	current_dev->status = 1; //READING
 
 	//4) Clear the caller’s event flag
 	//a) check that the event flag is not NULL (event_flag == NULL)
@@ -516,7 +518,7 @@ int serial_read(device dev, char *buf, size_t len)
 		//if the event flag is null, return -306
 		return -306;
 	}
-	//b) clear the event flag (event_flag = 0)
+	//b) clear the current event flag (event_flag = 0)
 	current_dev->event_flag = 0;
 
 	//5) Copy characters from the ring buffer to the requestor’s buffer, until the ring buffer is emptied, the
@@ -528,101 +530,121 @@ int serial_read(device dev, char *buf, size_t len)
 		//if the ring buffer is empty, return -307
 		return -307;
 	}
-	//b) check that the requested count has not been reached (input_count == input_len)
-	if(current_dev->input_count == current_dev->input_len) {
-		//if the requested count has been reached, return -308
-		return -308;
+	//b) check that the requested count has not been reached (input_count == input_len)	
+
+	cli(); //disable interrupts while transfer is occuring
+
+	//d) copy the characters from the ring buffer to the requestor’s buffer (input_buf = ring_buffer)
+	for(int i = 0; i < current_dev->ring_count; i++) {
+		//check to see if ring buffer in empty (ring_count == 0)
+		if(current_dev->ring_count == 0) {
+			//if the ring buffer is empty, break out of the loop
+			break;
+		}
+
+		//check for newline character before copying anything else into the requestor's buffer
+		if(current_dev->input_buf[current_dev->input_count] == NEWLINE) {
+			//if the new-line code is found, break out of the loop
+			break;
+		}
+
+		//copy the characters from the ring buffer to the requestor’s buffer
+		current_dev->input_buf[current_dev->input_count] = current_dev->ring_buffer[current_dev->ring_start];
+		//take characters out of ring buffer after being copied into the requestor's buffer
+		current_dev->ring_buffer[current_dev->ring_start] = '\0'; //clear the ring buffer index after copying
+	
+		//remove the copied characters from the ring buffer
+		//since its a ring buffer we need to increment the ring start index and wrap it around if it reaches the end of the buffer
+		current_dev->ring_start = (current_dev->ring_start + 1) % MAX_RING_BUFFER_SIZE;
+		current_dev->ring_count--;
+		current_dev->input_count++;
 	}
-	//c) check that a new-line code has not been found (new_line == 0)
-	if(current_dev->input_buf[current_dev->input_count] != NEWLINE) {
-		//if a new-line code has been found, return -309
-		return -309;
-	}	
+
+	sti(); //enable interrupts when trasnfer is completed
 	
 
 	//6) If more characters are needed, return. If the block is complete, continue with step 7
-	
+	//maybe something needed here to check if the input count is less than the input length and return if it is
 
 	//7) Reset the DCB status to idle, set the event flag, and return the actual count to the requestor’s variable
+	//a) set the status to idle (status = IDLE)
+	current_dev->status = 0; //IDLE
+	//b) set the event flag (event_flag = 1)
+
+	//set event flag to global event flag in file
+	current_dev->event_flag = &serial_event_flag;
+
+	//c) return the actual count to the requestor’s variable (input_count = input_count)
+	return current_dev->input_count;
 
 	//Notice that it is not necessary for serial read() to enable or disable input interrupts, except while
 	//the ring buffer is being accessed. These are always enabled while the port is open. However, we must not
 	//allow the process of removing characters from the ring buffer to be interrupted by an attempt to put a new
 	//character in
-
-	int dno = serial_devno(dev);
-	if (dno == -1 || initialized[dno] == 0) {
-		return -1;
-	}
-	return serial_poll(dev, buf, len);
 }
 
-int serial_write(device dev, const char *buf, size_t len)
+int serial_write(device dev, char *buf, size_t len)
 {
-	int dno = serial_devno(dev);
-	if (dno == -1 || initialized[dno] == 0) {
-		return -1;
+	dcb* current_dev;
+	//Ensure that the input parameters are valid
+	//Ensure that the device number is valid (COM1 - COM4)
+	switch(serial_devno(dev)) {
+		case COM1:
+			current_dev = &COM1_DCB;
+			break;
+		case COM2:
+			current_dev = &COM2_DCB;
+			break;
+		case COM3:
+			current_dev = &COM3_DCB;
+			break;
+		case COM4:
+			current_dev = &COM4_DCB;
+			break;
+		default:
+			return -1; // Invalid device number
 	}
-	return serial_out(dev, buf, len);
-}
-
-
-void serial_interrupt(void)
-{
-	/*REMINDER TO GET CORRECT DCB??*/
-
-	// Disable Interrupts 
-	cli ();
-
-	dcb* DCB = &COM1_DCB;
-
-	//Check to see if port is open
-	if(DCB->open != 0){
-		// Port is NOT open  ---  Clear interrupt and return
-		outb(0x20 , 0x20 ); // Send EOI to to register to clear
-		return;
-	} 
-
-	//Read from 
-	unsigned char interrupt_ID = inb(IIR);  // UART REGISTER ID
-
-	//check to see if interrupt was caused by serial port
-	if(interrupt_ID & (1)) {
-
-		//Identify Interrupt from register
-		if( !(interrupt_ID & (1<<2))  &&  !(interrupt_ID & (1<<1)) ){ //0b0000100 - try this method if fails
-			// 00 - MODEM STATUS INTERRUPT
-			// Read from MSR and continue
-			inb(MSR);
-		}
-		else if( !(interrupt_ID & (1<<2))  &&  (interrupt_ID & (1<<1))){
-			// 01 - OUTPUT INTERRUPT
-			// Send to secondary function
-			serial_output_interrupt(DCB); // Pass the DCB Device 
-
-		}
-		else if( (interrupt_ID & (1<<2))  &&  !(interrupt_ID & (1<<1))){
-			// 10 - INPUT INTERRUPT	
-			// Send to secondary function
-			serial_input_interrupt(DCB);
-
-		}
-		else if( (interrupt_ID & (1<<2))  &&  (interrupt_ID & (1<<1))){
-			// 11 - LINE STATUS INTERRUPT
-			// Read from LSR and continue
-			inb(LSR);
-		}
-		else{
-			// Failed to identify interrupt ID
-			// Huh
-		}
+	//check for null buffer (buf == NULL)
+	if(buf == NULL) {
+		//if the buffer is null, return -302
+		return -302;
+	}
+	//check for invalid length (len < 0 || len > MAX_RING_BUFFER_SIZE)
+	if(len < 0 || len > (size_t)MAX_RING_BUFFER_SIZE) {
+		//if the length is less than zero or greater than the size of the buffer, return -303
+		return -303;
 	}
 
-	//clear the interrupt by sending EOI to PIC command register
-	outb (0x20 , 0x20 );
+	//Ensure that the port is currently open and IDLE
+	if(initialized[serial_devno(dev)] == 0) {
+		//if the device is not open, return -301
+		return -301;
+	}
 
-	// Enable Interrupts
-	sti ();
+	//Install the buffer pointer and counters in the DCB, and set the current status to writing
+	//Set the output buffer to the supplied buffer (output_buf = buf)
+	current_dev->output_buf = buf;
+	//Set the output length to the supplied length (output_len = len)
+	current_dev->output_len = len;
+	//Set the output count to zero (output_count = 0)
+	current_dev->output_count = 0;
+	//Set the status to writing (status = WRITING)
+	current_dev->status = 2; //WRITING
+
+	// Clear the caller’s event flag
+	//Set the event flag to 0 (event_flag = 0)
+	current_dev->event_flag = 0;
+
+	//Get the first character from the requestor’s buffer and store it in the output register
+	outb(dev + THR , current_dev->output_buf[current_dev->output_count]);
+
+
+	//Enable write interrupts by setting bit 1 of the Interrupt Enable register. This must be done by setting
+	//the register to the logical OR of its previous contents and 0x02
+	outb(dev + IER, inb(dev + IER) | 0x02); //enable write interrupts
+
+	return current_dev->output_count; //return the output count to the requestor's variable
+
 }
 
 
