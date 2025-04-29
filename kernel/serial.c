@@ -589,16 +589,16 @@ int serial_write(device dev, char *buf, size_t len)
 	//Ensure that the input parameters are valid
 	//Ensure that the device number is valid (COM1 - COM4)
 	switch(serial_devno(dev)) {
-		case COM1:
+		case 0:
 			current_dev = &COM1_DCB;
 			break;
-		case COM2:
+		case 1:
 			current_dev = &COM2_DCB;
 			break;
-		case COM3:
+		case 2:
 			current_dev = &COM3_DCB;
 			break;
-		case COM4:
+		case 3:
 			current_dev = &COM4_DCB;
 			break;
 		default:
