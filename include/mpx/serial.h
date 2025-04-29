@@ -7,7 +7,8 @@
 #include <mpx/device.h>
 
 typedef struct dcb {
-    int dev;    
+    int dev;
+    device dev_address; 
     int open; // 0 closed, 1 open
     int status; // 0 idle, 1 reading, 2 writing
     int* event_flag; // for i/o completion signaling (0 = start, 1 = complete)
