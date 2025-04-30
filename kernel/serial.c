@@ -1,12 +1,4 @@
-#include <mpx/io.h>
 #include <mpx/serial.h>
-#include <sys_req.h>
-#include <stdlib.h>
-#include <string.h>
-#include <mpx/serial.h>
-#include <mpx/comexec.h>
-#include <memory.h>
-#include <mpx/interrupts.h>
 
 // declare assembly stub
 extern void serial_isr(void);
@@ -293,7 +285,12 @@ int serial_open(device dev, int speed)
 	* In partciular, this should include:
 	*/
 
-		dcb* new_dcb = (dcb*)sys_alloc_mem(sizeof(dcb));
+		dcb* new_dcb = get_dcb(dno); // get the DCB for the specified device number
+		// note: we verified previously that this device is not already open
+
+	 	// setting the device number in the DCB
+
+		new_dcb->dev_address = dev; // set the device address
 
 	 	// indicating that the device is open
 		new_dcb->open = 1;
