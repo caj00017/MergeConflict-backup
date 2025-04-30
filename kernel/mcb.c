@@ -11,7 +11,7 @@ char str[100] = { 0 };
 void initialize_heap(size_t size) {
     void* heap = kmalloc(size, 0, NULL); //allocate singular page for heap
     if(heap == NULL) {
-        print("Heap allocation failed\n");
+        // print("Heap allocation failed\n");
         return;
     }
 
@@ -32,15 +32,15 @@ mcb* mcb_setup(unsigned int start_addr, int size) {
     // initialize members
     clear(str);
     new_mcb->start_addr = start_addr + sizeof(mcb);
-    print("Start address intialized: 0x");
-    print(custom_itoa((int)new_mcb->start_addr, str, 16));
-    println();
+    // print("Start address intialized: 0x");
+    // print(custom_itoa((int)new_mcb->start_addr, str, 16));
+    // println();
 
     clear(str);
     new_mcb->size = size - sizeof(mcb);
-    print("Size initialized: ");
-    print(custom_itoa((new_mcb->size+ sizeof(mcb)), str, 10));
-    println();
+    // print("Size initialized: ");
+    // print(custom_itoa((new_mcb->size+ sizeof(mcb)), str, 10));
+    // println();
 
     new_mcb->next_node = NULL;
     new_mcb->prev_node = NULL;
@@ -68,13 +68,13 @@ void * allocate_memory(size_t size){
 
     //Check if size is an appropriate value
     if(size<=0){
-        print_error("Passed size cannot be allocated.\n");
+        // print_error("Passed size cannot be allocated.\n");
         return NULL;
     }
 
     /*CHECK IF THERE ARE AVAILABLE FREE BLOCKS*/
     if(MCB_LIST.head == NULL){
-        print_error("Cannot Allocate Memory ; No Blocks Available ");
+        // print_error("Cannot Allocate Memory ; No Blocks Available ");
     }
 
     //Pointer to find best fit and temp pointer to iterate through list
@@ -96,7 +96,7 @@ void * allocate_memory(size_t size){
     //Check if the best fit has a value
     if(bestFitPtr == NULL){
         //There was no mcb big enough
-        print_error("There was not enough memory to allocate.");
+        // print_error("There was not enough memory to allocate.");
         return NULL;
     }
 

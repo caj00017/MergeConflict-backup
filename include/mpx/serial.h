@@ -38,6 +38,8 @@ typedef struct iocb {
     struct iocb* next;
 } iocb;
 
+extern dcb* dcb_list[4];
+
 /** 
     @brief Character Code for Up Arrow Key
 */

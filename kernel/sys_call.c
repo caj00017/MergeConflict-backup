@@ -19,16 +19,20 @@ context* sys_call(context* ctx) {
 
     // get the operation code from the context
     int op = ctx->EAX;
-    int dev = ctx->EBX;
-    current_dcb = get_dcb(dev);
 
-    iocb* cur_iocb = current_dcb->queue_head;
+    extern dcb* dcb_list[4];
 
-    while(cur_iocb != NULL){
-        if(cur_iocb->event_flag == 1){
-            IO_Completion(ctx, cur_iocb);
+    for(int i = 0; i < 4; i++){
+        dcb* dev = dcb_list[i];
+        if(dev && dev->queue_head != NULL){
+            iocb* current_iocb = dev->queue_head;
+            while(current_iocb != NULL){
+                if(current_iocb->event_flag == 1){
+                    IO_Completion(ctx, current_iocb);
+                }
+                current_iocb = current_iocb->next;
+            }
         }
-        cur_iocb = cur_iocb->next;
     }
 
     // if there is a ready process in the queue, set it to the next process
@@ -102,36 +106,109 @@ context* sys_call(context* ctx) {
 
     }
     else if (op == 2) /* READ */{
+
+        int dev = ctx->EBX;
+        void* buf = (void*)ctx->ECX;
+        int len = ctx->EDX;
+
+        current_dcb = get_dcb(dev);
+
         if(current_dcb->status == 0){
-            serial_read(current_dcb->dev, current_dcb->queue_head->buffer, current_dcb->queue_head->length);
+            serial_read(dev, buf, len);
+
+            iocb* new_iocb = iocb_setup(CURRENT_PCB, buf, len, 2);
+            current_dcb->queue_head = new_iocb;
+            current_dcb->status = 1;
         }
         else{
-            IO_Scheduler(ctx, 2);
+            if(CURRENT_PCB != NULL){
+                pcb_remove(CURRENT_PCB);
+                CURRENT_PCB->state = 3;
+                pcb_insert(CURRENT_PCB);
+            }
+    
+            IO_Scheduler(ctx, 3);
+    
+            if (nextPCB != NULL) {
+                //remove the process from the queue to be exited
+                pcb_remove(nextPCB);
+                CURRENT_PCB = nextPCB;
+                //set its state to runnning
+                CURRENT_PCB->state = RUNNING;
+                //save the context of the process while it is being run
+                context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
+                //make sure the return value seen by sys_req is zero
+                next_ctx->EAX = 0;
+                //return the running process' context
+                return next_ctx;
+            }
+            else{
+                GLOBAL_CTX->EAX = 0;
+                return GLOBAL_CTX;
+            }
         }
-        context *return_ctx = ctx;
-        return return_ctx;
+        ctx->EAX = 0;
+        return ctx;
     }
     
     else if (op == 3) /* WRITE */{
+
+        int dev = ctx->EBX;
+        void* buf = (void*)ctx->ECX;
+        int len = ctx->EDX;
+
+        current_dcb = get_dcb(dev);
+
         if(current_dcb->status == 0){
-            serial_write(current_dcb->dev, current_dcb->queue_head->buffer, current_dcb->queue_head->length);
-            
+            serial_write(dev, buf, len);
+
+            iocb* new_iocb = iocb_setup(CURRENT_PCB, current_dcb->output_buf, current_dcb->output_len, 3);
+            current_dcb->queue_head = new_iocb;
+            current_dcb->status = 2;
         }
         else{
-            IO_Scheduler(ctx, 3);
-        }
+            if(CURRENT_PCB != NULL){
+                pcb_remove(CURRENT_PCB);
+                CURRENT_PCB->state = 3;
+                pcb_insert(CURRENT_PCB);
+            }
 
-        context *return_ctx = ctx;
-        return return_ctx;
+            IO_Scheduler(ctx, 3);
+
+            if (nextPCB != NULL) {
+                //remove the process from the queue to be exited
+                pcb_remove(nextPCB);
+                CURRENT_PCB = nextPCB;
+                //set its state to runnning
+                CURRENT_PCB->state = RUNNING;
+                //save the context of the process while it is being run
+                context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
+                //make sure the return value seen by sys_req is zero
+                next_ctx->EAX = 0;
+                //return the running process' context
+                return next_ctx;
+            }
+            else{
+                GLOBAL_CTX->EAX = 0;
+                return GLOBAL_CTX;
+            }
+        }
+        ctx->EAX = 0;
+        return ctx;
     }
-    //shouldn't reach here
-    else {
-        //in that case we just need to make sure that we return the current context
-        //and also make sure that the return value seen by sys_req is -1
-        ctx->EAX = -1;
-        context *return_ctx = ctx;
-        return return_ctx;
-    }
+
+   
+    // //shouldn't reach here
+    // else {
+    //     //in that case we just need to make sure that we return the current context
+    //     //and also make sure that the return value seen by sys_req is -1
+    //     ctx->EAX = -1;
+    //     context *return_ctx = ctx;
+    //     return return_ctx;
+    // }
+    ctx->EAX = -1;
+    context *return_ctx = ctx;
+    return return_ctx;
 }
 
 pcb* find_first_ready(void) {
@@ -173,30 +250,29 @@ int IO_Scheduler(context* ctx, int op_code) {
     // }
 
     //Checking to make sure the size is greater than 0
-    if(ctx->EDX <= 0){
+    if(ctx->EDX == 0){
+        return -1;
+    }
+ 
+
+    iocb* new_iocb = iocb_setup(CURRENT_PCB, (void*)ctx->ECX, ctx->EDX, op_code);
+    if(new_iocb == NULL){
         return -1;
     }
 
-    if(current_dcb->queue_head->process == NULL){
-        
-        current_dcb->queue_head->process = CURRENT_PCB;
-        current_dcb->queue_head->buffer = (void*)ctx->ECX;
-        current_dcb->queue_head->length = ctx->EBX;
+    current_dcb = get_dcb(ctx->EBX);
 
-        if(op_code == 2){
-            serial_input_interrupt(current_dcb->dev);
-        }
-        else{
-            serial_output_interrupt(current_dcb->dev);
-        }
+    if(current_dcb->queue_head == NULL){
+        current_dcb->queue_head = new_iocb;
+
+        serial_interrupt();
     }
-    else if(current_dcb->queue_head != NULL){
-        iocb* current_iocb = current_dcb->queue_head;
-        while(current_iocb->next != NULL){
-            current_iocb = current_iocb->next;
+    else{
+        iocb* current = current_dcb->queue_head;
+        while(current->next != NULL){
+            current = current->next;
         }
-        iocb* new_iocb = iocb_setup(CURRENT_PCB, (void*)ctx->ECX, ctx->EDX, op_code);
-        current_iocb->next = new_iocb;
+        current->next = new_iocb;
     }
 
     return 0;

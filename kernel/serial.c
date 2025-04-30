@@ -35,6 +35,13 @@ struct dcb COM2_DCB;
 struct dcb COM3_DCB;
 struct dcb COM4_DCB;
 
+dcb* dcb_list[] = {
+	&COM1_DCB,
+	&COM2_DCB,
+	&COM3_DCB,
+	&COM4_DCB
+};
+
 static int serial_event_flag = 1; // global event flag for serial devices
 
 static int initialized[4] = { 0 };
@@ -293,7 +300,7 @@ int serial_open(device dev, int speed)
 	* In partciular, this should include:
 	*/
 
-		dcb* new_dcb = (dcb*)sys_alloc_mem(sizeof(dcb));
+		dcb* new_dcb = get_dcb(dno);
 
 	 	// indicating that the device is open
 		new_dcb->open = 1;
@@ -589,16 +596,16 @@ int serial_write(device dev, char *buf, size_t len)
 	//Ensure that the input parameters are valid
 	//Ensure that the device number is valid (COM1 - COM4)
 	switch(serial_devno(dev)) {
-		case COM1:
+		case 0:
 			current_dev = &COM1_DCB;
 			break;
-		case COM2:
+		case 1:
 			current_dev = &COM2_DCB;
 			break;
-		case COM3:
+		case 2:
 			current_dev = &COM3_DCB;
 			break;
-		case COM4:
+		case 3:
 			current_dev = &COM4_DCB;
 			break;
 		default:
@@ -646,6 +653,63 @@ int serial_write(device dev, char *buf, size_t len)
 	return current_dev->output_count; //return the output count to the requestor's variable
 
 }
+
+void serial_interrupt(void)
+{
+ 
+ 	// Disable Interrupts 
+ 	cli ();
+ 
+ 	dcb* DCB = &COM1_DCB;
+ 
+ 	//Check to see if port is open
+ 	if(DCB->open != 0){
+ 		// Port is NOT open  ---  Clear interrupt and return
+ 		outb(0x20 , 0x20 ); // Send EOI to to register to clear
+ 		return;
+ 	} 
+ 
+ 	//Read from 
+ 	unsigned char interrupt_ID = inb(IIR);  // UART REGISTER ID
+ 
+ 	//check to see if interrupt was caused by serial port
+ 	if(interrupt_ID & (1)) {
+ 
+ 		//Identify Interrupt from register
+ 		if( !(interrupt_ID & (1<<2))  &&  !(interrupt_ID & (1<<1)) ){ //0b0000100 - try this method if fails
+ 			// 00 - MODEM STATUS INTERRUPT
+ 			// Read from MSR and continue
+ 			inb(MSR);
+ 		}
+ 		else if( !(interrupt_ID & (1<<2))  &&  (interrupt_ID & (1<<1))){
+ 			// 01 - OUTPUT INTERRUPT
+ 			// Send to secondary function
+ 			serial_output_interrupt(DCB); // Pass the DCB Device 
+ 
+ 		}
+ 		else if( (interrupt_ID & (1<<2))  &&  !(interrupt_ID & (1<<1))){
+ 			// 10 - INPUT INTERRUPT	
+ 			// Send to secondary function
+ 			serial_input_interrupt(DCB);
+ 
+ 		}
+ 		else if( (interrupt_ID & (1<<2))  &&  (interrupt_ID & (1<<1))){
+ 			// 11 - LINE STATUS INTERRUPT
+ 			// Read from LSR and continue
+ 			inb(LSR);
+ 		}
+ 		else{
+ 			// Failed to identify interrupt ID
+ 			// Huh
+ 		}
+ 	}
+ 
+ 	//clear the interrupt by sending EOI to PIC command register
+ 	outb (0x20 , 0x20 );
+ 
+ 	// Enable Interrupts
+ 	sti ();
+ }
 
 
 void serial_input_interrupt(dcb* DCB)
@@ -757,13 +821,13 @@ void serial_output_interrupt(dcb* DCB)
 dcb* get_dcb(int devno) {
 	// Get the DCB for the specified device number
 	switch (devno) {
-	case 0:
+	case COM1:
 		return &COM1_DCB;
-	case 1:
+	case COM2:
 		return &COM2_DCB;
-	case 2:
+	case COM3:
 		return &COM3_DCB;
-	case 3:
+	case COM4:
 		return &COM4_DCB;
 	default:
 		return NULL; // Invalid device number
@@ -785,5 +849,29 @@ int get_irq(int devno) {
 			return -1; // invalid device number
 	}
 	return irq;
+}
+
+iocb* iocb_setup(struct pcb* current_pcb, char* new_buffer, size_t new_length, int op_code){
+    iocb* new_iocb = (iocb*)sys_alloc_mem(sizeof(iocb));
+	if(new_iocb == NULL){
+		return NULL;
+	}
+
+	new_iocb->process = current_pcb;
+	new_iocb->buffer = new_buffer;
+	new_iocb->length = new_length;
+	new_iocb->event_flag = 0;
+	new_iocb->transferred = 0;
+	new_iocb->operation = op_code;
+	new_iocb->next = NULL;
+
+	return new_iocb;
+}
+
+void iocb_clear(iocb* cur_iocb){
+	cur_iocb->process = NULL;
+	cur_iocb->buffer = NULL;
+	cur_iocb->length = 0;
+	cur_iocb->operation = -1;
 }
 
