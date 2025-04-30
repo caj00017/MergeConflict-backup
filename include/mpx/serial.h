@@ -3,11 +3,21 @@
 
 #define MAX_RING_BUFFER_SIZE 128
 
-#include <stddef.h>
+#include <mpx/interrupts.h>
+#include <mpx/comexec.h>
 #include <mpx/device.h>
+#include <mpx/io.h>
+
+#include <sys_req.h>
+#include <stdlib.h>
+#include <string.h>
+#include <memory.h>
+#include <stddef.h>
 
 typedef struct dcb {
-    int dev;    
+
+    device dev_address; // enum corresponding to the device address (COM1, COM2, COM3, COM4)
+    int dev; // device number (0-3 for COM1-COM4)
     int open; // 0 closed, 1 open
     int status; // 0 idle, 1 reading, 2 writing
     int* event_flag; // for i/o completion signaling (0 = start, 1 = complete)
