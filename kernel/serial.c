@@ -661,53 +661,51 @@ void serial_interrupt(void)
  	dcb* DCB = &COM1_DCB;
  
  	//Check to see if port is open
- 	if(DCB->open != 0){
+ 	if(DCB->open != 1){
  		// Port is NOT open  ---  Clear interrupt and return
  		outb(0x20 , 0x20 ); // Send EOI to to register to clear
  		return;
  	} 
  
  	//Read from 
- 	unsigned char interrupt_ID = inb(IIR);  // UART REGISTER ID
+ 	unsigned char interrupt_ID = inb(DCB->dev_address + IIR);  // UART REGISTER ID
  
  	//check to see if interrupt was caused by serial port
- 	if(interrupt_ID & (1)) {
  
  		//Identify Interrupt from register
- 		if( !(interrupt_ID & (1<<2))  &&  !(interrupt_ID & (1<<1)) ){ //0b0000100 - try this method if fails
+ 		if( (interrupt_ID & 0x06) == 0x00 ){ //0b0000100 - try this method if fails
  			// 00 - MODEM STATUS INTERRUPT
  			// Read from MSR and continue
- 			inb(MSR);
+ 			inb(DCB->dev_address + MSR);
  		}
- 		else if( !(interrupt_ID & (1<<2))  &&  (interrupt_ID & (1<<1))){
+ 		else if( (interrupt_ID & 0x06) == 0x02){
  			// 01 - OUTPUT INTERRUPT
  			// Send to secondary function
  			serial_output_interrupt(DCB); // Pass the DCB Device 
  
  		}
- 		else if( (interrupt_ID & (1<<2))  &&  !(interrupt_ID & (1<<1))){
+ 		else if((interrupt_ID & 0x06) == 0x04){
  			// 10 - INPUT INTERRUPT	
  			// Send to secondary function
  			serial_input_interrupt(DCB);
  
  		}
- 		else if( (interrupt_ID & (1<<2))  &&  (interrupt_ID & (1<<1))){
+ 		else if((interrupt_ID & 0x06) == 0x06){
  			// 11 - LINE STATUS INTERRUPT
  			// Read from LSR and continue
- 			inb(LSR);
+ 			inb(DCB->dev_address + LSR);
  		}
  		else{
  			// Failed to identify interrupt ID
  			// Huh
  		}
+
+		//clear the interrupt by sending EOI to PIC command register
+		outb(0x20 , 0x20 );
+ 
+		// Enable Interrupts
+		sti ();
  	}
- 
- 	//clear the interrupt by sending EOI to PIC command register
- 	outb (0x20 , 0x20 );
- 
- 	// Enable Interrupts
- 	sti ();
- }
 
 
 void serial_input_interrupt(dcb* DCB)
