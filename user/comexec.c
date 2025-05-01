@@ -783,8 +783,8 @@ int comexec(void) {
     }
 
     else {
-        println();
-        print_error("Error: Invalid command. Please Re-type.");
+        //println();
+        //print_error("Error: Invalid command. Please Re-type.");
         return 1;
     }
 }

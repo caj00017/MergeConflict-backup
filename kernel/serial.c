@@ -461,16 +461,16 @@ int serial_read(device dev, char *buf, size_t len)
 	//1) validate the supplied params
 	//a) check that the device number is valid (COM1 - COM4)
 	switch(serial_devno(dev)) {
-		case COM1:
+		case 0:
 			current_dev = &COM1_DCB;
 			break;
-		case COM2:
+		case 1:
 			current_dev = &COM2_DCB;
 			break;
-		case COM3:
+		case 2:
 			current_dev = &COM3_DCB;
 			break;
-		case COM4:
+		case 3:
 			current_dev = &COM4_DCB;
 			break;
 		default:
@@ -500,7 +500,7 @@ int serial_read(device dev, char *buf, size_t len)
 		return -304;
 	}
 	//b) check that the input buffer is not NULL (input_buf == NULL)
-	if(current_dev->input_buf == NULL) {
+	if(current_dev->input_buf != NULL) {
 		//if the input buffer is null, return -305
 		return -305;
 	}
@@ -530,24 +530,19 @@ int serial_read(device dev, char *buf, size_t len)
 	//should, of course, be removed from the ring buffer. Either input interrupts or all interrupts should be
 	//disabled during the copying
 	//a) check that the ring buffer is not empty (ring_count == 0)
-	if(current_dev->ring_count == 0) {
-		//if the ring buffer is empty, return -307
-		return -307;
-	}
-	//b) check that the requested count has not been reached (input_count == input_len)	
 
 	cli(); //disable interrupts while transfer is occuring
 
 	//d) copy the characters from the ring buffer to the requestor’s buffer (input_buf = ring_buffer)
-	for(int i = 0; i < current_dev->ring_count; i++) {
-		//check to see if ring buffer in empty (ring_count == 0)
-		if(current_dev->ring_count == 0) {
-			//if the ring buffer is empty, break out of the loop
-			break;
-		}
+	for(int i = current_dev->ring_count; i < 0; i--) {
+		// //check to see if ring buffer in empty (ring_count == 0)
+		// if(current_dev->ring_count == 0) {
+		// 	//if the ring buffer is empty, break out of the loop
+		// 	continue;
+		// }
 
 		//check for newline character before copying anything else into the requestor's buffer
-		if(current_dev->input_buf[current_dev->input_count] == NEWLINE) {
+		if(current_dev->input_buf[current_dev->input_count] == '\n') {
 			//if the new-line code is found, break out of the loop
 			break;
 		}
@@ -562,9 +557,13 @@ int serial_read(device dev, char *buf, size_t len)
 		current_dev->ring_start = (current_dev->ring_start + 1) % MAX_RING_BUFFER_SIZE;
 		current_dev->ring_count--;
 		current_dev->input_count++;
+		if(current_dev->input_count >= len) {
+			break;
+		}
 	}
+	if(current_dev->input_count == 0) {
 
-	sti(); //enable interrupts when trasnfer is completed
+		sti(); //enable interrupts when trasnfer is completed
 	
 
 	//6) If more characters are needed, return. If the block is complete, continue with step 7
@@ -572,14 +571,23 @@ int serial_read(device dev, char *buf, size_t len)
 
 	//7) Reset the DCB status to idle, set the event flag, and return the actual count to the requestor’s variable
 	//a) set the status to idle (status = IDLE)
-	current_dev->status = 0; //IDLE
+	//current_dev->status = 0; //IDLE
 	//b) set the event flag (event_flag = 1)
 
 	//set event flag to global event flag in file
-	current_dev->event_flag = &serial_event_flag;
+		current_dev->event_flag = &serial_event_flag;
 
 	//c) return the actual count to the requestor’s variable (input_count = input_count)
-	return current_dev->input_count;
+		return current_dev->input_count;
+	}
+	else {
+		sti();
+		//if the input count is not zero, that means we have characters in the requestor's buffer, so we need to set the status to idle and set the event flag
+		current_dev->status = 0; //IDLE
+		current_dev->event_flag = &serial_event_flag; //set event flag to global event flag in file
+		//return the actual count to the requestor’s variable (input_count = input_count)
+		return current_dev->input_count;
+	}
 
 	//Notice that it is not necessary for serial read() to enable or disable input interrupts, except while
 	//the ring buffer is being accessed. These are always enabled while the port is open. However, we must not
@@ -712,7 +720,7 @@ void serial_input_interrupt(dcb* DCB)
 {
 
 	// Read char from the register
-	unsigned char in_data = inb(RBR);
+	unsigned char in_data = inb(DCB->dev_address + RBR);
 
 	// Check current status:
 	if(DCB->status != 1) { 
