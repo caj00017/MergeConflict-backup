@@ -164,78 +164,6 @@ int comexec(void) {
             return 0;
         }
     }
-    else if (strcmp(buf, "process_block") == 0 || strcmp(buf, "pb") == 0)
-    {
-        char* name;
-        char response[100] = { 0 };
-        println();
-        print("Please enter the name of the process to block: ");
-
-        //Write formatting for entry and read from the command line
-        println();
-        print_color("@ ", color);
-        sys_req(READ, COM1, response, sizeof(response));
-        trim(response);
-
-        name = response;
-
-        pcb* PCB = pcb_find(name);
-        if (PCB == NULL) {
-            println();
-            print("Process not found: ");
-            print(name);
-            return 0; // continue running comexec
-        }
-        else if (PCB->state != READY_SUS && PCB->state != READY_NOT_SUS) {
-            println();
-            print("Process is not in a ready state: ");
-            print(name);
-            return 0; // continue running comexec
-        }
-        else {
-            println();
-            print("Blocking PCB: ");
-            print(name);
-            block_PCB(name);
-            return 0;
-        }
-    }
-    else if (strcmp(buf, "process_unblock") == 0 || strcmp(buf, "pub") == 0)
-    {
-        char* name;
-        char response[100] = { 0 };
-        println();
-        print("Please enter the name of the process to unblock: ");
-
-        //Write formatting for entry and read from the command line
-        println();
-        print_color("@ ", color);
-        sys_req(READ, COM1, response, sizeof(response));
-        trim(response);
-
-        name = response;
-
-        pcb* PCB = pcb_find(name);
-        if (PCB == NULL) {
-            println();
-            print("Process not found: ");
-            print(name);
-            return 0; // continue running comexec
-        }
-        else if (PCB->state != BLOCKED_SUS && PCB->state != BLOCKED_NOT_SUS) {
-            println();
-            print("Process is not in a blocked state: ");
-            print(name);
-            return 0; // continue running comexec
-        }
-        else {
-            println();
-            print("Unblocking PCB: ");
-            print(name);
-            unblock_PCB(name);
-            return 0;
-        }
-    }
     else if (strcmp(buf, "process_suspend") == 0 || strcmp(buf, "psus") == 0)
     {
         char* name;
@@ -976,12 +904,6 @@ int help(void) {
     println(); 
     print_color("@ ", color);
     print("process_delete\tpd\tDeletes a process.");
-    println(); 
-    print_color("@ ", color);
-    print("process_block\t\tpb\tBlocks a process.");
-    println(); 
-    print_color("@ ", color);
-    print("process_unblock\tpub\tUnblocks a process.");
     println(); 
     print_color("@ ", color);
     print("process_suspend\tpsus\tSuspends a process.");
