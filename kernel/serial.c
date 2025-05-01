@@ -785,10 +785,10 @@ void serial_output_interrupt(dcb* DCB)
 			// Get next character from requestor output buffer                <-----------
 			unsigned char data_out = DCB->output_buf[DCB->output_count];
 			DCB->output_buf[DCB->output_count] = '\0';
-			DCB->output_count --;
+			DCB->output_count ++;
 
 			// Store in output register
-			outb(THR, data_out);
+			outb(DCB->dev_address + THR, data_out);
 
 			return ;
 
@@ -802,7 +802,7 @@ void serial_output_interrupt(dcb* DCB)
 			//Set event flag 												<-------------
 			*(DCB->event_flag) = 1;
 			// Disable write interrupts by clearing bit 1 in the interrupt enable register
-			outb(IER, ( inb(IER)  & 253));  //1111 1101
+			outb(DCB->dev_address + IER, ( inb(IER)  & 253));  //1111 1101
 
 			return;
 			//Return count value??
