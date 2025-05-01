@@ -710,6 +710,8 @@ void serial_interrupt(void)
 
 		//clear the interrupt by sending EOI to PIC command register
 		outb(0x20 , 0x20 );
+
+		DCB->queue_head->event_flag = 1;
  
 		// Enable Interrupts
 		sti ();
@@ -763,6 +765,8 @@ void serial_input_interrupt(dcb* DCB)
 		//Set status to idle
 		DCB->status = 0;
 
+		DCB->queue_head->transferred = DCB->input_count;
+
 		//Set event flag 												<-------------------
 		*(DCB->event_flag) = 1;
 		return;
@@ -809,6 +813,8 @@ void serial_output_interrupt(dcb* DCB)
 			DCB->status = 0;
 			//Set event flag 												<-------------
 			*(DCB->event_flag) = 1;
+
+			DCB->queue_head->transferred = DCB->output_count;
 			// Disable write interrupts by clearing bit 1 in the interrupt enable register
 			outb(DCB->dev_address + IER, ( inb(IER)  & 253));  //1111 1101
 
@@ -877,5 +883,7 @@ void iocb_clear(iocb* cur_iocb){
 	cur_iocb->buffer = NULL;
 	cur_iocb->length = 0;
 	cur_iocb->operation = -1;
+
+	sys_free_mem(cur_iocb);
 }
 

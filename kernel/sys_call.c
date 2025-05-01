@@ -287,6 +287,8 @@ void IO_Completion(context* ctx, iocb* current_iocb){
 
    ctx->EAX = current_iocb->transferred;
 
+   current_dcb->queue_head = current_iocb->next;
+
    iocb_clear(current_iocb);
 
 

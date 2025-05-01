@@ -26,7 +26,7 @@ void comhand(void) {
             return;
         }
         if(status != 5) {
-            println();
+            // println();
         }
         sys_req(IDLE);
     } 
