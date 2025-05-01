@@ -265,7 +265,8 @@ int IO_Scheduler(context* ctx, int op_code) {
     if(current_dcb->queue_head == NULL){
         current_dcb->queue_head = new_iocb;
 
-        serial_interrupt();
+        
+
     }
     else{
         iocb* current = current_dcb->queue_head;
@@ -287,6 +288,7 @@ void IO_Completion(context* ctx, iocb* current_iocb){
    ctx->EAX = current_iocb->transferred;
 
    iocb_clear(current_iocb);
+
 
    if(current_dcb->queue_head != NULL){
         IO_Scheduler(ctx, current_dcb->queue_head->next->operation);

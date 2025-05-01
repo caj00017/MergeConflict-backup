@@ -1,8 +1,8 @@
 bits 32
 global serial_isr
-extern sys_call
+extern serial_interrupt
 
 serial_isr:
 
-    call sys_call
+    call serial_interrupt
     iret

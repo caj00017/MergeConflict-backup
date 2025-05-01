@@ -1,7 +1,7 @@
 #include <mpx/serial.h>
 
 // declare assembly stub
-extern void serial_isr(void);
+extern void serial_isr(void *);
 
 //Function protos
 void buffer_refresh(char *buffer, int buf_length, int pos);

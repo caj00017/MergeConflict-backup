@@ -28,6 +28,7 @@ void kmain(void)
 	// via klogv(), or the message won't print. In all other cases, the
 	// output should come first as it describes what is about to happen.
 	int intialize_serial = serial_init(COM1);
+	serial_open(COM1, 19200);
 
 	if(intialize_serial == 0){
 		klogv(COM1, "Initialized serial I/O on COM1 device...");
