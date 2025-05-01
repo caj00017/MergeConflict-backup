@@ -28,7 +28,7 @@ void kmain(void)
 	// via klogv(), or the message won't print. In all other cases, the
 	// output should come first as it describes what is about to happen.
 	int intialize_serial = serial_init(COM1);
-	serial_open(COM1, 19200);
+	
 
 	if(intialize_serial == 0){
 		klogv(COM1, "Initialized serial I/O on COM1 device...");
@@ -99,7 +99,7 @@ void kmain(void)
 	klogv(COM1, "Transferring control to commhand...");
 	// pcb* comhand_pcb = pcb_setup("comhand", 1, 0, 1, comhand);
 	// pcb_insert(comhand_pcb);
-	
+	serial_open(COM1, 19200);
 
 	pcb* sysidleprocess = pcb_setup("sysidleprocess", 1, 9, 1, sys_idle_process, NULL);
 	pcb_insert(sysidleprocess);

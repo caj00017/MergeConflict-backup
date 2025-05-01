@@ -160,7 +160,7 @@ context* sys_call(context* ctx) {
         current_dcb = get_dcb(dev);
 
         if(current_dcb->status == 0){
-            serial_write(dev, buf, len);
+            serial_write(dev, buf, len); //do we need to pay attention to output??
 
             iocb* new_iocb = iocb_setup(CURRENT_PCB, current_dcb->output_buf, current_dcb->output_len, 3);
             current_dcb->queue_head = new_iocb;

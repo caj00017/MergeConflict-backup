@@ -283,7 +283,7 @@ int serial_open(device dev, int speed)
 		return -1; // verify device is valid, this status code may be wrong
 	}
 
-	if (initialized[dno] == 1) {
+	if (initialized[dno] != 1) {
 		return -103; // verify device is not open
 	}
 
@@ -292,7 +292,7 @@ int serial_open(device dev, int speed)
 	* In partciular, this should include:
 	*/
 
-		dcb* new_dcb = get_dcb(dno); // get the DCB for the specified device number
+		dcb* new_dcb = get_dcb(dev); // get the DCB for the specified device number
 		// note: we verified previously that this device is not already open
 
 	 	// setting the device number in the DCB
@@ -303,7 +303,7 @@ int serial_open(device dev, int speed)
 		new_dcb->open = 1;
 		
 	 	// setting the event flag to 0
-		new_dcb->event_flag = 0;
+		new_dcb->event_flag = &serial_event_flag;
 
 	 	// setting the initial device status to idle
 		new_dcb->status = 0;
@@ -523,7 +523,7 @@ int serial_read(device dev, char *buf, size_t len)
 		return -306;
 	}
 	//b) clear the current event flag (event_flag = 0)
-	current_dev->event_flag = 0;
+	*(current_dev->event_flag) = 0;
 
 	//5) Copy characters from the ring buffer to the requestor’s buffer, until the ring buffer is emptied, the
 	//requested count has been reached, or a new-line (ENTER) code has been found. The copied characters
@@ -637,11 +637,12 @@ int serial_write(device dev, char *buf, size_t len)
 
 	// Clear the caller’s event flag
 	//Set the event flag to 0 (event_flag = 0)
-	current_dev->event_flag = 0;
+	*(current_dev->event_flag) = 0;
 
 	//Get the first character from the requestor’s buffer and store it in the output register
 	outb(dev + THR , current_dev->output_buf[current_dev->output_count]);
 
+	current_dev->output_count++;
 
 	//Enable write interrupts by setting bit 1 of the Interrupt Enable register. This must be done by setting
 	//the register to the logical OR of its previous contents and 0x02
