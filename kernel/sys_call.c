@@ -122,6 +122,7 @@ context* sys_call(context* ctx) {
         }
         else{
             if(CURRENT_PCB != NULL){
+                CURRENT_PCB->stack_ptr = (unsigned char*)ctx;
                 pcb_remove(CURRENT_PCB);
                 CURRENT_PCB->state = BLOCKED_NOT_SUS;
                 pcb_insert(CURRENT_PCB);
@@ -171,6 +172,7 @@ context* sys_call(context* ctx) {
         }
 
         if(CURRENT_PCB != NULL){
+            CURRENT_PCB->stack_ptr = (unsigned char*)ctx;
             pcb_remove(CURRENT_PCB);
             CURRENT_PCB->state = BLOCKED_NOT_SUS;
             pcb_insert(CURRENT_PCB);
@@ -300,7 +302,10 @@ void IO_Completion(context* ctx, iocb* current_iocb){
 
 
    if(current_dcb->queue_head != NULL){
-        IO_Scheduler(ctx, current_dcb->queue_head->next->operation);
+        pcb_remove(current_dcb->queue_head->process);
+        current_dcb->queue_head->process->state = BLOCKED_NOT_SUS;
+        pcb_insert(current_dcb->queue_head->process);
+        IO_Scheduler(ctx, current_dcb->queue_head->operation);
    }
 
 }

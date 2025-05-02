@@ -124,8 +124,8 @@ void sys_idle_process(void)
 {
 	// char msg[] = "IDLE PROCESS EXECUTING.\r\n";
 	
-	// for (;;) {
+	for (;;) {
 	// 	sys_req(WRITE, COM1, msg, strlen(msg));
-		sys_req(IDLE);
-	// }
+	sys_req(IDLE);
+	}
 }
