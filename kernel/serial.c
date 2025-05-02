@@ -571,7 +571,7 @@ int serial_read(device dev, char *buf, size_t len)
 
 	//7) Reset the DCB status to idle, set the event flag, and return the actual count to the requestor’s variable
 	//a) set the status to idle (status = IDLE)
-	//current_dev->status = 0; //IDLE
+		current_dev->status = 0; //IDLE
 	//b) set the event flag (event_flag = 1)
 
 	//set event flag to global event flag in file
@@ -649,7 +649,7 @@ int serial_write(device dev, char *buf, size_t len)
 
 	//Get the first character from the requestor’s buffer and store it in the output register
 	outb(dev + THR , current_dev->output_buf[current_dev->output_count]);
-
+	current_dev->output_buf[current_dev->output_count] = '\0';
 	current_dev->output_count++;
 
 	//Enable write interrupts by setting bit 1 of the Interrupt Enable register. This must be done by setting
