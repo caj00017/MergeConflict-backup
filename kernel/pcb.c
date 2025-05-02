@@ -163,7 +163,6 @@ void pcb_insert(pcb* pcbPtr){
         //Create pointer to help iterate through array
         pcb* tempPtr = NULL;
 
-
         //Case 1: No Nodes in the ready queue
         if(READY.head == NULL && READY.tail == NULL){
             //Set both the head and tail equal to the pcb
@@ -177,10 +176,6 @@ void pcb_insert(pcb* pcbPtr){
 
         //Iterate through.
         while( pcbPtr->priority >= tempPtr->priority   ){
-            if(pcbPtr->name == tempPtr->name){
-                return;
-            }
-
             //Reached end
             if(tempPtr->next_node == NULL){
                 //Place at tail
