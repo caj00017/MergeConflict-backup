@@ -20,8 +20,8 @@ context* sys_call(context* ctx) {
     // get the operation code from the context
     int op = ctx->EAX;
 
+    // first, run any pending I/O completions
     extern dcb* dcb_list[4];
-
     for(int i = 0; i < 4; i++){
         dcb* dev = dcb_list[i];
         if(dev && dev->queue_head != NULL){
@@ -35,75 +35,54 @@ context* sys_call(context* ctx) {
         }
     }
 
-    // if there is a ready process in the queue, set it to the next process
-    if(return_queue(0) != NULL) {
-        nextPCB = find_first_ready();
-    }
+    // clear out last syscall's choice
+    nextPCB = NULL;
     
-    if(op == 0) /* EXIT */{
-        //Delete Currently Running PCB
+    if(op == 0) /* EXIT */ {
         pcb_free(CURRENT_PCB);
         CURRENT_PCB = NULL;
 
-        //check if there is a ready process in the queue
+        // **recompute** who's next *after* freeing the old process**
+        nextPCB = find_first_ready();
         if (nextPCB != NULL) {
-            //remove the process from the queue to be exited
             pcb_remove(nextPCB);
             CURRENT_PCB = nextPCB;
-            //set its state to runnning
             CURRENT_PCB->state = RUNNING;
-            //save the context of the process while it is being run
             context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
-            //make sure the return value seen by sys_req is zero
             next_ctx->EAX = 0;
-            //return the running process' context
             return next_ctx;
         }
         else {
-            //if there is no ready process in the queue, return the global context
-            context* next_ctx = GLOBAL_CTX;
-            //make sure the value seen by sys_req is zero
-            next_ctx->EAX = 0;
+            GLOBAL_CTX->EAX = 0;
             return GLOBAL_CTX;
         }
     }
 
     else if (op == 1) /* IDLE */ {
-
-        //Save Global Context
-        if(GLOBAL_CTX == NULL) {
+        if (GLOBAL_CTX == NULL) {
             GLOBAL_CTX = ctx;
         }
-        //as long as the current pcb is not null, store the context of the current pcb and insert it back into the queue before the next
-        //process is run (context switch)
-        if(CURRENT_PCB != NULL){
+        if (CURRENT_PCB != NULL) {
             CURRENT_PCB->stack_ptr = (unsigned char*)ctx;
-            CURRENT_PCB->state = READY_NOT_SUS;
+            CURRENT_PCB->state     = READY_NOT_SUS;
             pcb_insert(CURRENT_PCB);
             CURRENT_PCB = NULL;
         }
 
-         //if any nonsuspended PCBs in queue, remove first from queue, store in temp variable as next process
-        if(nextPCB != NULL){
-            //remove the next process from the queue
+        // **only now** look for the next ready PCB
+        nextPCB = find_first_ready();
+        if (nextPCB != NULL) {
             pcb_remove(nextPCB);
-            
-            //set the current pcb to the next process if there is no process running
             CURRENT_PCB = nextPCB;
-            //set its state to running in the system
             CURRENT_PCB->state = RUNNING;
-            //return the context of the next process
             context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
             next_ctx->EAX = 0;
             return next_ctx;
         }
         else {
-            //if there are no ready processes in the queue, return the global context of the first process run in the system
-            context* next_ctx = GLOBAL_CTX;
-            next_ctx->EAX = 0;
-            return next_ctx;
+            GLOBAL_CTX->EAX = 0;
+            return GLOBAL_CTX;
         }
-
     }
     else if (op == 2) /* READ */{
 

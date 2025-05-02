@@ -343,7 +343,7 @@ int serial_open(device dev, int speed)
 			return -1; // invalid device number
 	}
 
-	idt_install(vector, (void (*)(void*))serial_isr);
+	idt_install(0x24, (void (*)(void*))serial_isr); // hard-code for com1
 
 	/**
 	* 4. Compute the required baud rate divisor.
