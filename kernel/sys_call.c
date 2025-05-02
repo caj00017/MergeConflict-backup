@@ -289,7 +289,9 @@ void IO_Completion(context* ctx, iocb* current_iocb){
    current_iocb->process->state = 1;
    pcb_insert(current_iocb->process);
 
-   ctx->EAX = current_iocb->transferred;
+   context* proc_ctx = (context*)current_iocb->process->stack_ptr;
+
+   proc_ctx->EAX = current_iocb->transferred;
 
    current_dcb->queue_head = current_iocb->next;
 
