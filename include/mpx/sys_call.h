@@ -17,7 +17,7 @@ extern pcb* nextPCB;
  * @brief system call function that handles all system calls from the user
  * @param ctx the context of the current process
  * @return the context of the next process
- * @authors Evan Humphrey, Izaak Whetsell, Chris Jones
+ * @authors Evan Humphrey, Izaak Whetsell, Chris Jones, Tanner Forbes
  */
 context* sys_call(context* ctx);
 
@@ -28,6 +28,19 @@ context* sys_call(context* ctx);
  */
 pcb* find_first_ready(void);
 
+/**
+ * @brief Processes Input and Output Requests
+ * @param ctx the context of the current process
+ * @param op_code the op_code of the current request
+ * @return an code of whether it scheduled successfully or not
+ * @author Tanner Forbes
+ */
 int IO_Scheduler(context* ctx, int op_code);
 
+/**
+ * @brief Completes the IO request when flag is signaled
+ * @param ctx the context of the current process
+ * @param current_iocb the current iocb whose IO request has been completed
+ * @author Tanner Forbes
+ */
 void IO_Completion(context* ctx, iocb* current_iocb);
