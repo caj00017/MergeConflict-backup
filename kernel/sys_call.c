@@ -126,7 +126,9 @@ context* sys_call(context* ctx) {
                 CURRENT_PCB->state = 3;
                 pcb_insert(CURRENT_PCB);
             }
-    
+
+            sys_req(IDLE);
+
             IO_Scheduler(ctx, 3);
     
             if (nextPCB != NULL) {
@@ -172,6 +174,8 @@ context* sys_call(context* ctx) {
                 CURRENT_PCB->state = 3;
                 pcb_insert(CURRENT_PCB);
             }
+
+            sys_req(IDLE);
 
             IO_Scheduler(ctx, 3);
 
