@@ -102,11 +102,11 @@ context* sys_call(context* ctx) {
         else{
             if(CURRENT_PCB != NULL){
                 pcb_remove(CURRENT_PCB);
-                CURRENT_PCB->state = 3;
+                CURRENT_PCB->state = BLOCKED_NOT_SUS;
                 pcb_insert(CURRENT_PCB);
             }
-    
-            IO_Scheduler(ctx, 3);
+
+            IO_Scheduler(ctx, 2);
     
             if (nextPCB != NULL) {
                 //remove the process from the queue to be exited
@@ -146,32 +146,32 @@ context* sys_call(context* ctx) {
             current_dcb->status = 2;
         }
         else{
-            if(CURRENT_PCB != NULL){
-                pcb_remove(CURRENT_PCB);
-                CURRENT_PCB->state = 3;
-                pcb_insert(CURRENT_PCB);
-            }
-
             IO_Scheduler(ctx, 3);
-
-            if (nextPCB != NULL) {
-                //remove the process from the queue to be exited
-                pcb_remove(nextPCB);
-                CURRENT_PCB = nextPCB;
-                //set its state to runnning
-                CURRENT_PCB->state = RUNNING;
-                //save the context of the process while it is being run
-                context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
-                //make sure the return value seen by sys_req is zero
-                next_ctx->EAX = 0;
-                //return the running process' context
-                return next_ctx;
-            }
-            else{
-                GLOBAL_CTX->EAX = 0;
-                return GLOBAL_CTX;
-            }
         }
+
+        if(CURRENT_PCB != NULL){
+            pcb_remove(CURRENT_PCB);
+            CURRENT_PCB->state = BLOCKED_NOT_SUS;
+            pcb_insert(CURRENT_PCB);
+        }
+        if (nextPCB != NULL) {
+            //remove the process from the queue to be exited
+            pcb_remove(nextPCB);
+            CURRENT_PCB = nextPCB;
+            //set its state to runnning
+            CURRENT_PCB->state = RUNNING;
+            //save the context of the process while it is being run
+            context* next_ctx = (context*) CURRENT_PCB->stack_ptr;
+            //make sure the return value seen by sys_req is zero
+            next_ctx->EAX = 0;
+            //return the running process' context
+            return next_ctx;
+        }
+        else{
+            GLOBAL_CTX->EAX = 0;
+            return GLOBAL_CTX;
+        }
+
         ctx->EAX = 0;
         return ctx;
     }
@@ -239,13 +239,18 @@ int IO_Scheduler(context* ctx, int op_code) {
         return -1;
     }
 
+
+
     current_dcb = get_dcb(ctx->EBX);
+
+    if(CURRENT_PCB != NULL){
+        pcb_remove(CURRENT_PCB);
+        CURRENT_PCB->state = BLOCKED_NOT_SUS;
+        pcb_insert(CURRENT_PCB);
+    }
 
     if(current_dcb->queue_head == NULL){
         current_dcb->queue_head = new_iocb;
-
-        
-
     }
     else{
         iocb* current = current_dcb->queue_head;
@@ -264,7 +269,9 @@ void IO_Completion(context* ctx, iocb* current_iocb){
    current_iocb->process->state = 1;
    pcb_insert(current_iocb->process);
 
-   ctx->EAX = current_iocb->transferred;
+   context* proc_ctx = (context*)current_iocb->process->stack_ptr;
+
+   proc_ctx->EAX = current_iocb->transferred;
 
    current_dcb->queue_head = current_iocb->next;
 

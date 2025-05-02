@@ -178,10 +178,22 @@ dcb* get_dcb(int devno);
  */
 int get_irq(int devno);
 
-dcb* get_dcb(int dev);
-
+/**
+ * @brief Allocates memory for a new iocb and intilizes its structure members
+ * @param current_pcb The current pcb that is going to be the process of the iocb
+ * @param new_buffer The pointer to the buffer of the new iocb
+ * @param new_length The size of the buffer length
+ * @param op_code The op code of the request
+ * @return A pointer to the newly created iocb
+ * @author Tanner Forbes
+ */
 iocb* iocb_setup(struct pcb* current_pcb, char* new_buffer, size_t new_length, int op_code);
 
+/**
+ * @brief Clears the memory of the given iocb
+ * @param cur_iocb A pointer to the iocb to be cleared and freed
+ * @author Tanner Forbes
+ */
 void iocb_clear(struct iocb* cur_iocb);
 
 #endif
